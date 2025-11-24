@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="icon" type="image/png" href="/static/images/favicon/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/static/images/favicon/favicon.svg" />
+    <link rel="shortcut icon" href="/static/images/favicon/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/images/favicon/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="MyWebSite" />
+    <link rel="manifest" href="/static/images/favicon/site.webmanifest" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Dojo Bay - Public Dojo Directory</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: #e74c3c;
+            --primary-dark: #c0392b;
+            --primary-light: #ec7063;
+            --dark-bg: #1e1e1e;
+            --card-bg: #2a2a2a;
+            --card-hover: #353535;
+            --border: #444;
+            --text-muted: #aaa;
+            --text-primary: #e0e0e0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background-color: #1a1a1a !important;
+            border-bottom: 2px solid var(--primary);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            color: var(--primary) !important;
+            font-weight: 700;
+            font-size: 1.75rem;
+            letter-spacing: -0.5px;
+        }
+
+        .navbar-brand:hover {
+            color: var(--primary-dark) !important;
+        }
+
+        .nav-link {
+            color: #ddd !important;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--primary) !important;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #000 0%, #1a1a1a 50%, #000 100%);
+            padding: 5rem 0;
+            border-bottom: 3px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(231, 76, 60, 0.1) 0%, transparent 50%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            color: var(--primary);
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 30px rgba(231, 76, 60, 0.3);
+        }
+
+        .hero .lead {
+            font-size: 1.5rem;
+            color: #ccc;
+            margin-bottom: 2rem;
+        }
+
+        .btn-warning {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: #000;
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-warning:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn-outline-warning {
+            border-color: var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-outline-warning:hover {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .section-title {
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 3rem;
+            font-size: 2.5rem;
+            text-align: center;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            height: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.2);
+            background-color: var(--card-hover);
+            z-index: 10;
+        }
+
+        .feature-icon {
+            color: var(--primary);
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h4 {
+            color: #fff;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .status-active {
+            background-color: #28a745;
+            box-shadow: 0 0 15px #28a745;
+        }
+
+        .status-inactive {
+            background-color: #dc3545;
+            animation: none;
+        }
+
+        .status-out-of-service {
+            background-color: #6c757d;
+            animation: none;
+        }
+
+        .status-section {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            border: 1px solid var(--border);
+            position: relative;
+            z-index: 1;
+        }
+
+        .status-section h4 {
+            color: #fff;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        #status {
+            padding-top: 3rem;
+            padding-bottom: 3rem;
+            clear: both;
+        }
+
+        .dojo-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .dojo-item:hover {
+            background-color: rgba(231, 76, 60, 0.05);
+            border-left: 3px solid var(--primary);
+            padding-left: calc(1rem - 3px);
+        }
+
+        .dojo-item:last-child {
+            border-bottom: none;
+        }
+
+        .dojo-name {
+            color: #fff;
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+
+        .onion-link {
+            color: #9b59b6;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+        }
+
+        .badge-network {
+            background-color: var(--primary);
+            color: #000;
+            font-weight: 700;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .badge-status {
+            font-weight: 600;
+            padding: 0.4rem 0.8rem;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-hover) 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stats-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .update-time {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .spinner-border {
+            color: var(--primary);
+            width: 3rem;
+            height: 3rem;
+        }
+
+        footer {
+            background-color: #000;
+            border-top: 2px solid var(--primary);
+            padding: 3rem 0;
+            margin-top: 5rem;
+        }
+
+        footer h5 {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        footer a:hover {
+            color: var(--primary);
+        }
+
+        .accordion-button:not(.collapsed) {
+            background-color: var(--card-hover) !important;
+            color: var(--primary) !important;
+        }
+
+        .accordion-button:focus {
+            box-shadow: none;
+            border-color: var(--border);
+        }
+
+        .accordion-button:hover {
+            background-color: var(--card-hover) !important;
+        }
+
+        .accordion-item {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 0.5rem !important;
+        }
+
+        .accordion-body {
+            background-color: var(--dark-bg) !important;
+            color: #e0e0e0 !important;
+        }
+
+        .alert {
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            clear: both;
+            position: relative;
+            z-index: 1;
+        }
+
+        .about-card {
+            background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-hover) 100%);
+            border-radius: 12px;
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .about-card h2 {
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .about-card .lead {
+            color: #ddd;
+            font-size: 1.15rem;
+            line-height: 1.8;
+        }
+
+        .about-card ul {
+            color: var(--text-muted);
+        }
+
+        .about-card ul li {
+            margin-bottom: 0.75rem;
+            line-height: 1.6;
+        }
+
+        .about-card strong {
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero .lead {
+                font-size: 1.2rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            /* Mobile accordion adjustments */
+            .accordion-body {
+                padding: 0.75rem !important;
+            }
+
+            /* Hide QR on mobile or make it smaller and stack below */
+            .accordion-body>div[style*="position: absolute"] {
+                position: static !important;
+                width: 200px !important;
+                height: 200px !important;
+                margin: 1rem auto !important;
+                padding: 1rem !important;
+            }
+
+            .accordion-body>div[style*="position: absolute"] img {
+                width: 170px !important;
+                height: 170px !important;
+            }
+
+            /* Remove right margin on content wrapper for mobile */
+            .accordion-body>div[style*="margin-right"] {
+                margin-right: 0 !important;
+            }
+
+            /* Make pairing details full width on mobile */
+            .accordion-body div[style*="max-width: 750px"] {
+                max-width: 100% !important;
+            }
+
+            /* Adjust font size for mobile readability */
+            .accordion-body pre {
+                font-size: 0.65rem !important;
+                padding: 0.75rem !important;
+            }
+
+            /* Stack info items better on mobile */
+            .accordion-body .mb-2 {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">The Dojo Bay</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/faq">FAQ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/disclaimer">Disclaimer</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="container hero-content">
+            <div class="text-center">
+                <h1>
+                    <img src="/static/images/DojobayV2.png" alt="The Dojo Bay"
+                        style="height: 260px; filter: drop-shadow(0 0 12px rgba(231, 76, 60, 0.5));">
+                </h1>
+                <p class="lead">Welcome to The Dojo Bay, a place where you can find public dojos</p>
+                <p style="color: #e0e0e0; font-size: 1.1rem;">Please have a look at the Disclaimer and FAQ</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Status Section -->
+    <div class="container my-5 py-4" id="status">
+        <div id="status-container">
+            <div class="loading">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-3" style="color: var(--text-muted); font-size: 1.1rem;">
+                    Checking Dojo network status...
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 text-center mb-4">
+                    <p>
+                        <a href="http://dojobay.pw" target="_blank" style="font-size: 1.1rem; margin-right: 2rem;">
+                            <i class="bi bi-globe2"></i> dojobay.pw
+                        </a>
+                        <a href="http://dojobayrdodoggmcrq5xrzfxhnvh4h52ti4d7oclegps3tlliv3e66qd.onion/" target="_blank"
+                            style="font-size: 1.1rem;">
+                            <i class="bi bi-incognito"></i> Onion URL
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let updateInterval;
+        let lastUpdate = null;
+
+        function showSignature(network, index) {
+            const signatureDiv = document.getElementById(`signature-${network}-${index}`);
+            if (signatureDiv.style.display === 'none' || signatureDiv.style.display === '') {
+                signatureDiv.style.display = 'block';
+            } else {
+                signatureDiv.style.display = 'none';
+            }
+        }
+
+        function copySignature(button, index, network) {
+            const preElement = document.getElementById(`signature-text-${network}-${index}`);
+            const text = preElement.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<i class="bi bi-check"></i> Copied!';
+                button.style.borderColor = '#00ff00';
+                button.style.color = '#00ff00';
+
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                button.innerHTML = '<i class="bi bi-x"></i> Failed';
+                setTimeout(() => {
+                    button.innerHTML = '<i class="bi bi-clipboard"></i> Copy';
+                }, 2000);
+            });
+        }
+
+        function copyPairingDetails(button, index, network) {
+            const preElement = document.getElementById(`pairing-${network}-${index}`);
+            const text = preElement.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<i class="bi bi-check"></i> Copied!';
+                button.style.borderColor = '#00ff00';
+                button.style.color = '#00ff00';
+
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                button.innerHTML = '<i class="bi bi-x"></i> Failed';
+                setTimeout(() => {
+                    button.innerHTML = '<i class="bi bi-clipboard"></i> Copy';
+                }, 2000);
+            });
+        }
+
+        async function loadStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+
+                if (data.error) {
+                    showError(data.error);
+                    return;
+                }
+
+                renderStatus(data);
+                lastUpdate = new Date();
+            } catch (error) {
+                showError('Failed to load status. Please check your Tor connection.');
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('status-container').innerHTML = `
+                <div class="alert alert-danger" role="alert" style="background-color: var(--card-bg); border-color: #dc3545;">
+                    <i class="bi bi-exclamation-triangle-fill"></i> 
+                    <strong>Error:</strong> ${message}
+                </div>
+            `;
+        }
+
+        function renderStatus(data) {
+            const stats = data.stats || {
+                mainnet_active: 0,
+                mainnet_total: data.mainnet.length,
+                testnet_active: 0,
+                testnet_total: data.testnet.length
+            };
+
+            const totalActive = stats.mainnet_active + stats.testnet_active;
+            const totalNodes = stats.mainnet_total + stats.testnet_total;
+
+            let html = `
+                <!-- Stats Overview -->
+                <div class="row g-4 mb-5">
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="stats-number">${totalActive}/${totalNodes}</div>
+                            <div class="stats-label">Total Active</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="stats-number">${stats.mainnet_active}/${stats.mainnet_total}</div>
+                            <div class="stats-label">Mainnet</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="stats-number">${stats.testnet_active}/${stats.testnet_total}</div>
+                            <div class="stats-label">Testnet</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mainnet Nodes -->
+                <div class="status-section">
+                    <h4>
+                        <span class="badge badge-network me-2">MAINNET</span>
+                    </h4>
+                    <div class="accordion accordion-flush" id="accordionMainnet">
+                        ${data.mainnet.map((dojo, index) => `
+                            <div class="accordion-item" style="background-color: var(--card-bg); border-color: var(--border); margin-bottom: 0.5rem;">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#mainnet${index}" style="background-color: var(--card-bg); color: #f5f5f5; border: none;">
+                                        <div class="d-flex align-items-center w-100">
+                                            <span class="status-indicator status-${dojo.status.toLowerCase().replace(' ', '-')}"></span>
+                                            <span class="dojo-name me-auto">
+                                                ${dojo.name}
+                                                ${dojo.signature ? '<i class="bi bi-shield-check ms-2" style="color: #00ff00; font-size: 0.9rem;"></i>' : ''}
+                                            </span>
+                                            <span class="badge badge-status ${dojo.status === 'Active' ? 'bg-success' : dojo.status === 'Out of Service' ? 'bg-secondary' : 'bg-danger'} me-2">
+                                                ${dojo.status}
+                                            </span>
+                                        </div>
+                                    </button>
+                                </h2>
+                                <div id="mainnet${index}" class="accordion-collapse collapse" data-bs-parent="#accordionMainnet">
+                                    <div class="accordion-body" style="background-color: var(--dark-bg); color: #e0e0e0; position: relative;">
+                                        ${dojo.image ? `
+                                            ${dojo.signature ? `<i class="bi bi-shield-check" onclick="showSignature('mainnet', ${index})" style="position: absolute; top: 1rem; right: 300px; color: #00ff00; font-size: 1.5rem; z-index: 10; cursor: pointer;" title="View Signature"></i>` : ''}
+                                            <div style="position: absolute; top: 1rem; right: 1rem; background-color: #fff; border: 1px solid #00ff00; border-radius: 8px; padding: 1.5rem; width: 280px; height: 280px; display: flex; align-items: center; justify-content: center;">
+                                                <img src="${dojo.image}" alt="QR Code" style="width: 250px; height: 250px; object-fit: contain; display: block;">
+                                            </div>
+                                        ` : ''}
+                                        <div style="margin-right: ${dojo.image ? '300px' : '0'};">
+                                        ${dojo.paynym ? `
+                                            <div class="mb-2">
+                                                <i class="bi bi-person-badge" style="color: var(--primary);"></i> 
+                                                <strong>PayNym:</strong> 
+                                                <a href="${dojo.paynym_url}" target="_blank" style="color: var(--primary);">${dojo.paynym}</a>
+                                            </div>
+                                        ` : ''}
+                                        ${dojo.nostr ? `
+                                            <div class="mb-2">
+                                                <i class="bi bi-lightning" style="color: var(--primary);"></i> 
+                                                <strong>Nostr:</strong> 
+                                                <a href="${dojo.nostr_url}" target="_blank" style="color: var(--primary);">${dojo.nostr}</a>
+                                            </div>
+                                        ` : ''}
+                                        ${dojo.x ? `
+                                            <div class="mb-2">
+                                                <i class="bi bi-twitter-x" style="color: var(--primary);"></i> 
+                                                <strong>X:</strong> 
+                                                <a href="${dojo.x_url}" target="_blank" style="color: var(--primary);">${dojo.x}</a>
+                                            </div>
+                                        ` : ''}
+                                        ${dojo.nym ? `
+                                            <div class="mb-2">
+                                                <i class="bi bi-person" style="color: var(--primary);"></i> 
+                                                <strong>Nym:</strong> ${dojo.nym}
+                                            </div>
+                                        ` : ''}
+                                        ${dojo.jurisdiction ? `
+                                            <div class="mb-2">
+                                                <i class="bi bi-geo-alt" style="color: var(--primary);"></i> 
+                                                <strong>Jurisdiction:</strong> ${dojo.jurisdiction}
+                                            </div>
+                                        ` : ''}
+                                        ${dojo.hardware ? `
+                                            <div class="mb-2">
+                                                <i class="bi bi-cpu" style="color: var(--primary);"></i> 
+                                                <strong>Hardware:</strong> ${dojo.hardware}
+                                            </div>
+                                        ` : ''}
+                                        <div style="font-size: 0.85rem; margin-top: 1rem; color: #e0e0e0;">
+                                            <i class="bi bi-clock"></i> Checked at: ${dojo.checked_at}
+                                        </div>
+                                        ${dojo.pairing ? `
+                                            <div style="background-color: var(--card-bg); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin-top: 1rem; max-width: 750px;">
+                                                <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0.75rem;">
+                                                    <div style="color: #00ff00; font-weight: 600; font-size: 0.95rem;">
+                                                        <i class="bi bi-link-45deg"></i> PAIRING DETAILS
+                                                    </div>
+                                                    <button class="btn btn-sm" style="background-color: transparent; border: 1px solid #00ff00; color: #00ff00; padding: 0.25rem 0.75rem; font-size: 0.8rem;" onclick="copyPairingDetails(this, ${index}, 'mainnet')" title="Copy to clipboard">
+                                                        <i class="bi bi-clipboard"></i> Copy
+                                                    </button>
+                                                </div>
+                                                <pre id="pairing-mainnet-${index}" style="background-color: #000; color: #00ff00; padding: 1rem; border-radius: 6px; font-size: 0.75rem; margin: 0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; border: 1px solid #00ff00;">{
+  "pairing": {
+    "type": "${dojo.pairing.type || 'N/A'}",
+    "version": "${dojo.pairing.version || 'N/A'}",
+    "apikey": "${dojo.pairing.apikey || 'N/A'}",
+    "url": "${dojo.pairing.url || 'N/A'}"
+  },
+  "explorer": {
+    "type": "${dojo.explorer ? dojo.explorer.type || 'N/A' : 'N/A'}",
+    "url": "${dojo.explorer ? dojo.explorer.url || 'N/A' : 'N/A'}"
+  }
+}</pre>
+                                            </div>
+                                        ` : ''}
+                                        ${dojo.signature ? `
+                                            <div id="signature-mainnet-${index}" style="display: none; background-color: var(--card-bg); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin-top: 1rem; max-width: 750px;">
+                                                <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0.75rem;">
+                                                    <div style="color: #00ff00; font-weight: 600; font-size: 0.95rem;">
+                                                        <i class="bi bi-shield-check"></i> SIGNATURE
+                                                    </div>
+                                                    <button class="btn btn-sm" style="background-color: transparent; border: 1px solid #00ff00; color: #00ff00; padding: 0.25rem 0.75rem; font-size: 0.8rem;" onclick="copySignature(this, ${index}, 'mainnet')" title="Copy to clipboard">
+                                                        <i class="bi bi-clipboard"></i> Copy
+                                                    </button>
+                                                </div>
+                                                <pre id="signature-text-mainnet-${index}" style="background-color: #000; color: #00ff00; padding: 1rem; border-radius: 6px; font-size: 0.7rem; margin: 0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; border: 1px solid #00ff00;">${dojo.signature}</pre>
+                                            </div>
+                                        ` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Testnet Nodes -->
+                <div class="status-section">
+                    <h4>
+                        <span class="badge bg-info text-dark me-2" style="font-weight: 700; padding: 0.5rem 1rem;">TESTNET</span>
+                    </h4>
+                    <div class="accordion accordion-flush" id="accordionTestnet">
+                        ${data.testnet.map((dojo, index) => `
+                            <div class="accordion-item" style="background-color: var(--card-bg); border-color: var(--border); margin-bottom: 0.5rem;">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#testnet${index}" style="background-color: var(--card-bg); color: #f5f5f5; border: none;">
+                                        <div class="d-flex align-items-center w-100">
+                                            <span class="status-indicator status-${dojo.status.toLowerCase().replace(' ', '-')}"></span>
+                                            <span class="dojo-name me-auto">
+                                                ${dojo.name}
+                                                ${dojo.signature ? '<i class="bi bi-shield-check ms-2" style="color: #00ff00; font-size: 0.9rem;"></i>' : ''}
+                                            </span>
+                                            <span class="badge badge-status ${dojo.status === 'Active' ? 'bg-success' : dojo.status === 'Out of Service' ? 'bg-secondary' : 'bg-danger'} me-2">
+                                                ${dojo.status}
+                                            </span>
+                                        </div>
+                                    </button>
+                                </h2>
+                                <div id="testnet${index}" class="accordion-collapse collapse" data-bs-parent="#accordionTestnet">
+                                    <div class="accordion-body" style="background-color: var(--dark-bg); color: #e0e0e0; position: relative;">
+                                        ${dojo.image ? `
+                                            ${dojo.signature ? `<i class="bi bi-shield-check" onclick="showSignature('testnet', ${index})" style="position: absolute; top: 1rem; right: 300px; color: #00ff00; font-size: 1.5rem; z-index: 10; cursor: pointer;" title="View Signature"></i>` : ''}
+                                            <div style="position: absolute; top: 1rem; right: 1rem; background-color: #fff; border: 1px solid #00ff00; border-radius: 8px; padding: 1.5rem; width: 280px; height: 280px; display: flex; align-items: center; justify-content: center;">
+                                                <img src="${dojo.image}" alt="QR Code" style="width: 250px; height: 250px; object-fit: contain; display: block;">
+                                            </div>
+                                        ` : ''}
+                                        <div style="margin-right: ${dojo.image ? '300px' : '0'};">
+                                        ${dojo.paynym ? `
+                                            <div class="mb-2">
+                                                <i class="bi bi-person-badge" style="color: var(--primary);"></i> 
+                                                <strong>PayNym:</strong> 
+                                                <a href="${dojo.paynym_url}" target="_blank" style="color: var(--primary);">${dojo.paynym}</a>
+                                            </div>
+                                        ` : ''}
+                                        ${dojo.nostr ? `
+                                            <div class="mb-2">
+                                                <i class="bi bi-lightning" style="color: var(--primary);"></i> 
+                                                <strong>Nostr:</strong> 
+                                                <a href="${dojo.nostr_url}" target="_blank" style="color: var(--primary);">${dojo.nostr}</a>
+                                            </div>
+                                        ` : ''}
+                                        ${dojo.x ? `
+                                            <div class="mb-2">
+                                                <i class="bi bi-twitter-x" style="color: var(--primary);"></i> 
+                                                <strong>X:</strong> 
+                                                <a href="${dojo.x_url}" target="_blank" style="color: var(--primary);">${dojo.x}</a>
+                                            </div>
+                                        ` : ''}
+                                        ${dojo.nym ? `
+                                            <div class="mb-2">
+                                                <i class="bi bi-person" style="color: var(--primary);"></i> 
+                                                <strong>Nym:</strong> ${dojo.nym}
+                                            </div>
+                                        ` : ''}
+                                        ${dojo.jurisdiction ? `
+                                            <div class="mb-2">
+                                                <i class="bi bi-geo-alt" style="color: var(--primary);"></i> 
+                                                <strong>Jurisdiction:</strong> ${dojo.jurisdiction}
+                                            </div>
+                                        ` : ''}
+                                        ${dojo.hardware ? `
+                                            <div class="mb-2">
+                                                <i class="bi bi-cpu" style="color: var(--primary);"></i> 
+                                                <strong>Hardware:</strong> ${dojo.hardware}
+                                            </div>
+                                        ` : ''}
+                                        <div style="font-size: 0.85rem; margin-top: 1rem; color: #e0e0e0;">
+                                            <i class="bi bi-clock"></i> Checked at: ${dojo.checked_at}
+                                        </div>
+                                        ${dojo.pairing ? `
+                                            <div style="background-color: var(--card-bg); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin-top: 1rem; max-width: 750px;">
+                                                <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0.75rem;">
+                                                    <div style="color: #00ff00; font-weight: 600; font-size: 0.95rem;">
+                                                        <i class="bi bi-link-45deg"></i> PAIRING DETAILS
+                                                    </div>
+                                                    <button class="btn btn-sm" style="background-color: transparent; border: 1px solid #00ff00; color: #00ff00; padding: 0.25rem 0.75rem; font-size: 0.8rem;" onclick="copyPairingDetails(this, ${index}, 'testnet')" title="Copy to clipboard">
+                                                        <i class="bi bi-clipboard"></i> Copy
+                                                    </button>
+                                                </div>
+                                                <pre id="pairing-testnet-${index}" style="background-color: #000; color: #00ff00; padding: 1rem; border-radius: 6px; font-size: 0.75rem; margin: 0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; border: 1px solid #00ff00;">{
+  "pairing": {
+    "type": "${dojo.pairing.type || 'N/A'}",
+    "version": "${dojo.pairing.version || 'N/A'}",
+    "apikey": "${dojo.pairing.apikey || 'N/A'}",
+    "url": "${dojo.pairing.url || 'N/A'}"
+  },
+  "explorer": {
+    "type": "${dojo.explorer ? dojo.explorer.type || 'N/A' : 'N/A'}",
+    "url": "${dojo.explorer ? dojo.explorer.url || 'N/A' : 'N/A'}"
+  }
+}</pre>
+                                            </div>
+                                        ` : ''}
+                                        ${dojo.signature ? `
+                                            <div id="signature-testnet-${index}" style="display: none; background-color: var(--card-bg); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin-top: 1rem; max-width: 750px;">
+                                                <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0.75rem;">
+                                                    <div style="color: #00ff00; font-weight: 600; font-size: 0.95rem;">
+                                                        <i class="bi bi-shield-check"></i> SIGNATURE
+                                                    </div>
+                                                    <button class="btn btn-sm" style="background-color: transparent; border: 1px solid #00ff00; color: #00ff00; padding: 0.25rem 0.75rem; font-size: 0.8rem;" onclick="copySignature(this, ${index}, 'testnet')" title="Copy to clipboard">
+                                                        <i class="bi bi-clipboard"></i> Copy
+                                                    </button>
+                                                </div>
+                                                <pre id="signature-text-testnet-${index}" style="background-color: #000; color: #00ff00; padding: 1rem; border-radius: 6px; font-size: 0.7rem; margin: 0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; border: 1px solid #00ff00;">${dojo.signature}</pre>
+                                            </div>
+                                        ` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="update-time">
+                    <i class="bi bi-clock-history"></i> Last updated: ${data.last_update}
+                    <br>
+                    <small style="color: #666;">Next update in 5 minutes</small>
+                </div>
+            `;
+
+            document.getElementById('status-container').innerHTML = html;
+        }
+
+        // Load status on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStatus();
+
+            // Auto-refresh every 5 minutes
+            updateInterval = setInterval(loadStatus, 5 * 60 * 1000);
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (updateInterval) {
+                clearInterval(updateInterval);
+            }
+        });
+    </script>
+</body>
+
+</html>

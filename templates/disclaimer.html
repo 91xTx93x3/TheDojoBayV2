@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Disclaimer - The Dojo Bay{% endblock %}
+
+{% block extra_css %}
+.about-card {
+    background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-hover) 100%);
+    border-radius: 12px;
+    padding: 2.5rem;
+    border: 1px solid var(--border);
+    margin-bottom: 2rem;
+}
+
+.about-card h2 {
+    color: var(--primary);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.about-card .lead {
+    color: #ddd;
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="about-card">
+                <h2 class="text-center mb-4">
+                    <i class="bi bi-exclamation-triangle-fill"></i> Disclaimer
+                </h2>
+                <p class="lead mb-4">
+                    As DojoBay (website), we do not collect any extended public keys (xpubs) from any node, 
+                    and we will not provide any information to third parties. However, please keep in mind 
+                    that node runners are independent and we cannot speak for their actions.
+                </p>
+                <p class="lead mb-4">
+                    We strongly encourage you to consider having your own node, not only for the sake of 
+                    decentralization but also for your own sovereignty and privacy.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
