@@ -11,7 +11,7 @@ app = Flask(__name__)
 # Configuration
 DEFAULT_PROXIES = {"http": "socks5h://127.0.0.1:9050", "https": "socks5h://127.0.0.1:9050"}
 CACHE_FILE = Path(__file__).parent / "status_cache.json"
-CACHE_DURATION = 300  # 5 minutos en segundos
+CACHE_DURATION = 600  # 10 minutos en segundos
 
 # Load Dojo URLs from JSON file
 DOJOS_DATA_FILE = Path(__file__).parent / "dojos_data.json"

@@ -597,21 +597,62 @@
             });
         }
 
+        let cachedData = null;
+
         async function loadStatus() {
+            // Show loading spinner during update
+            if (cachedData !== null) {
+                document.getElementById('status-container').innerHTML = `
+                    <div class="loading">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Updating...</span>
+                        </div>
+                        <p class="mt-3" style="color: var(--text-muted); font-size: 1.1rem;">
+                            Updating node status...
+                        </p>
+                    </div>
+                `;
+            }
+
             try {
                 const response = await fetch('/api/status');
                 const data = await response.json();
 
                 if (data.error) {
-                    showError(data.error);
+                    // If we have cached data, keep showing it
+                    if (cachedData !== null) {
+                        renderStatus(cachedData);
+                        showUpdateWarning();
+                    } else {
+                        showError(data.error);
+                    }
                     return;
                 }
 
+                cachedData = data;
                 renderStatus(data);
                 lastUpdate = new Date();
             } catch (error) {
-                showError('Failed to load status. Please check your Tor connection.');
+                // On error, keep showing cached data if available
+                if (cachedData !== null) {
+                    renderStatus(cachedData);
+                    showUpdateWarning();
+                } else {
+                    showError('Unable to connect to server. Please try again later.');
+                }
             }
+        }
+
+        function showUpdateWarning() {
+            const container = document.getElementById('status-container');
+            const warning = document.createElement('div');
+            warning.className = 'alert alert-warning';
+            warning.style.cssText = 'background-color: var(--card-bg); border-color: #ffc107; margin-bottom: 1rem;';
+            warning.innerHTML = `
+                <i class="bi bi-exclamation-circle"></i> 
+                <strong>Notice:</strong> Unable to fetch latest updates. Showing last known status.
+            `;
+            container.insertBefore(warning, container.firstChild);
         }
 
         function showError(message) {
@@ -896,7 +937,7 @@
                 <div class="update-time">
                     <i class="bi bi-clock-history"></i> Last updated: ${data.last_update}
                     <br>
-                    <small style="color: #666;">Next update in 5 minutes</small>
+                    <small style="color: #666;">Next update in 10 minutes</small>
                 </div>
             `;
 
@@ -907,8 +948,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadStatus();
 
-            // Auto-refresh every 5 minutes
-            updateInterval = setInterval(loadStatus, 5 * 60 * 1000);
+            // Auto-refresh every 10 minutes
+            updateInterval = setInterval(loadStatus, 10 * 60 * 1000);
         });
 
         // Cleanup on page unload
