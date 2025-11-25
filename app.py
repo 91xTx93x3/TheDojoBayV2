@@ -39,10 +39,20 @@ def index():
     if cached:
         return render_template('index.html', status=cached)
     
-    # No cache available, perform check
-    status = checker.check_all(mainnet_dojos, testnet_dojos)
-    cache.save(status)
-    return render_template('index.html', status=status)
+    # No cache available, return empty state - JS will fetch via API
+    from datetime import datetime
+    empty_status = {
+        "mainnet": [],
+        "testnet": [],
+        "last_update": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "stats": {
+            "mainnet_active": 0,
+            "mainnet_total": len(mainnet_dojos),
+            "testnet_active": 0,
+            "testnet_total": len(testnet_dojos)
+        }
+    }
+    return render_template('index.html', status=empty_status)
 
 
 @app.route('/about')
