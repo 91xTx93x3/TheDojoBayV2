@@ -3,21 +3,19 @@
 {% block title %}FAQ - The Dojo Bay{% endblock %}
 
 {% block extra_css %}
-<style>
-    .card {
-        background-color: var(--card-bg);
-        border: 1px solid var(--border);
-        margin-bottom: 1.5rem;
-    }
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+}
 
-    .card h5 {
-        color: var(--primary);
-    }
+.card h5 {
+    color: var(--primary);
+}
 
-    .alert {
-        margin-bottom: 1rem;
-    }
-</style>
+.alert {
+    margin-bottom: 1rem;
+}
 {% endblock %}
 
 {% block content %}
@@ -27,47 +25,46 @@
             <h2 class="text-center mb-5" style="color: var(--primary);">
                 <i class="bi bi-question-circle-fill"></i> FAQ
             </h2>
-
+            
             <h3 class="mb-4 text-center" style="color: var(--primary);">FOR THE DOJO SEEKERS</h3>
-
+            
             <div class="card p-4 mb-4">
                 <h5 class="mb-3"><i class="bi bi-exclamation-circle"></i> Important Reminder</h5>
-                <p><strong>Do not delete your Ashigaru or Samourai wallet if you do not remember the
-                        passphrase.</strong></p>
+                <p><strong>Do not delete your Ashigaru or Samourai wallet if you do not remember the passphrase.</strong></p>
                 <p>
-                    The passphrase is only displayed once when the wallet is created and differs from the PIN
+                    The passphrase is only displayed once when the wallet is created and differs from the PIN 
                     you use to access the app. These are not linked.
                 </p>
                 <p>
-                    If you need to change the dojo to which your wallet is connected, you will have to delete
-                    the wallet. Be sure to verify that you have the correct passphrase before proceeding. The
-                    wallet can check whether the passphrase you believe you have matches the correct one. Please
-                    note that the passphrase cannot be recovered. If you do not remember it, do not delete the
+                    If you need to change the dojo to which your wallet is connected, you will have to delete 
+                    the wallet. Be sure to verify that you have the correct passphrase before proceeding. The 
+                    wallet can check whether the passphrase you believe you have matches the correct one. Please 
+                    note that the passphrase cannot be recovered. If you do not remember it, do not delete the 
                     wallet. There are some workarounds available.
                 </p>
                 <p>You will need both the 12-word mnemonic seed phrase and the passphrase to recover your wallet.</p>
                 <p>
-                    To verify your passphrase, go to Settings > Wallet > Check BIP39 Passphrase and enter it.
+                    To verify your passphrase, go to Settings > Wallet > Check BIP39 Passphrase and enter it. 
                     If everything is correct, you will receive a confirmation.
                 </p>
                 <div class="alert alert-danger mt-3">
-                    🔴 <strong>If you do not have the passphrase, do not delete the wallet. Instead, send the
-                        funds to a wallet you control.</strong>
+                    🔴 <strong>If you do not have the passphrase, do not delete the wallet. Instead, send the 
+                    funds to a wallet you control.</strong>
                 </div>
                 <div class="alert alert-success mt-3">
-                    🟢 <strong>If you have the passphrase and the 12 words, you can delete the wallet to change
-                        your device or connect to another Dojo server.</strong>
+                    🟢 <strong>If you have the passphrase and the 12 words, you can delete the wallet to change 
+                    your device or connect to another Dojo server.</strong>
                 </div>
                 <p class="mt-3">
                     A good practice is to verify everything once you create the wallet to avoid future issues.
                 </p>
                 <p>
-                    If you have the passphrase but not the 12 words, you can access the wallet by decrypting
+                    If you have the passphrase but not the 12 words, you can access the wallet by decrypting 
                     the backup file with the passphrase.
                 </p>
                 <p>
-                    If you lose the connection to a Dojo server and do not remember the passphrase, you can
-                    export the extended public key to Sparrow to create a watch-only wallet and sign offline
+                    If you lose the connection to a Dojo server and do not remember the passphrase, you can 
+                    export the extended public key to Sparrow to create a watch-only wallet and sign offline 
                     transactions from Ashigaru.
                 </p>
             </div>
@@ -75,13 +72,13 @@
             <div class="card p-4 mb-4">
                 <h5 class="mb-3">Are there any privacy concerns for the dojo seekers?</h5>
                 <p>
-                    When connecting to a Dojo, it's crucial to remember that you are sharing your extended
-                    public key (xpub). The Dojo runner has the option to access this information and check
-                    your past, present, and future transactions. Therefore, ensure you're connecting to a
+                    When connecting to a Dojo, it's crucial to remember that you are sharing your extended 
+                    public key (xpub). The Dojo runner has the option to access this information and check 
+                    your past, present, and future transactions. Therefore, ensure you're connecting to a 
                     reputable and trustworthy Dojo.
                 </p>
                 <p>
-                    Additionally, using your own Dojo can enhance your privacy and security. Always prioritize
+                    Additionally, using your own Dojo can enhance your privacy and security. Always prioritize 
                     your data protection when dealing with third-party services.
                 </p>
             </div>
@@ -89,42 +86,33 @@
             <div class="card p-4 mb-4">
                 <h5 class="mb-3">How to verify a Signed Dojo?</h5>
                 <p>
-                    Check that the PayNym corresponds to a person of certain reputation, either because they
-                    have it in their bio on a social network, on a page of their own, or have mentioned it
-                    publicly. With the PayNym in the PayNym.rs directory, you can see its code. With the signed
-                    message, go to the page
+                    Check that the PayNym corresponds to a person of certain reputation, either because they 
+                    have it in their bio on a social network, on a page of their own, or have mentioned it 
+                    publicly. With the PayNym in the PayNym.rs directory, you can see its code. With the signed 
+                    message, go to the page 
                     <a href="https://pajasevi.github.io/bip47-verifier/" target="_blank" style="color: var(--primary);">
                         https://pajasevi.github.io/bip47-verifier/
-                    </a>
+                    </a> 
                     created by <a href="https://x.com/PavelTheCoder" target="_blank" style="color: var(--primary);">
                         PavelTheCoder
-                    </a> and fill in the fields. If everything is correct, 'Message verified successfully'
+                    </a> and fill in the fields. If everything is correct, 'Message verified successfully' 
                     will appear.
                 </p>
                 <p>
-                    If you encourage issues validating the message, use the tool available in Samourai/Ashigaru
-                    (Tools-&gt; Verify message).
+                    If you encourage issues validating the message, use the tool available in Samourai/Ashigaru (Tools-&gt; Verify message).
                 </p>
             </div>
 
             <div class="card p-4 mb-4">
                 <h5 class="mb-3">Where can I find information on how to run or add Dojo capabilities in a Node?</h5>
                 <p>
-                    A Dojo instance can be installed using various implementations, including
-                    <strong>RoninDojo</strong>, <strong>Vanilla Dojo</strong> (installation instructions available at <a
-                        href="https://ashigaru.rs" target="_blank" style="color: var(--primary);">ashigaru.rs</a>), or
-                    through the <strong>Umbrel</strong> and <strong>Start9</strong> marketplaces.
+                    A Dojo instance can be installed using various implementations, including <strong>RoninDojo</strong>, <strong>Vanilla Dojo</strong> (installation instructions available at <a href="https://ashigaru.rs" target="_blank" style="color: var(--primary);">ashigaru.rs</a>), or through the <strong>Umbrel</strong> and <strong>Start9</strong> marketplaces.
                 </p>
                 <p>
-                    At present, it is possible to deploy a personal Dojo on almost any Bitcoin node implementation,
-                    allowing users to maintain full control over their Samourai / Ashigaru Wallet backend and ensuring
-                    maximum privacy and data sovereignty.
+                    At present, it is possible to deploy a personal Dojo on almost any Bitcoin node implementation, allowing users to maintain full control over their Samourai / Ashigaru Wallet backend and ensuring maximum privacy and data sovereignty.
                 </p>
                 <p>
-                    The use of any public Dojo should be considered strictly temporary or for testing purposes only.
-                    Once a private node and Dojo are operational, users are strongly advised to migrate their funds to
-                    new addresses managed by their own instance. This minimizes potential privacy leaks and prevents
-                    exposure or reuse of previously derived public keys.
+                    The use of any public Dojo should be considered strictly temporary or for testing purposes only. Once a private node and Dojo are operational, users are strongly advised to migrate their funds to new addresses managed by their own instance. This minimizes potential privacy leaks and prevents exposure or reuse of previously derived public keys.
                 </p>
             </div>
 
@@ -133,10 +121,10 @@
             <div class="card p-4 mb-4">
                 <h5 class="mb-3">Are there any privacy concerns for the dojo runners?</h5>
                 <p>
-                    Not really security concerns. By sharing a pairing payload, you are revealing onion address
-                    of your Dojo which means a malicious party could try to DDoS attack it. You are also risking
-                    that very many people will pair to your Dojo which means you need good enough hardware to
-                    handle that. You will also not be able to unshare your pairing info until we have api key
+                    Not really security concerns. By sharing a pairing payload, you are revealing onion address 
+                    of your Dojo which means a malicious party could try to DDoS attack it. You are also risking 
+                    that very many people will pair to your Dojo which means you need good enough hardware to 
+                    handle that. You will also not be able to unshare your pairing info until we have api key 
                     management in Dojo.
                 </p>
             </div>
@@ -152,10 +140,9 @@
             </div>
 
             <div class="card p-4 mb-4">
-                <h5 class="mb-3">Is it possible to limit this number, if the hardware can only handle a certain number
-                    of connections?</h5>
+                <h5 class="mb-3">Is it possible to limit this number, if the hardware can only handle a certain number of connections?</h5>
                 <p>
-                    This is not about connections but about tracking a very big number of addresses. But the
+                    This is not about connections but about tracking a very big number of addresses. But the 
                     limit is relatively very high even for lower grade devices.
                 </p>
             </div>
