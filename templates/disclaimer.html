@@ -4,23 +4,29 @@
 
 {% block extra_css %}
 .about-card {
-    background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-hover) 100%);
-    border-radius: 12px;
-    padding: 2.5rem;
-    border: 1px solid var(--border);
-    margin-bottom: 2rem;
+background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-hover) 100%);
+border-radius: 12px;
+padding: 2.5rem;
+border: 2px solid var(--border);
+margin-bottom: 2rem;
+transition: all 0.3s;
+}
+
+.about-card:hover {
+border-color: var(--primary);
+box-shadow: 0 5px 25px rgba(231, 76, 60, 0.2);
 }
 
 .about-card h2 {
-    color: var(--primary);
-    font-weight: 700;
-    margin-bottom: 1.5rem;
+color: var(--primary);
+font-weight: 700;
+margin-bottom: 1.5rem;
 }
 
 .about-card .lead {
-    color: #ddd;
-    font-size: 1.1rem;
-    line-height: 1.8;
+color: #ddd;
+font-size: 1.1rem;
+line-height: 1.8;
 }
 {% endblock %}
 
@@ -33,12 +39,12 @@
                     <i class="bi bi-exclamation-triangle-fill"></i> Disclaimer
                 </h2>
                 <p class="lead mb-4">
-                    As DojoBay (website), we do not collect any extended public keys (xpubs) from any node, 
-                    and we will not provide any information to third parties. However, please keep in mind 
+                    As DojoBay (website), we do not collect any extended public keys (xpubs) from any node,
+                    and we will not provide any information to third parties. However, please keep in mind
                     that node runners are independent and we cannot speak for their actions.
                 </p>
                 <p class="lead mb-4">
-                    We strongly encourage you to consider having your own node, not only for the sake of 
+                    We strongly encourage you to consider having your own node, not only for the sake of
                     decentralization but also for your own sovereignty and privacy.
                 </p>
             </div>
