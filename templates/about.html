@@ -3,52 +3,54 @@
 {% block title %}About - The Dojo Bay{% endblock %}
 
 {% block extra_css %}
-.about-card {
-    background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-hover) 100%);
-    border-radius: 12px;
-    padding: 2.5rem;
-    border: 2px solid var(--border);
-    transition: all 0.3s;
-}
+<style>
+    .about-card {
+        background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-hover) 100%);
+        border-radius: 12px;
+        padding: 2.5rem;
+        border: 2px solid var(--border);
+        transition: all 0.3s;
+    }
 
-.about-card:hover {
-    border-color: var(--primary);
-    box-shadow: 0 5px 25px rgba(231, 76, 60, 0.2);
-}
+    .about-card:hover {
+        border-color: var(--primary);
+        box-shadow: 0 5px 25px rgba(231, 76, 60, 0.2);
+    }
 
-.about-card h2 {
-    color: var(--primary);
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-}
+    .about-card h2 {
+        color: var(--primary);
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+    }
 
-.about-card .lead {
-    color: #ddd;
-    font-size: 1.1rem;
-    line-height: 1.8;
-}
+    .about-card .lead {
+        color: #ddd;
+        font-size: 1.1rem;
+        line-height: 1.8;
+    }
 
-.card {
-    background-color: var(--card-bg);
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    transition: all 0.3s;
-}
+    .card {
+        background-color: var(--card-bg);
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        transition: all 0.3s;
+    }
 
-.card:hover {
-    border-color: var(--primary);
-    box-shadow: 0 5px 25px rgba(231, 76, 60, 0.2);
-}
+    .card:hover {
+        border-color: var(--primary);
+        box-shadow: 0 5px 25px rgba(231, 76, 60, 0.2);
+    }
 
-.card h4 {
-    color: var(--primary);
-    font-weight: 600;
-}
+    .card h4 {
+        color: var(--primary);
+        font-weight: 600;
+    }
 
-.card p {
-    color: #e0e0e0;
-    line-height: 1.7;
-}
+    .card p {
+        color: #e0e0e0;
+        line-height: 1.7;
+    }
+</style>
 {% endblock %}
 
 {% block content %}

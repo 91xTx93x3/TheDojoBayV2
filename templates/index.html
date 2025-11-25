@@ -618,6 +618,12 @@
                 const response = await fetch('/api/status');
                 const data = await response.json();
 
+                if (data.loading) {
+                    // Server is still loading data, retry in 5 seconds
+                    setTimeout(loadStatus, 5000);
+                    return;
+                }
+
                 if (data.error) {
                     // If we have cached data, keep showing it
                     if (cachedData !== null) {
