@@ -1,7 +1,10 @@
 """Background checker service for periodic Dojo status updates."""
 import threading
 import time
+import os
+import fcntl
 from typing import List, Dict, Any
+from pathlib import Path
 
 from checker import DojoChecker
 from cache import StatusCache
@@ -35,6 +38,8 @@ class BackgroundChecker:
         self.check_interval = check_interval
         self._thread = None
         self._running = False
+        self._lock_file = None
+        self._lock_path = Path("/tmp/dojobay_checker.lock")
     
     def start(self) -> None:
         """Start the background checker thread."""
@@ -42,26 +47,54 @@ class BackgroundChecker:
             print("[WARNING] Background checker already running")
             return
         
+        # Try to acquire exclusive lock
+        try:
+            self._lock_file = open(self._lock_path, 'w')
+            fcntl.flock(self._lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            print(f"[INFO] Acquired background checker lock (PID: {os.getpid()})")
+        except (IOError, OSError):
+            print(f"[INFO] Another background checker is running, skipping (PID: {os.getpid()})")
+            return
+        
         self._running = True
         self._thread = threading.Thread(target=self._run, daemon=True)
         self._thread.start()
-        print("[INFO] Background checker started")
+        print(f"[INFO] Background checker started (PID: {os.getpid()})")
     
     def stop(self) -> None:
         """Stop the background checker thread."""
         self._running = False
         if self._thread:
             self._thread.join(timeout=5)
+        
+        # Release lock
+        if self._lock_file:
+            try:
+                fcntl.flock(self._lock_file.fileno(), fcntl.LOCK_UN)
+                self._lock_file.close()
+                self._lock_path.unlink(missing_ok=True)
+            except Exception:
+                pass
+        
         print("[INFO] Background checker stopped")
     
     def _run(self) -> None:
         """Main loop for background checking."""
+        # Perform initial check immediately
+        try:
+            results = self.checker.check_all(self.mainnet_dojos, self.testnet_dojos)
+            self.cache.save(results)
+            print(f"[INFO] Initial status check completed at {results['last_update']}")
+        except Exception as e:
+            print(f"[ERROR] Initial background check failed: {e}")
+        
+        # Continue with periodic checks
         while self._running:
+            time.sleep(self.check_interval)
+            
             try:
                 results = self.checker.check_all(self.mainnet_dojos, self.testnet_dojos)
                 self.cache.save(results)
                 print(f"[INFO] Status check completed at {results['last_update']}")
             except Exception as e:
                 print(f"[ERROR] Background check failed: {e}")
-            
-            time.sleep(self.check_interval)
