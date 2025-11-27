@@ -976,6 +976,19 @@
 
             // Auto-refresh every 10 minutes
             updateInterval = setInterval(loadStatus, 10 * 60 * 1000);
+
+            // Handle accordion to allow only one open at a time across both mainnet and testnet
+            document.addEventListener('show.bs.collapse', function (event) {
+                const allAccordions = document.querySelectorAll('.accordion-collapse.show');
+                allAccordions.forEach(accordion => {
+                    if (accordion.id !== event.target.id) {
+                        const bsCollapse = bootstrap.Collapse.getInstance(accordion);
+                        if (bsCollapse) {
+                            bsCollapse.hide();
+                        }
+                    }
+                });
+            });
         });
 
         // Cleanup on page unload
