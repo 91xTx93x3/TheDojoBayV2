@@ -70,7 +70,8 @@
       "explorer": {
         "type": "explorer.btc_rpc_explorer",
         "url": "http://eefhmn3z6jmh72kph6777fahelbalvlrtgklu5newib7aa4dbjrgmwyd.onion"
-      }
+      },
+      "signature": "-----BEGIN BITCOIN SIGNED MESSAGE-----\n{\n  \"pairing\": {\n    \"type\": \"dojo.api\",\n    \"version\": \"1.26.0\",\n    \"apikey\": \"nfuheeix023i493m4v438tv34v8t3n4yt3\",\n    \"url\": \"http://pouocz43pimqo46ypkvifjekjzisovc5nzlkpqe3zlsxdrz2elzyz3id.onion/v2\"\n  },\n  \"explorer\": {\n    \"type\": \"explorer.btc_rpc_explorer\",\n    \"url\": \"http://eefhmn3z6jmh72kph6777fahelbalvlrtgklu5newib7aa4dbjrgmwyd.onion\"\n  }\n}\n\nBIP47: PM8TJM51x2mDd85CzEgVc2y7vdyB3eBj93JVjVtCt6PZtmfzhFzYPMXYBXh28zthWhVKGjVQZPT1MKxGxEtfenLYEkuc5GhoWtMzQCF8c8mrckYFM7r1\n-----BEGIN BITCOIN SIGNATURE-----\nVersion: Bitcoin-qt (1.0)\nAddress: 1K8CDoBYWBuaeAhejLAk5hiACAgbbPnDCJ\n\nHxXGUXc6ZsL8yJrTIp2cxPlAwWWXAMefboF7PQj9x/FwfgDi61uZPHNCs2dCbNEQezaBKomyww5NSg8O3jVrK9g=\n-----END BITCOIN SIGNATURE-----"
     },
     {
       "url": "http://2ql2zitmzdncnttcnxmjoufcw2zptvytdvigy4nx2cbqgwt3r75fwqqd.onion",
