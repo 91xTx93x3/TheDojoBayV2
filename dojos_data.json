@@ -20,6 +20,8 @@
     },
     {
       "name": "otto",
+      "paynym": "+voicelessindividual29",
+      "paynym_url": "https://paynym.rs/+voicelessindividual29",
       "nostr": "otto",
       "nostr_url": "https://primal.net/p/npub10tt00tt07exx7mgf9td0026mx454hq6dyl9vwm72aeyf0tljf8msjs3z28",
       "hardware": "ThinkPad T490 Debian 12.8",
