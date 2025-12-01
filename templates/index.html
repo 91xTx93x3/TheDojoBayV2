@@ -659,6 +659,7 @@
         }
 
         let cachedData = null;
+        let lastUpdateTime = null;
 
         async function loadStatus() {
             // Show loading spinner during update
@@ -678,6 +679,16 @@
             try {
                 const response = await fetch('/api/status');
                 const data = await response.json();
+                
+                // Check if data has been updated
+                if (lastUpdateTime !== null && data.last_update !== lastUpdateTime) {
+                    // Data has been updated, reload page to get fresh content
+                    console.log('Status updated, reloading page...');
+                    window.location.reload();
+                    return;
+                }
+                
+                lastUpdateTime = data.last_update;
 
                 if (data.loading) {
                     // Server is still loading data, retry in 5 seconds
