@@ -679,7 +679,7 @@
             try {
                 const response = await fetch('/api/status');
                 const data = await response.json();
-                
+
                 // Check if data has been updated
                 if (lastUpdateTime !== null && data.last_update !== lastUpdateTime) {
                     // Data has been updated, reload page to get fresh content
@@ -687,7 +687,7 @@
                     window.location.reload();
                     return;
                 }
-                
+
                 lastUpdateTime = data.last_update;
 
                 if (data.loading) {
