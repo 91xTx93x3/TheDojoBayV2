@@ -520,10 +520,48 @@
             border-radius: 8px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
         }
+
+        /* Support Banner */
+        .support-banner {
+            background-color: #dc3545;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.95rem;
+            position: relative;
+            z-index: 1050;
+        }
+
+        .support-banner a {
+            color: white;
+            text-decoration: underline;
+            font-weight: 500;
+        }
+
+        .support-banner a:hover {
+            color: #f8f9fa;
+        }
+
+        @media (max-width: 768px) {
+            .support-banner {
+                font-size: 0.85rem;
+                padding: 0.75rem;
+            }
+        }
     </style>
 </head>
 
 <body>
+    <!-- Support Banner -->
+    <div class="support-banner">
+        Support Bill and Keonne in their fight against unjust prosecution in the case against Samourai Wallet.
+        <a href="https://billandkeonne.org/" target="_blank" rel="noopener noreferrer">Learn more</a> ·
+        <a href="https://www.change.org/p/stand-up-for-freedom-pardon-the-innocent-coders-jailed-for-building-privacy-tools"
+            target="_blank" rel="noopener noreferrer">Sign the petition</a> ·
+        <a href="https://www.givesendgo.com/billandkeonne" target="_blank" rel="noopener noreferrer">Donate to
+            families</a>
+    </div>
+
     <!-- Popup -->
     <div id="welcomePopup" class="popup-overlay">
         <div class="popup-content">
