@@ -139,11 +139,58 @@
             padding-top: 2rem;
         }
 
-        {% block extra_css %}{% endblock %}
+        /* Support Banner */
+        .support-banner {
+            background-color: #dc3545;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.95rem;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+            width: 100%;
+        }
+
+        .support-banner a {
+            color: white;
+            text-decoration: underline;
+            font-weight: 500;
+        }
+
+        .support-banner a:hover {
+            color: #f8f9fa;
+        }
+
+        @media (max-width: 768px) {
+            .support-banner {
+                font-size: 0.85rem;
+                padding: 0.75rem;
+                position: relative;
+            }
+        }
+
+            {
+            % block extra_css %
+        }
+
+            {
+            % endblock %
+        }
     </style>
 </head>
 
 <body>
+    <!-- Support Banner -->
+    <div class="support-banner">
+        Support Bill and Keonne in their fight against unjust prosecution in the case against Samourai Wallet.
+        <a href="https://billandkeonne.org/" target="_blank" rel="noopener noreferrer">Learn more</a> ·
+        <a href="https://www.change.org/p/stand-up-for-freedom-pardon-the-innocent-coders-jailed-for-building-privacy-tools"
+            target="_blank" rel="noopener noreferrer">Sign the petition</a> ·
+        <a href="https://www.givesendgo.com/billandkeonne" target="_blank" rel="noopener noreferrer">Donate to
+            families</a>
+    </div>
+
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="/">The Dojo Bay</a>
