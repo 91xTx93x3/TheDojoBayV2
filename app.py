@@ -1,6 +1,7 @@
 """Flask application for Dojobay - Public Dojo Directory."""
 from flask import Flask, render_template, jsonify, send_from_directory
 import os
+from datetime import datetime
 
 from config import (
     DEFAULT_PROXIES, CACHE_FILE, DOJOS_DATA_FILE, 
@@ -29,6 +30,30 @@ background_checker = BackgroundChecker(
     testnet_dojos=testnet_dojos,
     check_interval=CACHE_DURATION
 )
+
+
+# Context processor for prison days
+@app.context_processor
+def inject_prison_days():
+    """Calculate days Keonne has been in prison and days remaining."""
+    sentence_start = datetime(2025, 12, 19)
+    sentence_years = 5
+    sentence_end = datetime(2030, 12, 19)  # 5 years later
+    
+    today = datetime.now()
+    days_served = (today - sentence_start).days
+    days_remaining = (sentence_end - today).days
+    
+    # Ensure we don't show negative values
+    if days_served < 0:
+        days_served = 0
+    if days_remaining < 0:
+        days_remaining = 0
+    
+    return dict(
+        keonne_days_served=days_served,
+        keonne_days_remaining=days_remaining
+    )
 
 
 # Routes

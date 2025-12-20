@@ -169,16 +169,26 @@
             }
         }
 
-        {% block extra_css %}{% endblock %}
+            {
+            % block extra_css %
+        }
+
+            {
+            % endblock %
+        }
     </style>
 </head>
 
 <body>
     <div class="support-banner">
-        Support Bill and Keonne in their fight against unjust prosecution in the case against Samourai Wallet.
+        Support Bill and Keonne in their fight against unjust prosecution in the case against Samourai Wallet.<br>
+        <span style="font-size: 0.9em; opacity: 0.95;">Keonne: {{ keonne_days_served }} days in prison · {{
+            keonne_days_remaining }} days remaining</span><br>
         <a href="https://billandkeonne.org/" target="_blank" rel="noopener noreferrer">Learn more</a> ·
-        <a href="https://www.change.org/p/stand-up-for-freedom-pardon-the-innocent-coders-jailed-for-building-privacy-tools" target="_blank" rel="noopener noreferrer">Sign the petition</a> ·
-        <a href="https://www.givesendgo.com/billandkeonne" target="_blank" rel="noopener noreferrer">Donate to families</a>
+        <a href="https://www.change.org/p/stand-up-for-freedom-pardon-the-innocent-coders-jailed-for-building-privacy-tools"
+            target="_blank" rel="noopener noreferrer">Sign the petition</a> ·
+        <a href="https://www.givesendgo.com/billandkeonne" target="_blank" rel="noopener noreferrer">Donate to
+            families</a>
     </div>
 
     <nav class="navbar navbar-expand-lg navbar-dark">
