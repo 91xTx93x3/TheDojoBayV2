@@ -250,13 +250,23 @@
       "signature": "-----BEGIN BITCOIN SIGNED MESSAGE-----\nhttps://expatriotic.me/info/\n\n{\n    \"pairing\": {\n        \"type\": \"dojo.api\",\n        \"version\": \"1.27.0\",\n        \"apikey\": \"a5c2415709f0ecf68af32a97ff0b993b\",\n        \"url\": \"http://cnjhanzulxeaj73d77l7wgpymqiq5tz26jfjwdztldvf67f5ryvgywad.onion/v2\"\n    },\n    \"explorer\": {\n        \"type\": \"explorer.btc_rpc_explorer\",\n        \"url\": \"http://2ioqnpvqngfncstbptrrzlmoatmg5me4rn6v4gksbh43zc3r2v44avad.onion\"\n    }\n}\n\nBIP47:\nPM8TJgbjQPjqRrFxypni83pNUsp8sZPzAunNG9qXPka9x4cpHEZ2H6XmCE9au9PvbCpw7RY13TPcjWMShptCkp1NbqBxW4QpCZdR5CQ5uR2hnGDszJxN\n-----BEGIN BITCOIN SIGNATURE-----\nVersion: Bitcoin-qt (1.0)\nAddress: 16VpuCyP1Hb38WCF4uxdoftmYBqyW7m6s4\n\nH589WF1jCy9Xzr1P3GAgRWAGdQJcYkmGszQddL37nFyxSAhSOJO45okqSx1ImHU0h2kA3cqo5wtscMwPvhnmxoI=\n-----END BITCOIN SIGNATURE-----"
     },
     {
-      "name": "arthur (Out Of Service)",
+      "name": "arthur",
       "paynym": "+melodicstress96",
       "paynym_url": "https://paynym.rs/+melodicstress96",
-      "jurisdiction": "UK",
-      "hardware": "Intel i7, 32gb running Fulcrum",
-      "image": "/static/images/qr/arthur_(Out_Of_Service)_E3029.png",
-      "status": "out_of_service"
+      "jurisdiction": "Central America",
+      "hardware": "Intel i7-8700, Fulcrum",
+      "image": "/static/images/qr/arthur.png",
+      "pairing": {
+        "type": "dojo.api",
+        "version": "1.28.2",
+        "apikey": "bbP1XT7g2ZIMcsyE8yhFWn",
+        "url": "http://37pennvjtwxunv3ik4uhybrznpkutmpktzlkfyx45zhq4cda4lyk6dqd.onion/v2"
+      },
+      "explorer": {
+        "type": "explorer.btc_rpc_explorer",
+        "url": "http://mempoolhqx4isw62xs7abwphsq7ldayuidyx2v2oethdhhj6mlo2r6ad.onion"
+      },
+      "signature": "-----BEGIN BITCOIN SIGNED MESSAGE-----\n#PardonSamourai\n(▀ Ĺ̯▀   )√  my KYC is /dev/null\n{\n    \"pairing\": {\n        \"type\": \"dojo.api\",\n        \"version\": \"1.28.2\",\n        \"apikey\": \"bbP1XT7g2ZIMcsyE8yhFWn\",\n        \"url\": \"http://37pennvjtwxunv3ik4uhybrznpkutmpktzlkfyx45zhq4cda4lyk6dqd.onion/v2\"\n    },\n    \"explorer\": {\n        \"type\": \"explorer.btc_rpc_explorer\",\n        \"url\": \"http://mempoolhqx4isw62xs7abwphsq7ldayuidyx2v2oethdhhj6mlo2r6ad.onion\"\n    }\n}\n-----BEGIN BITCOIN SIGNATURE-----\nVersion: Bitcoin-qt (1.0)\nAddress: 1K7pxnHg7VFvzGwSA9phYGYuLVLGB59xty\n\nH0S6pRW4xo6KqD+xFBuTnKhOd3fwc4HcVDjj+nNI7QCyWYpEcgx0xFaRqxuEhip07vklhRXzO/wAVGZrqxjxBKM=\n-----END BITCOIN SIGNATURE-----"
     }
   ],
   "testnet": [
