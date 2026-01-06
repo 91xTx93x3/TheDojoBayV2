@@ -35,24 +35,36 @@ background_checker = BackgroundChecker(
 # Context processor for prison days
 @app.context_processor
 def inject_prison_days():
-    """Calculate days Keonne has been in prison and days remaining."""
-    sentence_start = datetime(2025, 12, 19)
-    sentence_years = 5
-    sentence_end = datetime(2030, 12, 19)  # 5 years later
-    
+    """Calculate days Keonne and Bill have been in prison and days remaining."""
     today = datetime.now()
-    days_served = (today - sentence_start).days
-    days_remaining = (sentence_end - today).days
+    
+    # Keonne's sentence
+    keonne_sentence_start = datetime(2025, 12, 19)
+    keonne_sentence_end = datetime(2030, 12, 19)  # 5 years later
+    keonne_days_served = (today - keonne_sentence_start).days
+    keonne_days_remaining = (keonne_sentence_end - today).days
+    
+    # Bill's sentence
+    bill_sentence_start = datetime(2026, 1, 2)
+    bill_sentence_end = datetime(2030, 1, 2)  # 4 years later
+    bill_days_served = (today - bill_sentence_start).days
+    bill_days_remaining = (bill_sentence_end - today).days
     
     # Ensure we don't show negative values
-    if days_served < 0:
-        days_served = 0
-    if days_remaining < 0:
-        days_remaining = 0
+    if keonne_days_served < 0:
+        keonne_days_served = 0
+    if keonne_days_remaining < 0:
+        keonne_days_remaining = 0
+    if bill_days_served < 0:
+        bill_days_served = 0
+    if bill_days_remaining < 0:
+        bill_days_remaining = 0
     
     return dict(
-        keonne_days_served=days_served,
-        keonne_days_remaining=days_remaining
+        keonne_days_served=keonne_days_served,
+        keonne_days_remaining=keonne_days_remaining,
+        bill_days_served=bill_days_served,
+        bill_days_remaining=bill_days_remaining
     )
 
 
