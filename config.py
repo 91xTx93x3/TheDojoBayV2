@@ -16,7 +16,7 @@ DEFAULT_PROXIES = {
 CACHE_DURATION = 600  # 10 minutes in seconds
 
 # Request settings
-REQUEST_TIMEOUT = 15  # seconds
+REQUEST_TIMEOUT = 45  # seconds (increased for slow/unreliable Tor connections)
 
 # Server settings
 HOST = '0.0.0.0'
