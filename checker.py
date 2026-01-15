@@ -90,9 +90,13 @@ class DojoChecker:
         """Check URL availability via Tor."""
         try:
             resp = requests.get(url, proxies=self.proxies, timeout=self.timeout)
-            entry["status"] = "Active" if resp.status_code == 200 else "Inactive"
-            
-            if resp.status_code != 200:
+            # Consider service active if we get a response (2xx, 4xx, 5xx)
+            # 4xx means server is responding but endpoint/auth issue
+            # Only mark inactive if we can't connect at all
+            if resp.status_code < 500:
+                entry["status"] = "Active"
+            else:
+                entry["status"] = "Inactive"
                 entry["error"] = f"HTTP {resp.status_code}"
         except requests.RequestException as e:
             entry["error"] = f"{type(e).__name__}"
