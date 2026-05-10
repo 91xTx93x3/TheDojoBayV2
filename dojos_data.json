@@ -193,25 +193,6 @@
       "signature": "-----BEGIN BITCOIN SIGNED MESSAGE-----\n{\n  \"pairing\": {\n    \"type\": \"dojo.api\",\n    \"version\": \"1.27.0\",\n    \"apikey\": \"55368b8cd74d67d49a31002a5ab500cf\",\n    \"url\": \"http://a34ald73bhz625jhdaksnlq6rnbjrqgjxq52j6ms3atx7vqdhgp7sxyd.onion/v2\"\n  },\n  \"explorer\": {\n    \"type\": \"explorer.btc_rpc_explorer\",\n    \"url\": \"http://it3nnxof4ad7zi2xi33j4iwedy6grkdikwwfcco2sd7yudkosu2ruvid.onion\"\n  }\n}\n\n\nBIP47:\nPM8TJQwkgoVeogzAQe431Bn3FSsXiCqjmFCpysFuSTjB7FaxfrJGtMAEfsA5dvptjMAAxLXKM6bDAen5tFp326EHBmRH6jQ9vJDPnSwARLmUcJoucQtd\n-----BEGIN BITCOIN SIGNATURE-----\nVersion: Bitcoin-qt (1.0)\nAddress: 134yhB7maeqdYiRNjqRYCFBLgUUzvDG58g\n\nHyncYCOrZXerg4Td/fGBOX6CPOol5U7OS1xFmxMVNcP0IpZhpg/yz8WiTchnZaObtWWUw5Uf03SDOzAHG5PO2q4=\n-----END BITCOIN SIGNATURE-----"
     },
     {
-      "name": "91xTx93 Tanto I",
-      "paynym": "+determinedcut58",
-      "paynym_url": "https://paynym.rs/+determinedcut58",
-      "jurisdiction": "Europe",
-      "hardware": "Tanto",
-      "image": "/static/images/qr/xTx_Tanto_I_Tanto-I--xTx--1.png",
-      "pairing": {
-        "type": "dojo.api",
-        "version": "1.27.0",
-        "apikey": "5a327b698fa658738751f99a5fbde348",
-        "url": "http://5cnih4b6h5uzyevp2ggbufe45lald4iy4nzj7gf23jxkae5dhust5bid.onion/v2"
-      },
-      "explorer": {
-        "type": "explorer.btc_rpc_explorer",
-        "url": "http://vr325z6oij64xbh7zrrvkjfphv36jekwm2iolxaz2ttdvnfm7lgl5gyd.onion"
-      },
-      "signature": "-----BEGIN BITCOIN SIGNED MESSAGE-----\n{\n  \"pairing\": {\n    \"type\": \"dojo.api\",\n    \"version\": \"1.27.0\",\n    \"apikey\": \"5a327b698fa658738751f99a5fbde348\",\n    \"url\": \"http://5cnih4b6h5uzyevp2ggbufe45lald4iy4nzj7gf23jxkae5dhust5bid.onion/v2\"\n  },\n  \"explorer\": {\n    \"type\": \"explorer.btc_rpc_explorer\",\n    \"url\": \"http://vr325z6oij64xbh7zrrvkjfphv36jekwm2iolxaz2ttdvnfm7lgl5gyd.onion\"\n  }\n}\n\nBIP47:\nPM8TJQwkgoVeogzAQe431Bn3FSsXiCqjmFCpysFuSTjB7FaxfrJGtMAEfsA5dvptjMAAxLXKM6bDAen5tFp326EHBmRH6jQ9vJDPnSwARLmUcJoucQtd\n-----BEGIN BITCOIN SIGNATURE-----\nVersion: Bitcoin-qt (1.0)\nAddress: 134yhB7maeqdYiRNjqRYCFBLgUUzvDG58g\n\nIEPXkxgyHR/MkDlU16JJL3fmnwTdn2P7URlSWk4ajembYOSwB7CUXSWcFXSt1PRIJp2YzP8aBrOQtOLQB98lzxA=\n-----END BITCOIN SIGNATURE-----"
-    },
-    {
       "name": "91xTx93 Tanto E",
       "paynym": "+determinedcut58",
       "paynym_url": "https://paynym.rs/+determinedcut58",
