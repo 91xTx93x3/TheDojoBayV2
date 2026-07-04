@@ -1,3 +1,0 @@
-[2026-07-04 13:43:47] Created token for team: mobile-app
-[2026-07-04 13:43:47] Created token for team: web-dashboard
-[2026-07-04 13:43:47] Created token for team: external-partner
