@@ -228,6 +228,32 @@
             <li class="nav-item">
               <a class="nav-link" href="/disclaimer">Disclaimer</a>
             </li>
+            <li class="nav-item">
+              {% if session_paynym %}
+              <a
+                class="nav-link d-flex align-items-center gap-2"
+                href="/add-dojo/dashboard"
+              >
+                <img
+                  src="{{ session_paynym_avatar }}"
+                  alt="PayNym"
+                  style="
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 2px solid var(--primary);
+                  "
+                  onerror="this.style.display = 'none'"
+                />
+                <span>My Dojos</span>
+              </a>
+              {% else %}
+              <a class="nav-link" href="/add-dojo">
+                <i class="bi bi-plus-circle me-1"></i>Add Your Dojo
+              </a>
+              {% endif %}
+            </li>
           </ul>
         </div>
       </div>

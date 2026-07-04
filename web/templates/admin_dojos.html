@@ -1,0 +1,225 @@
+{% extends "base.html" %} {% block title %}Admin — Pending Dojos{% endblock %}
+{% block extra_css %} .admin-header { background: linear-gradient(135deg,
+var(--card-bg) 0%, var(--card-hover) 100%); border-radius: 12px; padding: 1.4rem
+2rem; border: 2px solid var(--primary); margin-bottom: 2rem; } .section-title {
+color: var(--primary); font-size: 0.75rem; font-weight: 700; text-transform:
+uppercase; letter-spacing: 1.5px; border-bottom: 1px solid var(--border);
+padding-bottom: 0.4rem; margin-bottom: 1.2rem; margin-top: 2rem; } .dojo-card {
+background: var(--card-bg); border: 2px solid var(--border); border-radius:
+12px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; } .dojo-card.is-pending {
+border-color: rgba(255,193,7,0.4); } .dojo-card.is-approved { border-color:
+rgba(40,167,69,0.4); } .dojo-card.is-rejected { border-color:
+rgba(231,76,60,0.3); } .label { font-size: 0.7rem; font-weight: 700;
+text-transform: uppercase; letter-spacing: 1px; color: var(--primary);
+margin-bottom: 0.2rem; } .val { color: #e0e0e0; font-size: 0.88rem; word-break:
+break-all; } .paynym-code { font-family: monospace; font-size: 0.78rem; color:
+#aaa; } .btn-approve { background: #27ae60; border: none; color: #fff;
+font-weight: 600; padding: 0.4rem 1.1rem; border-radius: 7px; font-size:
+0.85rem; cursor: pointer; transition: background 0.2s; } .btn-approve:hover {
+background: #219a52; } .btn-reject { background: transparent; border: 1.5px
+solid var(--primary); color: var(--primary); font-weight: 600; padding: 0.4rem
+1.1rem; border-radius: 7px; font-size: 0.85rem; cursor: pointer; transition: all
+0.2s; } .btn-reject:hover { background: var(--primary); color: #fff; }
+.count-badge { display: inline-block; background: rgba(255,193,7,0.15); border:
+1px solid rgba(255,193,7,0.4); color: #ffc107; border-radius: 20px; padding:
+0.15rem 0.6rem; font-size: 0.75rem; font-weight: 700; } {% endblock %} {% block
+content %}
+<div class="container my-5">
+  <div
+    class="admin-header d-flex align-items-center justify-content-between flex-wrap gap-3"
+  >
+    <div>
+      <h2 style="color: #fff; font-weight: 700; margin: 0; font-size: 1.4rem">
+        <i class="bi bi-shield-lock-fill me-2" style="color: var(--primary)"></i
+        >Admin Panel
+      </h2>
+      <p class="mb-0 mt-1" style="color: var(--text-muted); font-size: 0.85rem">
+        Dojo submission review &mdash; accessible only to
+        <code style="color: var(--primary)">+91xTx93x3</code>
+      </p>
+    </div>
+    <a
+      href="/add-dojo/dashboard"
+      class="btn-reject"
+      style="text-decoration: none"
+    >
+      <i class="bi bi-arrow-left me-1"></i>My Dashboard
+    </a>
+  </div>
+
+  <!-- Pending -->
+  <div class="section-title">
+    <i class="bi bi-hourglass-split me-1"></i>Pending Review
+    <span class="count-badge ms-2">{{ pending|length }}</span>
+  </div>
+
+  {% if pending %} {% for dojo in pending %}
+  <div class="dojo-card is-pending">
+    <div
+      class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3"
+    >
+      <div class="paynym-code">
+        <i class="bi bi-person-badge me-1"></i>{{ dojo.paynym[:12] }}…{{
+        dojo.paynym[-6:] }}
+      </div>
+      <div class="d-flex gap-2">
+        <form
+          method="POST"
+          action="/admin/dojos/{{ dojo.id }}/approve"
+          style="display: inline"
+        >
+          <button type="submit" class="btn-approve">
+            <i class="bi bi-check-lg me-1"></i>Approve
+          </button>
+        </form>
+        <form
+          method="POST"
+          action="/admin/dojos/{{ dojo.id }}/reject"
+          style="display: inline"
+        >
+          <button type="submit" class="btn-reject">
+            <i class="bi bi-x-lg me-1"></i>Reject
+          </button>
+        </form>
+      </div>
+    </div>
+    <div class="row g-3">
+      {% if dojo.jurisdiction %}
+      <div class="col-sm-4">
+        <div class="label"><i class="bi bi-geo-alt me-1"></i>Jurisdiction</div>
+        <div class="val">{{ dojo.jurisdiction }}</div>
+      </div>
+      {% endif %} {% if dojo.hardware %}
+      <div class="col-sm-4">
+        <div class="label"><i class="bi bi-cpu me-1"></i>Hardware</div>
+        <div class="val">{{ dojo.hardware }}</div>
+      </div>
+      {% endif %} {% if dojo.electrum_server %}
+      <div class="col-sm-4">
+        <div class="label"><i class="bi bi-plug me-1"></i>Electrum/Fulcrum</div>
+        <div class="val">{{ dojo.electrum_server }}</div>
+      </div>
+      {% endif %}
+      <div class="col-12">
+        <div class="label">
+          <i class="bi bi-link-45deg me-1"></i>Pairing Details
+        </div>
+        <pre
+          style="
+            background: #111;
+            border-radius: 6px;
+            padding: 0.6rem 0.9rem;
+            font-size: 0.78rem;
+            color: #aaa;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 120px;
+            overflow-y: auto;
+          "
+        >
+{{ dojo.pairing_details }}</pre
+        >
+      </div>
+    </div>
+    <div style="font-size: 0.72rem; color: #555; margin-top: 0.5rem">
+      Submitted: {{ dojo.submitted_at[:16].replace('T',' ') }}
+    </div>
+  </div>
+  {% endfor %} {% else %}
+  <p style="color: var(--text-muted); padding: 1rem 0">
+    No pending submissions.
+  </p>
+  {% endif %}
+
+  <!-- Approved -->
+  <div class="section-title">
+    <i class="bi bi-check-circle me-1"></i>Approved
+    <span
+      class="count-badge ms-2"
+      style="
+        background: rgba(40, 167, 69, 0.15);
+        border-color: rgba(40, 167, 69, 0.4);
+        color: #6fcf97;
+      "
+      >{{ approved|length }}</span
+    >
+  </div>
+  {% for dojo in approved %}
+  <div
+    class="dojo-card is-approved d-flex justify-content-between align-items-center flex-wrap gap-2"
+  >
+    <div>
+      <span class="paynym-code"
+        ><i class="bi bi-person-badge me-1"></i>{{ dojo.paynym[:12] }}…{{
+        dojo.paynym[-6:] }}</span
+      >
+      {% if dojo.jurisdiction %}<span
+        style="color: #aaa; font-size: 0.82rem; margin-left: 1rem"
+        >{{ dojo.jurisdiction }}</span
+      >{% endif %}
+    </div>
+    <form
+      method="POST"
+      action="/admin/dojos/{{ dojo.id }}/reject"
+      style="display: inline"
+    >
+      <button
+        type="submit"
+        class="btn-reject"
+        style="font-size: 0.78rem; padding: 0.3rem 0.8rem"
+      >
+        <i class="bi bi-x-lg me-1"></i>Revoke
+      </button>
+    </form>
+  </div>
+  {% else %}
+  <p style="color: var(--text-muted); padding: 0.5rem 0">None yet.</p>
+  {% endfor %}
+
+  <!-- Rejected -->
+  <div class="section-title">
+    <i class="bi bi-x-circle me-1"></i>Rejected
+    <span
+      class="count-badge ms-2"
+      style="
+        background: rgba(231, 76, 60, 0.12);
+        border-color: rgba(231, 76, 60, 0.3);
+        color: #f1948a;
+      "
+      >{{ rejected|length }}</span
+    >
+  </div>
+  {% for dojo in rejected %}
+  <div
+    class="dojo-card is-rejected d-flex justify-content-between align-items-center flex-wrap gap-2"
+  >
+    <div>
+      <span class="paynym-code"
+        ><i class="bi bi-person-badge me-1"></i>{{ dojo.paynym[:12] }}…{{
+        dojo.paynym[-6:] }}</span
+      >
+      {% if dojo.jurisdiction %}<span
+        style="color: #aaa; font-size: 0.82rem; margin-left: 1rem"
+        >{{ dojo.jurisdiction }}</span
+      >{% endif %}
+    </div>
+    <form
+      method="POST"
+      action="/admin/dojos/{{ dojo.id }}/approve"
+      style="display: inline"
+    >
+      <button
+        type="submit"
+        class="btn-approve"
+        style="font-size: 0.78rem; padding: 0.3rem 0.8rem"
+      >
+        <i class="bi bi-check-lg me-1"></i>Approve
+      </button>
+    </form>
+  </div>
+  {% else %}
+  <p style="color: var(--text-muted); padding: 0.5rem 0">None.</p>
+  {% endfor %}
+</div>
+{% endblock %}

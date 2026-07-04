@@ -1,5 +1,6 @@
 """Configuration settings for Dojobay application."""
 from pathlib import Path
+import secrets as _secrets
 
 # Application paths
 BASE_DIR = Path(__file__).parent
@@ -22,3 +23,22 @@ REQUEST_TIMEOUT = 45  # seconds (increased for slow/unreliable Tor connections)
 HOST = '0.0.0.0'
 PORT = 5002
 DEBUG = False
+
+# Submissions file for user-submitted dojos
+SUBMISSIONS_FILE = BASE_DIR / 'dojo_submissions.json'
+
+# ── Auth47 / PayNym ────────────────────────────────────────────────────────────
+import os as _os
+SITE_URL = _os.environ.get('SITE_URL', 'https://dojobay.pw')
+AUTH47_CALLBACK_URL = f"{SITE_URL}/api/auth47/verify"
+
+# Secret key for Flask sessions (generated once, stored in .secret_key)
+_secret_key_file = BASE_DIR / '.secret_key'
+try:
+    if _secret_key_file.exists():
+        SECRET_KEY = _secret_key_file.read_text().strip()
+    else:
+        SECRET_KEY = _secrets.token_hex(32)
+        _secret_key_file.write_text(SECRET_KEY)
+except Exception:
+    SECRET_KEY = _secrets.token_hex(32)

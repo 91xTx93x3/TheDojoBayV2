@@ -1,11 +1,19 @@
 """Flask application for Dojobay - Public Dojo Directory."""
-from flask import Flask, render_template, jsonify, send_from_directory
+from flask import Flask, render_template, jsonify, send_from_directory, request, session, redirect, url_for
 import os
+import json
+import uuid
+from pathlib import Path
 from datetime import datetime
 
 from config import (
-    DEFAULT_PROXIES, CACHE_FILE, DOJOS_DATA_FILE, 
-    CACHE_DURATION, REQUEST_TIMEOUT, HOST, PORT, DEBUG
+    DEFAULT_PROXIES, CACHE_FILE, DOJOS_DATA_FILE,
+    CACHE_DURATION, REQUEST_TIMEOUT, HOST, PORT, DEBUG,
+    SECRET_KEY, SUBMISSIONS_FILE, AUTH47_CALLBACK_URL,
+)
+from auth47 import (
+    generate_challenge, get_challenge, verify_signature,
+    complete_challenge, consume_challenge, generate_qr_png_b64,
 )
 from cache import StatusCache
 from checker import DojoChecker
@@ -15,6 +23,7 @@ from background_checker import BackgroundChecker
 
 # Initialize Flask app
 app = Flask(__name__)
+app.secret_key = SECRET_KEY
 
 # Initialize components
 data_loader = DojoDataLoader(DOJOS_DATA_FILE)
@@ -68,6 +77,24 @@ def inject_prison_days():
     )
 
 
+ADMIN_PAYNMS = {
+    'PM8TJQwkgoVeogzAQe431Bn3FSsXiCqjmFCpysFuSTjB7FaxfrJGtMAEfsA5dvptjMAAxLXKM6bDAen5tFp326EHBmRH6jQ9vJDPnSwARLmUcJoucQtd',  # classic
+    'PM8TJQwkgoVeogzAQe431Bn3FSsXiCqjmFCpysFuSTjB7FaxfrJGtMAEfsA5dvptjMAAxLXKM6bDAen5tFp326EHBmRH6jQ9vJDPnSwARLmUcJw9Rtf9',  # segwit
+}
+
+
+@app.context_processor
+def inject_session_paynym():
+    """Expose logged-in PayNym and avatar URL to all templates."""
+    paynym = session.get('paynym')
+    avatar_url = f'https://paynym.rs/{paynym}/avatar' if paynym else None
+    return dict(
+        session_paynym=paynym,
+        session_paynym_avatar=avatar_url,
+        is_admin=(paynym in ADMIN_PAYNMS),
+    )
+
+
 # Routes
 @app.route('/')
 def index():
@@ -108,6 +135,369 @@ def disclaimer():
 def faq():
     """FAQ page."""
     return render_template('faq.html')
+
+
+# ── Image upload helper ──────────────────────────────────────────────────────
+
+DOJO_IMAGE_DIR = Path(__file__).parent / 'static' / 'images' / 'dojos'
+DOJO_IMAGE_DIR.mkdir(parents=True, exist_ok=True)
+MAX_IMAGE_BYTES = 1 * 1024 * 1024  # 1 MB
+ALLOWED_EXTS = {'jpg', 'jpeg', 'png', 'webp', 'gif'}
+
+
+def _save_dojo_image(file_storage, old_filename=None) -> str | None:
+    """Validate and save an uploaded image. Returns filename or None."""
+    if not file_storage or not file_storage.filename:
+        return None
+    ext = file_storage.filename.rsplit('.', 1)[-1].lower()
+    if ext not in ALLOWED_EXTS:
+        return None
+    data = file_storage.read()
+    if len(data) > MAX_IMAGE_BYTES:
+        return None
+    filename = f"dojo_{uuid.uuid4().hex}.{ext}"
+    (DOJO_IMAGE_DIR / filename).write_bytes(data)
+    # Remove old image if replaced
+    if old_filename:
+        old_path = DOJO_IMAGE_DIR / old_filename
+        if old_path.exists():
+            old_path.unlink()
+    return filename
+
+
+# ── Dojo self-service helpers ─────────────────────────────────────────────────
+
+def _load_submissions():
+    if SUBMISSIONS_FILE.exists():
+        with open(SUBMISSIONS_FILE) as f:
+            return json.load(f)
+    return []
+
+
+def _save_submissions(data):
+    with open(SUBMISSIONS_FILE, 'w') as f:
+        json.dump(data, f, indent=2)
+
+
+def _require_login():
+    """Return paynym from session or None if not logged in."""
+    return session.get('paynym')
+
+
+# ── Dojo self-service routes ──────────────────────────────────────────────────
+
+@app.route('/add-dojo')
+def add_dojo():
+    """Login page — authenticate via Auth47 / PayNym BIP47."""
+    if _require_login():
+        return redirect(url_for('dojo_dashboard'))
+    return render_template('add_dojo.html')
+
+
+# ── Auth47 API endpoints (used by JS and wallet) ──────────────────────────────
+
+@app.route('/api/auth47/challenge', methods=['POST'])
+def api_auth47_challenge():
+    """Generate a new Auth47 challenge; called by the browser on page load."""
+    challenge = generate_challenge(AUTH47_CALLBACK_URL)
+    return jsonify(challenge.to_dict())
+
+
+@app.route('/api/auth47/verify', methods=['POST'])
+def api_auth47_verify():
+    """Wallet callback: verify BIP-137 signature and mark challenge completed."""
+    import re
+
+    # Accept JSON or form-encoded body
+    if request.is_json:
+        data = request.get_json(silent=True) or {}
+    else:
+        data = request.form.to_dict()
+
+    # Wallet sends: challenge (full auth47 URI), nym (payment code), signature
+    # Extract nonce from challenge URI: auth47://<nonce>?...
+    challenge_uri = str(data.get('challenge') or '')
+    m = re.match(r'auth47://([a-f0-9A-F]+)', challenge_uri)
+    nonce_from_uri = m.group(1) if m else ''
+
+    challenge_id = str(data.get('challenge_id') or data.get('nonce') or nonce_from_uri).strip()
+    payment_code = str(data.get('nym') or data.get('payment_code') or data.get('paynym') or '').strip()
+    signature    = str(data.get('signature') or data.get('sig') or '').strip()
+
+    if verify_signature(challenge_id, payment_code, signature):
+        complete_challenge(challenge_id, payment_code)
+        return jsonify({'ok': True})
+    return jsonify({'ok': False, 'error': 'Invalid signature or expired challenge'}), 400
+
+
+@app.route('/api/auth47/challenge-status/<challenge_id>')
+def api_auth47_status(challenge_id):
+    """Browser polls this to know when the wallet has signed."""
+    ch = get_challenge(challenge_id)
+    if not ch:
+        return jsonify({'status': 'expired'})
+    if ch.completed:
+        return jsonify({'status': 'completed'})
+    return jsonify({'status': 'pending', 'seconds_remaining': ch.seconds_remaining()})
+
+
+@app.route('/api/auth47/finalize', methods=['POST'])
+def api_auth47_finalize():
+    """Browser exchanges a completed challenge_id for a Flask session."""
+    data = request.get_json(silent=True) or {}
+    challenge_id = str(data.get('challenge_id', '')).strip()
+    payment_code = consume_challenge(challenge_id)
+    if payment_code:
+        session['paynym'] = payment_code
+        return jsonify({'ok': True, 'redirect_url': url_for('dojo_dashboard')})
+    return jsonify({'ok': False, 'error': 'Challenge not completed or already used'}), 400
+
+
+@app.route('/add-dojo/logout')
+def dojo_logout():
+    """Clear session."""
+    session.pop('paynym', None)
+    return redirect(url_for('add_dojo'))
+
+
+@app.route('/add-dojo/dashboard')
+def dojo_dashboard():
+    """Show all dojos registered by the logged-in PayNym."""
+    paynym = _require_login()
+    if not paynym:
+        return redirect(url_for('add_dojo'))
+    submissions = _load_submissions()
+    user_dojos = [d for d in submissions if d.get('paynym') == paynym]
+    return render_template('dojo_dashboard.html', dojos=user_dojos, paynym=paynym)
+
+
+@app.route('/add-dojo/new', methods=['GET', 'POST'])
+def dojo_new():
+    """Add a new dojo."""
+    paynym = _require_login()
+    if not paynym:
+        return redirect(url_for('add_dojo'))
+    if request.method == 'POST':
+        name          = request.form.get('name', '').strip()
+        pairing_details = request.form.get('pairing_details', '').strip()
+        if not name:
+            return render_template('dojo_form.html', mode='new',
+                                   error='Dojo name is required.',
+                                   form_data=request.form)
+        if not pairing_details:
+            return render_template('dojo_form.html', mode='new',
+                                   error='Pairing details are required.',
+                                   form_data=request.form)
+        image_file = _save_dojo_image(request.files.get('image'))
+        entry = {
+            'id': str(uuid.uuid4()),
+            'paynym': paynym,
+            'name': name,
+            'network': request.form.get('network', 'mainnet').strip(),
+            'jurisdiction': request.form.get('jurisdiction', '').strip(),
+            'hardware': request.form.get('hardware', '').strip(),
+            'pairing_details': pairing_details,
+            'electrum_server': request.form.get('electrum_server', '').strip(),
+            'image_file': image_file,
+            'submitted_at': datetime.now().isoformat(),
+            'updated_at': datetime.now().isoformat(),
+            'status': 'pending',
+        }
+        submissions = _load_submissions()
+        submissions.append(entry)
+        _save_submissions(submissions)
+        return redirect(url_for('dojo_dashboard'))
+    return render_template('dojo_form.html', mode='new')
+
+
+@app.route('/add-dojo/edit/<dojo_id>', methods=['GET', 'POST'])
+def dojo_edit(dojo_id):
+    """Edit an existing dojo (owner only)."""
+    paynym = _require_login()
+    if not paynym:
+        return redirect(url_for('add_dojo'))
+    submissions = _load_submissions()
+    dojo = next((d for d in submissions
+                 if d.get('id') == dojo_id and d.get('paynym') == paynym), None)
+    if not dojo:
+        return redirect(url_for('dojo_dashboard'))
+    if request.method == 'POST':
+        name          = request.form.get('name', '').strip()
+        pairing_details = request.form.get('pairing_details', '').strip()
+        if not name:
+            return render_template('dojo_form.html', mode='edit', dojo=dojo,
+                                   error='Dojo name is required.',
+                                   form_data=request.form)
+        if not pairing_details:
+            return render_template('dojo_form.html', mode='edit', dojo=dojo,
+                                   error='Pairing details are required.',
+                                   form_data=request.form)
+        new_image = _save_dojo_image(request.files.get('image'), dojo.get('image_file'))
+        dojo['name']           = name
+        dojo['network']        = request.form.get('network', 'mainnet').strip()
+        dojo['jurisdiction']   = request.form.get('jurisdiction', '').strip()
+        dojo['hardware']       = request.form.get('hardware', '').strip()
+        dojo['pairing_details'] = pairing_details
+        dojo['electrum_server'] = request.form.get('electrum_server', '').strip()
+        if new_image:
+            dojo['image_file'] = new_image
+        dojo['updated_at'] = datetime.now().isoformat()
+        _save_submissions(submissions)
+        return redirect(url_for('dojo_dashboard'))
+    return render_template('dojo_form.html', mode='edit', dojo=dojo)
+
+
+@app.route('/add-dojo/delete/<dojo_id>', methods=['POST'])
+def dojo_delete(dojo_id):
+    """Delete a dojo (owner only)."""
+    paynym = _require_login()
+    if not paynym:
+        return redirect(url_for('add_dojo'))
+    submissions = _load_submissions()
+    submissions = [d for d in submissions
+                   if not (d.get('id') == dojo_id and d.get('paynym') == paynym)]
+    _save_submissions(submissions)
+    return redirect(url_for('dojo_dashboard'))
+
+
+# ── Admin routes (ADMIN_PAYNMS only) ─────────────────────────────────────────
+
+def _require_admin():
+    """Return paynym if admin, else None."""
+    p = session.get('paynym')
+    return p if p in ADMIN_PAYNMS else None
+
+
+@app.route('/admin/dojos')
+def admin_dojos():
+    if not _require_admin():
+        return redirect(url_for('index'))
+    submissions = _load_submissions()
+    pending  = [d for d in submissions if d.get('status') == 'pending']
+    approved = [d for d in submissions if d.get('status') == 'approved']
+    rejected = [d for d in submissions if d.get('status') == 'rejected']
+    return render_template('admin_dojos.html',
+                           pending=pending, approved=approved, rejected=rejected)
+
+
+@app.route('/admin/dojos/<dojo_id>/approve', methods=['POST'])
+def admin_approve(dojo_id):
+    if not _require_admin():
+        return redirect(url_for('index'))
+
+    submissions = _load_submissions()
+    dojo = next((d for d in submissions if d.get('id') == dojo_id), None)
+    if not dojo:
+        return redirect(url_for('admin_dojos'))
+
+    # ── 1. Parse pairing_details JSON ─────────────────────────────────────────
+    try:
+        pairing_obj = json.loads(dojo.get('pairing_details', '{}'))
+    except (json.JSONDecodeError, TypeError):
+        pairing_obj = {}
+
+    # ── 2. Resolve PayNym alias from payment code via paynym.rs ───────────────
+    payment_code = dojo.get('paynym', '')
+    paynym_alias = None
+    paynym_url   = None
+    if payment_code.startswith('PM8T'):
+        try:
+            import urllib.request, ssl
+            req_data = json.dumps({"nym": payment_code}).encode()
+            req = urllib.request.Request(
+                'https://paynym.rs/api/v1/nym',
+                data=req_data,
+                headers={'Content-Type': 'application/json'},
+                method='POST',
+            )
+            ctx = ssl.create_default_context()
+            with urllib.request.urlopen(req, timeout=10, context=ctx) as resp:
+                info = json.loads(resp.read())
+            codes = info.get('codes', [])
+            # prefer the code that matches the submitted payment_code
+            matched = next((c for c in codes if c.get('code') == payment_code), None)
+            nym_name = info.get('nymName') or info.get('nym_name')
+            if nym_name:
+                paynym_alias = f'+{nym_name}' if not nym_name.startswith('+') else nym_name
+                paynym_url   = f'https://paynym.rs/{paynym_alias}'
+        except Exception:
+            pass  # proceed without alias
+
+    # ── 3. Generate QR image from pairing JSON ────────────────────────────────
+    qr_filename = None
+    if pairing_obj:
+        try:
+            import qrcode as _qrcode
+            safe_name = ''.join(c if c.isalnum() or c in '-_' else '_'
+                                for c in dojo.get('name', 'dojo'))
+            qr_filename = f"{safe_name}_{dojo_id[:8]}.png"
+            qr_path = Path(__file__).parent / 'static' / 'images' / 'qr' / qr_filename
+            qr_path.parent.mkdir(parents=True, exist_ok=True)
+            qr_data = json.dumps(pairing_obj, separators=(',', ':'))
+            qr = _qrcode.QRCode(
+                error_correction=_qrcode.constants.ERROR_CORRECT_M,
+                box_size=6, border=2,
+            )
+            qr.add_data(qr_data)
+            qr.make(fit=True)
+            img = qr.make_image(fill_color='#000000', back_color='#ffffff')
+            img.save(str(qr_path))
+        except Exception:
+            qr_filename = None
+
+    # ── 4. Build dojos_data.json entry ────────────────────────────────────────
+    network  = dojo.get('network', 'mainnet')
+    new_entry = {'name': dojo.get('name', '')}
+    if paynym_alias:
+        new_entry['paynym']     = paynym_alias
+        new_entry['paynym_url'] = paynym_url
+    if dojo.get('jurisdiction'):
+        new_entry['jurisdiction'] = dojo['jurisdiction']
+    if dojo.get('hardware'):
+        new_entry['hardware'] = dojo['hardware']
+    if qr_filename:
+        new_entry['image'] = f'/static/images/qr/{qr_filename}'
+    if pairing_obj:
+        new_entry['pairing'] = pairing_obj
+    if dojo.get('electrum_server'):
+        new_entry['electrum_server'] = dojo['electrum_server']
+
+    # Load, append, save dojos_data.json
+    with open(DOJOS_DATA_FILE) as f:
+        dojos_data = json.load(f)
+    dojos_data.setdefault('mainnet', [])
+    dojos_data.setdefault('testnet', [])
+    dojos_data[network].append(new_entry)
+    with open(DOJOS_DATA_FILE, 'w') as f:
+        json.dump(dojos_data, f, indent=2, ensure_ascii=False)
+
+    # ── 5. Mark submission approved ───────────────────────────────────────────
+    dojo['status']     = 'approved'
+    dojo['updated_at'] = datetime.now().isoformat()
+    _save_submissions(submissions)
+
+    # ── 6. Reload in-memory data so new node is checked immediately ───────────
+    global mainnet_dojos, testnet_dojos
+    mainnet_dojos, testnet_dojos = data_loader.load()
+    background_checker.mainnet_dojos = mainnet_dojos
+    background_checker.testnet_dojos = testnet_dojos
+    cache.invalidate()
+
+    return redirect(url_for('admin_dojos'))
+
+
+@app.route('/admin/dojos/<dojo_id>/reject', methods=['POST'])
+def admin_reject(dojo_id):
+    if not _require_admin():
+        return redirect(url_for('index'))
+    submissions = _load_submissions()
+    for d in submissions:
+        if d.get('id') == dojo_id:
+            d['status'] = 'rejected'
+            d['updated_at'] = datetime.now().isoformat()
+            break
+    _save_submissions(submissions)
+    return redirect(url_for('admin_dojos'))
 
 
 @app.route('/api/status')

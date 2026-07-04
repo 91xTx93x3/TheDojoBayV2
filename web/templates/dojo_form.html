@@ -1,0 +1,195 @@
+{% extends "base.html" %} {% block title %}{{ 'Edit Dojo' if mode == 'edit' else
+'Add Dojo' }} - The Dojo Bay{% endblock %} {% block extra_css %} .form-card {
+background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-hover) 100%);
+border-radius: 14px; padding: 2.5rem; border: 2px solid var(--border); }
+.form-card h2 { color: var(--primary); font-weight: 700; } .form-label { color:
+#ccc; font-weight: 500; font-size: 0.9rem; margin-bottom: 0.4rem; }
+.required-star { color: var(--primary); margin-left: 3px; } .form-control,
+.form-select { background-color: #1a1a1a; border: 1.5px solid var(--border);
+color: #e0e0e0; border-radius: 8px; padding: 0.65rem 1rem; transition:
+border-color 0.3s, box-shadow 0.3s; } .form-control:focus, .form-select:focus {
+background-color: #1a1a1a; border-color: var(--primary); color: #e0e0e0;
+box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25); } .form-control::placeholder {
+color: #555; } .form-text { color: var(--text-muted); font-size: 0.82rem; }
+.section-label { color: var(--primary); font-size: 0.72rem; font-weight: 700;
+text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid
+var(--border); padding-bottom: 0.4rem; margin-bottom: 1.2rem; } .btn-save {
+background-color: var(--primary); border: none; color: white; font-weight: 600;
+padding: 0.65rem 2rem; border-radius: 8px; transition: background-color 0.3s,
+transform 0.15s; } .btn-save:hover { background-color: var(--primary-dark);
+color: white; transform: translateY(-1px); } .btn-cancel { background:
+transparent; border: 1.5px solid var(--border); color: var(--text-muted);
+font-weight: 500; padding: 0.65rem 1.5rem; border-radius: 8px; text-decoration:
+none; transition: border-color 0.2s, color 0.2s; } .btn-cancel:hover {
+border-color: #666; color: #e0e0e0; } .alert-error { background-color: rgba(231,
+76, 60, 0.15); border: 1.5px solid var(--primary); border-radius: 8px; color:
+#f1948a; padding: 0.65rem 1rem; font-size: 0.88rem; margin-bottom: 1.25rem; }
+.invalid-feedback { font-size: 0.82rem; } {% endblock %} {% block content %}
+<div class="container my-5">
+  <div class="row">
+    <div class="col-lg-7 mx-auto">
+      <div class="form-card">
+        <h2 class="text-center mb-1">
+          {% if mode == 'edit' %}
+          <i class="bi bi-pencil-fill me-2"></i>Edit Dojo {% else %}
+          <i class="bi bi-plus-circle-fill me-2"></i>Add New Dojo {% endif %}
+        </h2>
+        <p
+          class="text-center mb-4"
+          style="color: var(--text-muted); font-size: 0.9rem"
+        >
+          Fields marked <span style="color: var(--primary)">*</span> are
+          required.
+        </p>
+
+        {% if error %}
+        <div class="alert-error">
+          <i class="bi bi-exclamation-triangle me-1"></i>{{ error }}
+        </div>
+        {% endif %}
+
+        <form method="POST" id="dojoForm" novalidate>
+          <!-- Identity -->
+          <p class="section-label"><i class="bi bi-tag me-1"></i>Identity</p>
+
+          <div class="mb-4">
+            <label class="form-label" for="name"
+              >Dojo Name <span class="required-star">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              name="name"
+              placeholder="e.g. My Privacy Node"
+              value="{{ form_data.name if form_data else (dojo.name if dojo else '') }}"
+              required
+            />
+            <div class="invalid-feedback">Dojo name is required.</div>
+          </div>
+
+          <!-- Node info -->
+          <p class="section-label">
+            <i class="bi bi-server me-1"></i>Node Info
+          </p>
+
+          {%- set net = (form_data.network if form_data else (dojo.network if dojo else 'mainnet')) -%}
+          <div class="mb-4">
+            <label class="form-label">Network <span class="required-star">*</span></label>
+            <div class="d-flex gap-4">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="network" id="net-mainnet" value="mainnet" required {{ 'checked' if net == 'mainnet' else '' }} />
+                <label class="form-check-label" for="net-mainnet">
+                  <i class="bi bi-currency-bitcoin me-1" style="color: var(--primary)"></i>Mainnet
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="network" id="net-testnet" value="testnet" {{ 'checked' if net == 'testnet' else '' }} />
+                <label class="form-check-label" for="net-testnet">
+                  <i class="bi bi-wrench me-1" style="color: #6c757d"></i>Testnet
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label" for="jurisdiction">Jurisdiction</label>
+            <input
+              type="text"
+              class="form-control"
+              id="jurisdiction"
+              name="jurisdiction"
+              placeholder="e.g. Germany, EU"
+              value="{{ form_data.jurisdiction if form_data else (dojo.jurisdiction if dojo else '') }}"
+            />
+            <div class="form-text mt-1">
+              Country or region where the node is hosted (optional).
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label" for="hardware">Hardware</label>
+            <input
+              type="text"
+              class="form-control"
+              id="hardware"
+              name="hardware"
+              placeholder="e.g. Raspberry Pi 5, NUC, VPS"
+              value="{{ form_data.hardware if form_data else (dojo.hardware if dojo else '') }}"
+            />
+            <div class="form-text mt-1">
+              Hardware or setup used to run the node (optional).
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label" for="electrum_server"
+              >Electrum / Fulcrum Server</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="electrum_server"
+              name="electrum_server"
+              placeholder="e.g. ssl://yournode.onion:50002"
+              value="{{ form_data.electrum_server if form_data else (dojo.electrum_server if dojo else '') }}"
+            />
+            <div class="form-text mt-1">
+              Public Electrum or Fulcrum endpoint, if available (optional).
+            </div>
+          </div>
+
+          <!-- Pairing -->
+          <p class="section-label mt-4">
+            <i class="bi bi-link-45deg me-1"></i>Pairing
+          </p>
+
+          <div class="mb-4">
+            <label class="form-label" for="pairing_details">
+              Pairing Details <span class="required-star">*</span>
+            </label>
+            <textarea
+              class="form-control"
+              id="pairing_details"
+              name="pairing_details"
+              rows="6"
+              placeholder="Paste your Dojo pairing payload (JSON) or pairing URL here…"
+              required
+            >
+{{ form_data.pairing_details if form_data else (dojo.pairing_details if dojo else '') }}</textarea
+            >
+            <div class="form-text mt-1">
+              The pairing payload used to connect Samourai / Ashigaru wallets to
+              your Dojo.
+            </div>
+            <div class="invalid-feedback">Pairing details are required.</div>
+          </div>
+
+          <!-- Actions -->
+          <div class="d-flex gap-3 justify-content-center mt-4">
+            <a href="/add-dojo/dashboard" class="btn-cancel">
+              <i class="bi bi-x-lg me-1"></i>Cancel
+            </a>
+            <button type="submit" class="btn btn-save">
+              <i class="bi bi-floppy me-2"></i>{{ 'Save Changes' if mode ==
+              'edit' else 'Submit Dojo' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  const form = document.getElementById("dojoForm");
+
+  form.addEventListener("submit", function (e) {
+    if (!form.checkValidity()) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    form.classList.add("was-validated");
+  });
+</script>
+{% endblock %}

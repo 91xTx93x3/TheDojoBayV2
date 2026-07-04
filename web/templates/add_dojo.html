@@ -1,0 +1,195 @@
+{% extends "base.html" %} {% block title %}Add Your Dojo - The Dojo Bay{%
+endblock %} {% block description %}Authenticate with your PayNym to manage your
+Dojo listings on The Dojo Bay.{% endblock %} {% block extra_css %} .login-card {
+background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-hover) 100%);
+border-radius: 14px; padding: 2.5rem; border: 2px solid var(--border); }
+.login-card h2 { color: var(--primary); font-weight: 700; margin-bottom: 0.3rem;
+} .qr-wrap { display: inline-flex; align-items: center; justify-content: center;
+background: #ffffff; border-radius: 8px; padding: 16px; border: 2px solid
+var(--border); } #qr-container canvas, #qr-container img { display: block;
+border-radius: 0 !important; } .divider { display: flex; align-items: center;
+gap: 0.75rem; color: var(--text-muted); font-size: 0.85rem; margin: 1.75rem 0; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px;
+background: var(--border); } .form-control { background-color: #1a1a1a; border:
+1.5px solid var(--border); color: #e0e0e0; border-radius: 8px; padding: 0.65rem
+1rem; transition: border-color 0.3s, box-shadow 0.3s; } .form-control:focus {
+background-color: #1a1a1a; border-color: var(--primary); color: #e0e0e0;
+box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25); } .form-control::placeholder {
+color: #555; } .form-label { color: #ccc; font-weight: 500; font-size: 0.9rem;
+margin-bottom: 0.4rem; } .btn-login { background-color: var(--primary); border:
+none; color: white; font-weight: 600; padding: 0.65rem 2rem; border-radius: 8px;
+width: 100%; transition: background-color 0.3s, transform 0.15s; }
+.btn-login:hover { background-color: var(--primary-dark); color: white;
+transform: translateY(-1px); } .alert-error { background-color: rgba(231, 76,
+60, 0.15); border: 1.5px solid var(--primary); border-radius: 8px; color:
+#f1948a; padding: 0.65rem 1rem; font-size: 0.88rem; margin-bottom: 1rem; }
+.privacy-note { font-size: 0.78rem; color: var(--text-muted); text-align:
+center; margin-top: 1.5rem; line-height: 1.5; } {% endblock %} {% block content
+%}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-5 col-md-7">
+      <div class="login-card">
+        <h2 class="text-center">
+          <img
+            src="/static/images/paynym-logo.png"
+            alt="PayNym"
+            style="
+              height: 1.2em;
+              width: 1.2em;
+              object-fit: contain;
+              vertical-align: -0.15em;
+              margin-right: 0.4rem;
+            "
+          />Dojo Dashboard
+        </h2>
+        <p
+          class="text-center mb-4"
+          style="color: var(--text-muted); font-size: 0.92rem"
+        >
+          Authenticate with your
+          <strong style="color: #e0e0e0">PayNym (BIP47)</strong> to manage your
+          listings.
+        </p>
+
+        <!-- QR code -->
+        <div class="text-center mb-2">
+          <div
+            class="qr-wrap d-inline-block"
+            id="qr-container"
+            style="min-width: 208px; min-height: 208px"
+          >
+            <div class="text-center py-3">
+              <div
+                class="spinner-border"
+                style="color: var(--primary)"
+                role="status"
+              >
+                <span class="visually-hidden">Generating challenge…</span>
+              </div>
+              <p
+                class="mt-2 mb-0"
+                style="font-size: 0.8rem; color: var(--text-muted)"
+              >
+                Generating Auth47 challenge…
+              </p>
+            </div>
+          </div>
+          <p
+            class="mt-2 mb-0"
+            style="font-size: 0.8rem; color: var(--text-muted)"
+          >
+            <i class="bi bi-phone me-1"></i>Open
+            <strong>Samourai / Ashigaru</strong> &rarr; PayNym &rarr; ⋮ &rarr;
+            Auth47 &rarr; scan
+          </p>
+          <p
+            id="status-msg"
+            class="mt-1 mb-0"
+            style="font-size: 0.78rem; color: var(--text-muted)"
+          ></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+  integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+></script>
+<script>
+  let currentChallengeId = null;
+  let pollInterval = null;
+
+  async function generateChallenge() {
+    try {
+      const res = await fetch("/api/auth47/challenge", { method: "POST" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const data = await res.json();
+      currentChallengeId = data.challenge_id;
+      displayQR(data.auth47_uri, data.seconds_remaining);
+      startPolling(data.challenge_id);
+    } catch (err) {
+      document.getElementById("qr-container").innerHTML =
+        '<p style="color:var(--primary);padding:1rem;">Failed to generate challenge.<br>Please reload the page.</p>';
+    }
+  }
+
+  function displayQR(uri, secondsRemaining) {
+    const container = document.getElementById("qr-container");
+    container.innerHTML = "";
+    // QR must have white background so wallet camera can read it
+    new QRCode(container, {
+      text: uri,
+      width: 256,
+      height: 256,
+      colorDark: "#000000",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.M,
+    });
+    updateCountdown(secondsRemaining);
+  }
+
+  function updateCountdown(secs) {
+    const msg = document.getElementById("status-msg");
+    if (!msg) return;
+    const m = Math.floor(secs / 60);
+    const s = String(secs % 60).padStart(2, "0");
+    msg.textContent = `Challenge expires in ${m}:${s} — waiting for wallet…`;
+  }
+
+  function startPolling(challengeId) {
+    if (pollInterval) clearInterval(pollInterval);
+    pollInterval = setInterval(async () => {
+      try {
+        const res = await fetch("/api/auth47/challenge-status/" + challengeId);
+        const data = await res.json();
+
+        if (data.status === "completed") {
+          clearInterval(pollInterval);
+          document.getElementById("status-msg").textContent =
+            "Signature received! Logging in…";
+          finalizeLogin(challengeId);
+        } else if (data.status === "expired") {
+          clearInterval(pollInterval);
+          document.getElementById("status-msg").textContent =
+            "Challenge expired. Generating new one…";
+          setTimeout(generateChallenge, 1500);
+        } else if (data.seconds_remaining !== undefined) {
+          updateCountdown(data.seconds_remaining);
+        }
+      } catch (err) {
+        // network hiccup — keep polling
+      }
+    }, 3000);
+  }
+
+  async function finalizeLogin(challengeId) {
+    try {
+      const res = await fetch("/api/auth47/finalize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ challenge_id: challengeId }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        window.location.href = data.redirect_url || "/add-dojo/dashboard";
+      } else {
+        document.getElementById("status-msg").textContent =
+          "Login failed: " + (data.error || "unknown error");
+      }
+    } catch (err) {
+      document.getElementById("status-msg").textContent =
+        "Network error. Please reload.";
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", generateChallenge);
+  window.addEventListener("beforeunload", () => {
+    if (pollInterval) clearInterval(pollInterval);
+  });
+</script>
+{% endblock %}
