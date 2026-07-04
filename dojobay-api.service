@@ -1,0 +1,52 @@
+[Unit]
+Description=Dojobay External API Service
+Documentation=file:///root/dojobay/EXTERNAL_API_DEPLOYMENT.md
+After=network.target
+
+[Service]
+Type=notify
+User=root
+Group=root
+WorkingDirectory=/root/dojobay
+
+# Environment
+EnvironmentFile=/root/dojobay/.env.production
+Environment="PATH=/root/dojobay/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Environment="PYTHONUNBUFFERED=1"
+
+# Start command
+ExecStart=/root/dojobay/venv/bin/gunicorn \
+    -c /root/dojobay/gunicorn_external_api_prod.conf.py \
+    --access-logfile /root/dojobay/external_api_access.log \
+    --error-logfile /root/dojobay/external_api_error.log \
+    external_api:app
+
+# Restart policy
+Restart=always
+RestartSec=5
+StartLimitInterval=600s
+StartLimitBurst=3
+
+# Performance
+Nice=0
+OOMScoreAdjust=-100
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/root/dojobay
+
+# Process management
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=dojobay-api
+
+[Install]
+WantedBy=multi-user.target
