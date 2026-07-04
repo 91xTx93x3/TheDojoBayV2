@@ -193,25 +193,6 @@
       "signature": "-----BEGIN BITCOIN SIGNED MESSAGE-----\n{\n  \"pairing\": {\n    \"type\": \"dojo.api\",\n    \"version\": \"1.27.0\",\n    \"apikey\": \"55368b8cd74d67d49a31002a5ab500cf\",\n    \"url\": \"http://a34ald73bhz625jhdaksnlq6rnbjrqgjxq52j6ms3atx7vqdhgp7sxyd.onion/v2\"\n  },\n  \"explorer\": {\n    \"type\": \"explorer.btc_rpc_explorer\",\n    \"url\": \"http://it3nnxof4ad7zi2xi33j4iwedy6grkdikwwfcco2sd7yudkosu2ruvid.onion\"\n  }\n}\n\n\nBIP47:\nPM8TJQwkgoVeogzAQe431Bn3FSsXiCqjmFCpysFuSTjB7FaxfrJGtMAEfsA5dvptjMAAxLXKM6bDAen5tFp326EHBmRH6jQ9vJDPnSwARLmUcJoucQtd\n-----BEGIN BITCOIN SIGNATURE-----\nVersion: Bitcoin-qt (1.0)\nAddress: 134yhB7maeqdYiRNjqRYCFBLgUUzvDG58g\n\nHyncYCOrZXerg4Td/fGBOX6CPOol5U7OS1xFmxMVNcP0IpZhpg/yz8WiTchnZaObtWWUw5Uf03SDOzAHG5PO2q4=\n-----END BITCOIN SIGNATURE-----"
     },
     {
-      "name": "91xTx93 Tanto E",
-      "paynym": "+determinedcut58",
-      "paynym_url": "https://paynym.rs/+determinedcut58",
-      "jurisdiction": "Europe",
-      "hardware": "Tanto",
-      "image": "/static/images/qr/xTx_Tanto_E_Tanto-E--xTx-.png",
-      "pairing": {
-        "type": "dojo.api",
-        "version": "1.27.0",
-        "apikey": "da28cce51e3bc4d484349c109c9c12e6",
-        "url": "http://xkjpwzcmk7nmn6vttii5uz4khsc45wh5pwypaxq25ofx3rkomuicazyd.onion/v2"
-      },
-      "explorer": {
-        "type": "explorer.btc_rpc_explorer",
-        "url": "http://jzym2wd4arlincp3bztdjz3mqh6uhh63sqeexgv6jy6xwtug4lmm3yqd.onion"
-      },
-      "signature": "-----BEGIN BITCOIN SIGNED MESSAGE-----\n{\n  \"pairing\": {\n    \"type\": \"dojo.api\",\n    \"version\": \"1.27.0\",\n    \"apikey\": \"da28cce51e3bc4d484349c109c9c12e6\",\n    \"url\": \"http://xkjpwzcmk7nmn6vttii5uz4khsc45wh5pwypaxq25ofx3rkomuicazyd.onion/v2\"\n  },\n  \"explorer\": {\n    \"type\": \"explorer.btc_rpc_explorer\",\n    \"url\": \"http://jzym2wd4arlincp3bztdjz3mqh6uhh63sqeexgv6jy6xwtug4lmm3yqd.onion\"\n  }\n}\n\nBIP47:\nPM8TJQwkgoVeogzAQe431Bn3FSsXiCqjmFCpysFuSTjB7FaxfrJGtMAEfsA5dvptjMAAxLXKM6bDAen5tFp326EHBmRH6jQ9vJDPnSwARLmUcJoucQtd\n-----BEGIN BITCOIN SIGNATURE-----\nVersion: Bitcoin-qt (1.0)\nAddress: 134yhB7maeqdYiRNjqRYCFBLgUUzvDG58g\n\nHwzsrTebYsFcKUO1etPrfcegd6Z1fxNxxuOOmLAkb2itWkfGsExiEW/3BmQitfJ5HwOKsqcdD3HZHuVhxyMm6hg=\n-----END BITCOIN SIGNATURE-----"
-    },
-    {
       "name": "Expatriotic",
       "paynym": "+expatriotic",
       "paynym_url": "https://paynym.rs/+expatriotic",
@@ -264,6 +245,26 @@
         "type": "explorer.null",
         "url": null
       }
+    },
+    {
+      "name": "Mainnet Test",
+      "paynym": "+painstakingfactor00",
+      "paynym_url": "https://paynym.rs/+painstakingfactor00",
+      "jurisdiction": "EU",
+      "hardware": "M910 12gb",
+      "pairing": {
+        "type": "dojo.api",
+        "version": "1.29.1",
+        "apikey": "55368b8cd74d67d49a31002a5ab500cf",
+        "url": "http://a34ald73bhz625jhdaksnlq6rnbjrqgjxq52j6ms3atx7vqdhgp7sxyd.onion/v2"
+      },
+      "explorer": {
+        "type": "explorer.btc_rpc_explorer",
+        "url": "http://it3nnxof4ad7zi2xi33j4iwedy6grkdikwwfcco2sd7yudkosu2ruvid.onion"
+      },
+      "electrum_server": "tmie4ggcjawm53fh2yvvmznqwahgvwuqpip7acp63ruw2ct5wagddzyd.onion",
+      "image": "/static/images/qr/Mainnet_Test_7690eb82.png",
+      "signature": "{\r\n    \"pairing\": {\r\n        \"type\": \"dojo.api\",\r\n        \"version\": \"1.29.1\",\r\n        \"apikey\": \"55368b8cd74d67d49a31002a5ab500cf\",\r\n        \"url\": \"http://a34ald73bhz625jhdaksnlq6rnbjrqgjxq52j6ms3atx7vqdhgp7sxyd.onion/v2\"\r\n    },\r\n    \"explorer\": {\r\n        \"type\": \"explorer.btc_rpc_explorer\",\r\n        \"url\": \"http://it3nnxof4ad7zi2xi33j4iwedy6grkdikwwfcco2sd7yudkosu2ruvid.onion\"\r\n    }\r\n}"
     }
   ],
   "testnet": [

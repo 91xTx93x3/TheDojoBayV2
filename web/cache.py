@@ -83,3 +83,13 @@ class StatusCache:
                 json.dump(cache, f, indent=2)
         except (IOError, OSError) as e:
             print(f"Failed to save cache to file: {e}")
+
+    def invalidate(self) -> None:
+        """Clear in-memory cache and delete the cache file."""
+        with self._lock:
+            self._memory_cache = {"data": None, "timestamp": None}
+        try:
+            if self.cache_file.exists():
+                self.cache_file.unlink()
+        except (IOError, OSError) as e:
+            print(f"Failed to delete cache file: {e}")

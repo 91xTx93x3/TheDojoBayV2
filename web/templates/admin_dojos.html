@@ -161,8 +161,9 @@ content %}
     </div>
     <form
       method="POST"
-      action="/admin/dojos/{{ dojo.id }}/reject"
+      action="/admin/dojos/{{ dojo.id }}/revoke"
       style="display: inline"
+      onsubmit="return confirm('Remove {{ dojo.name }} from the live directory?')"
     >
       <button
         type="submit"

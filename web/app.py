@@ -349,18 +349,80 @@ def dojo_edit(dojo_id):
 
 @app.route('/add-dojo/delete/<dojo_id>', methods=['POST'])
 def dojo_delete(dojo_id):
-    """Delete a dojo (owner only)."""
+    """Delete a dojo (owner only) — marks as deleted for deferred cleanup."""
     paynym = _require_login()
     if not paynym:
         return redirect(url_for('add_dojo'))
     submissions = _load_submissions()
-    submissions = [d for d in submissions
-                   if not (d.get('id') == dojo_id and d.get('paynym') == paynym)]
+    for d in submissions:
+        if d.get('id') == dojo_id and d.get('paynym') == paynym:
+            d['status']     = 'deleted'
+            d['updated_at'] = datetime.now().isoformat()
+            break
     _save_submissions(submissions)
     return redirect(url_for('dojo_dashboard'))
 
 
 # ── Admin routes (ADMIN_PAYNMS only) ─────────────────────────────────────────
+
+def _cleanup_old_submissions():
+    """Purge images and records for rejected/deleted submissions older than 3 days."""
+    if not SUBMISSIONS_FILE.exists():
+        return
+    from datetime import timedelta
+    cutoff = datetime.now() - timedelta(days=3)
+    try:
+        submissions = _load_submissions()
+    except Exception:
+        return
+
+    to_keep = []
+    purged = 0
+    for dojo in submissions:
+        status = dojo.get('status')
+        if status not in ('rejected', 'deleted'):
+            to_keep.append(dojo)
+            continue
+        try:
+            updated = datetime.fromisoformat(dojo.get('updated_at', ''))
+        except (ValueError, TypeError):
+            to_keep.append(dojo)
+            continue
+        if updated >= cutoff:
+            to_keep.append(dojo)
+            continue
+
+        # ── Older than 3 days: delete files ───────────────────────────────────
+        # Uploaded image (static/images/dojos/)
+        if dojo.get('image_file'):
+            p = DOJO_IMAGE_DIR / dojo['image_file']
+            if p.exists():
+                try:
+                    p.unlink()
+                except OSError:
+                    pass
+
+        # QR image (static/images/qr/)
+        qr_filename = dojo.get('qr_filename')
+        if not qr_filename:
+            safe_name = ''.join(
+                c if c.isalnum() or c in '-_' else '_'
+                for c in dojo.get('name', 'dojo')
+            )
+            qr_filename = f"{safe_name}_{dojo.get('id', '')[:8]}.png"
+        qr_path = Path(__file__).parent / 'static' / 'images' / 'qr' / qr_filename
+        if qr_path.exists():
+            try:
+                qr_path.unlink()
+            except OSError:
+                pass
+
+        purged += 1
+        print(f"[CLEANUP] Purged {status} submission >3d: {dojo.get('name')} ({dojo.get('id', '')[:8]})")
+
+    if purged:
+        _save_submissions(to_keep)
+
 
 def _require_admin():
     """Return paynym if admin, else None."""
@@ -440,8 +502,11 @@ def admin_approve(dojo_id):
             )
             qr.add_data(qr_data)
             qr.make(fit=True)
+            from PIL import Image as _PILImage
             img = qr.make_image(fill_color='#000000', back_color='#ffffff')
-            img.save(str(qr_path))
+            pil_img = img.get_image().convert('RGB')
+            pil_img = pil_img.resize((400, 400), _PILImage.NEAREST)
+            pil_img.save(str(qr_path))
         except Exception:
             qr_filename = None
 
@@ -458,9 +523,20 @@ def admin_approve(dojo_id):
     if qr_filename:
         new_entry['image'] = f'/static/images/qr/{qr_filename}'
     if pairing_obj:
-        new_entry['pairing'] = pairing_obj
+        # pairing_details may be a wrapped {"pairing": {...}, "explorer": {...}}
+        # or already a flat pairing object — handle both
+        inner_pairing = pairing_obj.get('pairing', pairing_obj)
+        inner_explorer = pairing_obj.get('explorer')
+        if inner_pairing:
+            new_entry['pairing'] = inner_pairing
+        if inner_explorer:
+            new_entry['explorer'] = inner_explorer
     if dojo.get('electrum_server'):
         new_entry['electrum_server'] = dojo['electrum_server']
+    # Use explicit signed message if provided, otherwise fall back to pairing_details
+    signature_content = dojo.get('signature_text') or dojo.get('pairing_details', '')
+    if signature_content:
+        new_entry['signature'] = signature_content
 
     # Load, append, save dojos_data.json
     with open(DOJOS_DATA_FILE) as f:
@@ -471,9 +547,11 @@ def admin_approve(dojo_id):
     with open(DOJOS_DATA_FILE, 'w') as f:
         json.dump(dojos_data, f, indent=2, ensure_ascii=False)
 
-    # ── 5. Mark submission approved ───────────────────────────────────────────
-    dojo['status']     = 'approved'
-    dojo['updated_at'] = datetime.now().isoformat()
+    # ── 5. Mark submission approved and store qr filename ────────────────────
+    dojo['status']      = 'approved'
+    dojo['updated_at']  = datetime.now().isoformat()
+    if qr_filename:
+        dojo['qr_filename'] = qr_filename
     _save_submissions(submissions)
 
     # ── 6. Reload in-memory data so new node is checked immediately ───────────
@@ -497,6 +575,46 @@ def admin_reject(dojo_id):
             d['updated_at'] = datetime.now().isoformat()
             break
     _save_submissions(submissions)
+    return redirect(url_for('admin_dojos'))
+
+
+@app.route('/admin/dojos/<dojo_id>/revoke', methods=['POST'])
+def admin_revoke(dojo_id):
+    """Revoke an approved dojo: remove from dojos_data.json and mark rejected."""
+    if not _require_admin():
+        return redirect(url_for('index'))
+
+    submissions = _load_submissions()
+    dojo = next((d for d in submissions if d.get('id') == dojo_id), None)
+    if not dojo:
+        return redirect(url_for('admin_dojos'))
+
+    # Remove from dojos_data.json by matching name + network
+    network = dojo.get('network', 'mainnet')
+    name    = dojo.get('name', '')
+    with open(DOJOS_DATA_FILE) as f:
+        dojos_data = json.load(f)
+    before = len(dojos_data.get(network, []))
+    dojos_data[network] = [
+        d for d in dojos_data.get(network, [])
+        if d.get('name') != name
+    ]
+    if len(dojos_data[network]) < before:
+        with open(DOJOS_DATA_FILE, 'w') as f:
+            json.dump(dojos_data, f, indent=2, ensure_ascii=False)
+
+    # Mark submission as rejected
+    dojo['status']     = 'rejected'
+    dojo['updated_at'] = datetime.now().isoformat()
+    _save_submissions(submissions)
+
+    # Reload in-memory data and invalidate cache
+    global mainnet_dojos, testnet_dojos
+    mainnet_dojos, testnet_dojos = data_loader.load()
+    background_checker.mainnet_dojos = mainnet_dojos
+    background_checker.testnet_dojos = testnet_dojos
+    cache.invalidate()
+
     return redirect(url_for('admin_dojos'))
 
 

@@ -87,14 +87,27 @@ class BackgroundChecker:
             print(f"[INFO] Initial status check completed at {results['last_update']}")
         except Exception as e:
             print(f"[ERROR] Initial background check failed: {e}")
-        
+
+        checks_since_cleanup = 0
+        # Run cleanup once per day (86400s / check_interval cycles)
+        cleanup_every = max(1, 86400 // self.check_interval)
+
         # Continue with periodic checks
         while self._running:
             time.sleep(self.check_interval)
-            
+
             try:
                 results = self.checker.check_all(self.mainnet_dojos, self.testnet_dojos)
                 self.cache.save(results)
                 print(f"[INFO] Status check completed at {results['last_update']}")
             except Exception as e:
                 print(f"[ERROR] Background check failed: {e}")
+
+            checks_since_cleanup += 1
+            if checks_since_cleanup >= cleanup_every:
+                checks_since_cleanup = 0
+                try:
+                    from app import _cleanup_old_submissions
+                    _cleanup_old_submissions()
+                except Exception as e:
+                    print(f"[ERROR] Cleanup failed: {e}")
