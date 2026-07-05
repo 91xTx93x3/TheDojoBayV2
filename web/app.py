@@ -202,6 +202,35 @@ def _load_submissions():
 def _save_submissions(data):
     with open(SUBMISSIONS_FILE, 'w') as f:
         json.dump(data, f, indent=2)
+    _sync_to_workspace()
+
+
+# ── Workspace sync ────────────────────────────────────────────────────────────
+
+_WORKSPACE_DIR = Path('/root/dojobay')
+
+def _sync_to_workspace():
+    """Mirror data files and QR images to the workspace if it exists."""
+    if not _WORKSPACE_DIR.exists():
+        return
+    try:
+        def _copy(src, dst):
+            Path(dst).write_bytes(Path(src).read_bytes())
+
+        # dojos_data.json
+        _copy(DOJOS_DATA_FILE, _WORKSPACE_DIR / 'dojos_data.json')
+        # dojo_submissions.json
+        _copy(SUBMISSIONS_FILE, _WORKSPACE_DIR / 'dojo_submissions.json')
+        # QR images (only new ones)
+        src_qr = Path(__file__).parent / 'static' / 'images' / 'qr'
+        dst_qr = _WORKSPACE_DIR / 'web' / 'static' / 'images' / 'qr'
+        dst_qr.mkdir(parents=True, exist_ok=True)
+        for f in src_qr.iterdir():
+            dst = dst_qr / f.name
+            if not dst.exists():
+                _copy(f, dst)
+    except Exception as e:
+        print(f'[SYNC] workspace sync failed: {e}')
 
 
 def _require_login():
