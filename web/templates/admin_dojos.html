@@ -59,8 +59,8 @@ content %}
       class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3"
     >
       <div class="paynym-code">
-        <i class="bi bi-person-badge me-1"></i>{{ dojo.paynym[:12] }}…{{
-        dojo.paynym[-6:] }}
+        <i class="bi bi-person-badge me-1"></i>{{ dojo.paynym_alias or
+        (dojo.paynym[:12] + '…' + dojo.paynym[-6:]) }}
       </div>
       <div class="d-flex gap-2">
         <form
@@ -151,8 +151,8 @@ content %}
   >
     <div>
       <span class="paynym-code"
-        ><i class="bi bi-person-badge me-1"></i>{{ dojo.paynym[:12] }}…{{
-        dojo.paynym[-6:] }}</span
+        ><i class="bi bi-person-badge me-1"></i>{{ dojo.paynym_alias or
+        (dojo.paynym[:12] + '…' + dojo.paynym[-6:]) }}</span
       >
       {% if dojo.jurisdiction %}<span
         style="color: #aaa; font-size: 0.82rem; margin-left: 1rem"
@@ -197,8 +197,8 @@ content %}
   >
     <div>
       <span class="paynym-code"
-        ><i class="bi bi-person-badge me-1"></i>{{ dojo.paynym[:12] }}…{{
-        dojo.paynym[-6:] }}</span
+        ><i class="bi bi-person-badge me-1"></i>{{ dojo.paynym_alias or
+        (dojo.paynym[:12] + '…' + dojo.paynym[-6:]) }}</span
       >
       {% if dojo.jurisdiction %}<span
         style="color: #aaa; font-size: 0.82rem; margin-left: 1rem"

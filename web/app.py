@@ -83,6 +83,31 @@ ADMIN_PAYNMS = {
 }
 
 
+def _resolve_paynym_alias(payment_code):
+    """Resolve a BIP47 payment code to a PayNym alias via paynym.rs.
+    Returns the alias string (e.g. '+arkad') or None on failure."""
+    if not (payment_code and payment_code.startswith('PM8T')):
+        return None
+    try:
+        import urllib.request, ssl
+        req_data = json.dumps({'nym': payment_code}).encode()
+        req = urllib.request.Request(
+            'https://paynym.rs/api/v1/nym',
+            data=req_data,
+            headers={'Content-Type': 'application/json'},
+            method='POST',
+        )
+        ctx = ssl.create_default_context()
+        with urllib.request.urlopen(req, timeout=10, context=ctx) as resp:
+            info = json.loads(resp.read())
+        nym_name = info.get('nymName') or info.get('nym_name')
+        if nym_name:
+            return f'+{nym_name}' if not nym_name.startswith('+') else nym_name
+    except Exception:
+        pass
+    return None
+
+
 @app.context_processor
 def inject_session_paynym():
     """Expose logged-in PayNym and avatar URL to all templates."""
@@ -292,6 +317,7 @@ def dojo_new():
         entry = {
             'id': str(uuid.uuid4()),
             'paynym': paynym,
+            'paynym_alias': _resolve_paynym_alias(paynym),
             'name': name,
             'network': request.form.get('network', 'mainnet').strip(),
             'jurisdiction': request.form.get('jurisdiction', '').strip(),
@@ -333,15 +359,35 @@ def dojo_edit(dojo_id):
                                    error='Pairing details are required.',
                                    form_data=request.form)
         new_image = _save_dojo_image(request.files.get('image'), dojo.get('image_file'))
+        was_approved = dojo.get('status') == 'approved'
+        old_name     = dojo.get('name', '')
         dojo['name']           = name
         dojo['network']        = request.form.get('network', 'mainnet').strip()
         dojo['jurisdiction']   = request.form.get('jurisdiction', '').strip()
         dojo['hardware']       = request.form.get('hardware', '').strip()
         dojo['pairing_details'] = pairing_details
         dojo['electrum_server'] = request.form.get('electrum_server', '').strip()
+        if not dojo.get('paynym_alias'):
+            dojo['paynym_alias'] = _resolve_paynym_alias(dojo.get('paynym', ''))
         if new_image:
             dojo['image_file'] = new_image
         dojo['updated_at'] = datetime.now().isoformat()
+        # If previously approved, revoke from live directory and require re-approval
+        if was_approved:
+            dojo['status'] = 'pending'
+            network  = dojo.get('network', 'mainnet')
+            with open(DOJOS_DATA_FILE) as f:
+                dojos_data = json.load(f)
+            dojos_data[network] = [
+                d for d in dojos_data.get(network, []) if d.get('name') != old_name
+            ]
+            with open(DOJOS_DATA_FILE, 'w') as f:
+                json.dump(dojos_data, f, indent=2, ensure_ascii=False)
+            global mainnet_dojos, testnet_dojos
+            mainnet_dojos, testnet_dojos = data_loader.load()
+            background_checker.mainnet_dojos = mainnet_dojos
+            background_checker.testnet_dojos = testnet_dojos
+            cache.invalidate()
         _save_submissions(submissions)
         return redirect(url_for('dojo_dashboard'))
     return render_template('dojo_form.html', mode='edit', dojo=dojo)
@@ -435,6 +481,16 @@ def admin_dojos():
     if not _require_admin():
         return redirect(url_for('index'))
     submissions = _load_submissions()
+    # Resolve missing paynym aliases (one-time, lazy backfill)
+    changed = False
+    for d in submissions:
+        if not d.get('paynym_alias') and d.get('paynym', '').startswith('PM8T'):
+            alias = _resolve_paynym_alias(d['paynym'])
+            if alias:
+                d['paynym_alias'] = alias
+                changed = True
+    if changed:
+        _save_submissions(submissions)
     pending  = [d for d in submissions if d.get('status') == 'pending']
     approved = [d for d in submissions if d.get('status') == 'approved']
     rejected = [d for d in submissions if d.get('status') == 'rejected']
