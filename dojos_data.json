@@ -320,25 +320,6 @@
       }
     },
     {
-      "name": "91xTx93 Blue",
-      "paynym": "+determinedcut58",
-      "paynym_url": "https://paynym.rs/+determinedcut58",
-      "jurisdiction": "Europe",
-      "hardware": "M710q 8gb Ubuntu 24.04",
-      "image": "/static/images/qr/xTx_Blue_xtx-Blue-Dojobay.png",
-      "pairing": {
-        "type": "dojo.api",
-        "version": "1.27.0",
-        "apikey": "7fcdb00957d3ab314b710d48907b4629",
-        "url": "http://kjv62weg6bm34yf6244jcxl3sc3ntpsojdd5xrpzhv2c36b5u5u4gkad.onion/test/v2"
-      },
-      "explorer": {
-        "type": "explorer.btc_rpc_explorer",
-        "url": "http://vvxwpqyfi3tbqpkjszlt6rvwwiqr4s2f457myntkbk4lcihvt5oti7qd.onion"
-      },
-      "signature": "-----BEGIN BITCOIN SIGNED MESSAGE-----\n{\n  \"pairing\": {\n    \"type\": \"dojo.api\",\n    \"version\": \"1.27.0\",\n    \"apikey\": \"7fcdb00957d3ab314b710d48907b4629\",\n    \"url\": \"http://kjv62weg6bm34yf6244jcxl3sc3ntpsojdd5xrpzhv2c36b5u5u4gkad.onion/test/v2\"\n  },\n  \"explorer\": {\n    \"type\": \"explorer.btc_rpc_explorer\",\n    \"url\": \"http://vvxwpqyfi3tbqpkjszlt6rvwwiqr4s2f457myntkbk4lcihvt5oti7qd.onion\"\n  }\n}\n\nBIP47:\nPM8TJQwkgoVeogzAQe431Bn3FSsXiCqjmFCpysFuSTjB7FaxfrJGtMAEfsA5dvptjMAAxLXKM6bDAen5tFp326EHBmRH6jQ9vJDPnSwARLmUcJoucQtd\n-----BEGIN BITCOIN SIGNATURE-----\nVersion: Bitcoin-qt (1.0)\nAddress: 134yhB7maeqdYiRNjqRYCFBLgUUzvDG58g\n\nIM7PbTwok40mRZmEYKzcRtMTFrtcE5sudMdvAJgoid+MSLK1PZNlDbEFi2KqXbsQoWE4ZtbQRXPy3sEo6S7a7dc=\n-----END BITCOIN SIGNATURE-----"
-    },
-    {
       "name": "BottomshelfBTC",
       "paynym": "+apprehensiverace53",
       "paynym_url": "https://paynym.rs/+apprehensiverace53",
@@ -379,6 +360,25 @@
       },
       "electrum_server": "xnkshos5cd6skc3mdzwrfj6erddo24hm4myfsb6b6qyedvroptijg6id.onion",
       "signature": "{\r\n    \"pairing\": {\r\n        \"type\": \"dojo.api\",\r\n        \"version\": \"1.29.2\",\r\n        \"apikey\": \"cdb0d29377c9088275817fcd7d643013\",\r\n        \"url\": \"http://4f6hya64dcofjavp66illnynpoxjdfc2bnvwduleqkvjuqq633d2fiyd.onion/test/v2\"\r\n    },\r\n    \"explorer\": {\r\n        \"type\": \"explorer.btc_rpc_explorer\",\r\n        \"url\": \"http://p7wvh24b6mdt3gqa2b2ynyei4ib6xahvk5wzqlgu6olamyvej6fkczqd.onion\"\r\n    }\r\n}"
+    },
+    {
+      "name": "91xTx93x3 Blue",
+      "paynym": "+91xTx93x3",
+      "paynym_url": "https://paynym.rs/+91xTx93x3",
+      "jurisdiction": "EU",
+      "hardware": "ThinkCentre M710q 8gb",
+      "image": "/static/images/qr/91xTx93x3_Blue_08532008.png",
+      "pairing": {
+        "type": "dojo.api",
+        "version": "1.29.1",
+        "apikey": "7fcdb00957d3ab314b710d48907b4629",
+        "url": "http://kjv62weg6bm34yf6244jcxl3sc3ntpsojdd5xrpzhv2c36b5u5u4gkad.onion/test/v2"
+      },
+      "explorer": {
+        "type": "explorer.btc_rpc_explorer",
+        "url": "http://vvxwpqyfi3tbqpkjszlt6rvwwiqr4s2f457myntkbk4lcihvt5oti7qd.onion"
+      },
+      "signature": "{\r\n    \"pairing\": {\r\n        \"type\": \"dojo.api\",\r\n        \"version\": \"1.29.1\",\r\n        \"apikey\": \"7fcdb00957d3ab314b710d48907b4629\",\r\n        \"url\": \"http://kjv62weg6bm34yf6244jcxl3sc3ntpsojdd5xrpzhv2c36b5u5u4gkad.onion/test/v2\"\r\n    },\r\n    \"explorer\": {\r\n        \"type\": \"explorer.btc_rpc_explorer\",\r\n        \"url\": \"http://vvxwpqyfi3tbqpkjszlt6rvwwiqr4s2f457myntkbk4lcihvt5oti7qd.onion\"\r\n    }\r\n}"
     }
   ]
 }

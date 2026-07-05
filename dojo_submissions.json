@@ -78,5 +78,21 @@
     "updated_at": "2026-07-05T08:47:15.004132",
     "status": "approved",
     "qr_filename": "91xTx93x3_Green_c422b6a1.png"
+  },
+  {
+    "id": "08532008-087a-47c8-863d-995294167276",
+    "paynym": "PM8TJQwkgoVeogzAQe431Bn3FSsXiCqjmFCpysFuSTjB7FaxfrJGtMAEfsA5dvptjMAAxLXKM6bDAen5tFp326EHBmRH6jQ9vJDPnSwARLmUcJoucQtd",
+    "paynym_alias": "+91xTx93x3",
+    "name": "91xTx93x3 Blue",
+    "network": "testnet",
+    "jurisdiction": "EU",
+    "hardware": "ThinkCentre M710q 8gb",
+    "pairing_details": "{\r\n    \"pairing\": {\r\n        \"type\": \"dojo.api\",\r\n        \"version\": \"1.29.1\",\r\n        \"apikey\": \"7fcdb00957d3ab314b710d48907b4629\",\r\n        \"url\": \"http://kjv62weg6bm34yf6244jcxl3sc3ntpsojdd5xrpzhv2c36b5u5u4gkad.onion/test/v2\"\r\n    },\r\n    \"explorer\": {\r\n        \"type\": \"explorer.btc_rpc_explorer\",\r\n        \"url\": \"http://vvxwpqyfi3tbqpkjszlt6rvwwiqr4s2f457myntkbk4lcihvt5oti7qd.onion\"\r\n    }\r\n}",
+    "electrum_server": "",
+    "image_file": null,
+    "submitted_at": "2026-07-05T10:05:44.629036",
+    "updated_at": "2026-07-05T10:05:51.506789",
+    "status": "approved",
+    "qr_filename": "91xTx93x3_Blue_08532008.png"
   }
 ]
