@@ -289,25 +289,6 @@
   ],
   "testnet": [
     {
-      "name": "91xTx93 Green",
-      "paynym": "+determinedcut58",
-      "paynym_url": "https://paynym.rs/+determinedcut58",
-      "jurisdiction": "Europe",
-      "hardware": "M900 8gb Ubuntu 24.04",
-      "image": "/static/images/qr/xTx_Green_xtx-Green-Dojobay-1.png",
-      "pairing": {
-        "type": "dojo.api",
-        "version": "1.27.0",
-        "apikey": "cdb0d29377c9088275817fcd7d643013",
-        "url": "http://4f6hya64dcofjavp66illnynpoxjdfc2bnvwduleqkvjuqq633d2fiyd.onion/test/v2"
-      },
-      "explorer": {
-        "type": "explorer.btc_rpc_explorer",
-        "url": "http://p7wvh24b6mdt3gqa2b2ynyei4ib6xahvk5wzqlgu6olamyvej6fkczqd.onion"
-      },
-      "signature": "-----BEGIN BITCOIN SIGNED MESSAGE-----\n{\n  \"pairing\": {\n    \"type\": \"dojo.api\",\n    \"version\": \"1.27.0\",\n    \"apikey\": \"cdb0d29377c9088275817fcd7d643013\",\n    \"url\": \"http://4f6hya64dcofjavp66illnynpoxjdfc2bnvwduleqkvjuqq633d2fiyd.onion/test/v2\"\n  },\n  \"explorer\": {\n    \"type\": \"explorer.btc_rpc_explorer\",\n    \"url\": \"http://p7wvh24b6mdt3gqa2b2ynyei4ib6xahvk5wzqlgu6olamyvej6fkczqd.onion\"\n  }\n}\n\nBIP47:\nPM8TJQwkgoVeogzAQe431Bn3FSsXiCqjmFCpysFuSTjB7FaxfrJGtMAEfsA5dvptjMAAxLXKM6bDAen5tFp326EHBmRH6jQ9vJDPnSwARLmUcJoucQtd\n-----BEGIN BITCOIN SIGNATURE-----\nVersion: Bitcoin-qt (1.0)\nAddress: 134yhB7maeqdYiRNjqRYCFBLgUUzvDG58g\n\nIAbi5uYD31Sdw/UPC7o4e2Wlw2pDJ5KWR1SYx4TRXFpQGwutt4+D+7O/RV9qrwW9Up1WyB3rfHdp7JY5mHI1ydE=\n-----END BITCOIN SIGNATURE-----"
-    },
-    {
       "name": "@Libertarian",
       "paynym": "+belligerentprinciple63",
       "paynym_url": "https://paynym.rs/+belligerentprinciple63",

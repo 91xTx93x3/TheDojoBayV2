@@ -1048,7 +1048,10 @@
                                         }
                                         ${
                                           dojo.signature
-                                            ? `
+                                            ? dojo.signature.startsWith(
+                                                "-----BEGIN BITCOIN SIGNED MESSAGE-----",
+                                              )
+                                              ? `
                                             <div id="signature-mainnet-${index}" style="display: none; background-color: var(--card-bg); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin-top: 1rem; max-width: 750px;">
                                                 <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0.75rem;">
                                                     <div style="color: #00ff00; font-weight: 600; font-size: 0.95rem;">
@@ -1060,7 +1063,28 @@
                                                 </div>
                                                 <pre id="signature-text-mainnet-${index}" style="background-color: #000; color: #00ff00; padding: 1rem; border-radius: 6px; font-size: 0.7rem; margin: 0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; border: 1px solid #00ff00;">${dojo.signature}</pre>
                                             </div>
-                                        `
+                                              `
+                                              : `
+                                            <div id="signature-mainnet-${index}" style="display: none; background-color: var(--card-bg); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin-top: 1rem; max-width: 750px;">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <img src="https://paynym.rs/${dojo.paynym}/avatar" alt="${dojo.paynym} avatar"
+                                                         style="width: 64px; height: 64px; border-radius: 50%; border: 2px solid #00ff00; object-fit: cover; flex-shrink: 0;"
+                                                         onerror="this.style.display='none'">
+                                                    <div>
+                                                        <div style="color: #00ff00; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem;">
+                                                            <i class="bi bi-person-check"></i> PAYNYM VERIFIED
+                                                        </div>
+                                                        <div style="color: #ccc; font-size: 0.85rem;">
+                                                            Submitted directly by the owner of PayNym
+                                                            <a href="https://paynym.rs/${dojo.paynym}" target="_blank" rel="noopener noreferrer"
+                                                               style="color: #00ff00; text-decoration: none; font-weight: 600;">
+                                                                ${dojo.paynym}
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                              `
                                             : ""
                                         }
                                         </div>
@@ -1206,7 +1230,10 @@
                                         }
                                         ${
                                           dojo.signature
-                                            ? `
+                                            ? dojo.signature.startsWith(
+                                                "-----BEGIN BITCOIN SIGNED MESSAGE-----",
+                                              )
+                                              ? `
                                             <div id="signature-testnet-${index}" style="display: none; background-color: var(--card-bg); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin-top: 1rem; max-width: 750px;">
                                                 <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0.75rem;">
                                                     <div style="color: #00ff00; font-weight: 600; font-size: 0.95rem;">
@@ -1218,7 +1245,28 @@
                                                 </div>
                                                 <pre id="signature-text-testnet-${index}" style="background-color: #000; color: #00ff00; padding: 1rem; border-radius: 6px; font-size: 0.7rem; margin: 0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; border: 1px solid #00ff00;">${dojo.signature}</pre>
                                             </div>
-                                        `
+                                              `
+                                              : `
+                                            <div id="signature-testnet-${index}" style="display: none; background-color: var(--card-bg); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin-top: 1rem; max-width: 750px;">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <img src="https://paynym.rs/${dojo.paynym}/avatar" alt="${dojo.paynym} avatar"
+                                                         style="width: 64px; height: 64px; border-radius: 50%; border: 2px solid #00ff00; object-fit: cover; flex-shrink: 0;"
+                                                         onerror="this.style.display='none'">
+                                                    <div>
+                                                        <div style="color: #00ff00; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem;">
+                                                            <i class="bi bi-person-check"></i> PAYNYM VERIFIED
+                                                        </div>
+                                                        <div style="color: #ccc; font-size: 0.85rem;">
+                                                            Submitted directly by the owner of PayNym
+                                                            <a href="https://paynym.rs/${dojo.paynym}" target="_blank" rel="noopener noreferrer"
+                                                               style="color: #00ff00; text-decoration: none; font-weight: 600;">
+                                                                ${dojo.paynym}
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                              `
                                             : ""
                                         }
                                         </div>
