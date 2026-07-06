@@ -227,7 +227,7 @@
       },
       "electrum_server": "x444eboylam4gmun3dcozm25edjrr6kd3a4n6rlvazazb5vxdyx3o7qd.onion",
       "signature": "{\r\n    \"pairing\": {\r\n        \"type\": \"dojo.api\",\r\n        \"version\": \"1.29.1\",\r\n        \"apikey\": \"3321cf8da75c4a2a51dfe2e7f34740d5\",\r\n        \"url\": \"http://udwtsxnrqtnodfk5xdmx75oeqfotoiyw6hovj2fwn542kfk6r4gxkwyd.onion/v2\"\r\n    },\r\n    \"explorer\": {\r\n        \"type\": \"explorer.btc_rpc_explorer\",\r\n        \"url\": \"http://lmn4glvizcicqvioxibel44hgmrhxsrs57omu2gvmhdx5itk73r33xqd.onion\"\r\n    }\r\n}",
-      "pairing_details": "{\n    \"pairing\": {\n        \"type\": \"dojo.api\",\n        \"version\": \"1.29.1\",\n        \"apikey\": \"3321cf8da75c4a2a51dfe2e7f34740d5\",\n        \"url\": \"http://udwtsxnrqtnodfk5xdmx75oeqfotoiyw6hovj2fwn542kfk6r4gxkwyd.onion/v2\"\n    },\n    \"explorer\": {\n        \"type\": \"explorer.btc_rpc_explorer\",\n        \"url\": \"http://lmn4glvizcicqvioxibel44hgmrhxsrs57omu2gvmhdx5itk73r33xqd.onion\"\n    }\n}"
+      "pairing_details": "{\r\n    \"pairing\": {\r\n        \"type\": \"dojo.api\",\r\n        \"version\": \"1.29.1\",\r\n        \"apikey\": \"3321cf8da75c4a2a51dfe2e7f34740d5\",\r\n        \"url\": \"http://udwtsxnrqtnodfk5xdmx75oeqfotoiyw6hovj2fwn542kfk6r4gxkwyd.onion/v2\"\r\n    },\r\n    \"explorer\": {\r\n        \"type\": \"explorer.btc_rpc_explorer\",\r\n        \"url\": \"http://lmn4glvizcicqvioxibel44hgmrhxsrs57omu2gvmhdx5itk73r33xqd.onion\"\r\n    }\r\n}"
     },
     {
       "name": "91xTx93x3 Red",
@@ -248,7 +248,7 @@
       },
       "electrum_server": "tmie4ggcjawm53fh2yvvmznqwahgvwuqpip7acp63ruw2ct5wagddzyd.onion",
       "signature": "{\r\n    \"pairing\": {\r\n        \"type\": \"dojo.api\",\r\n        \"version\": \"1.29.1\",\r\n        \"apikey\": \"55368b8cd74d67d49a31002a5ab500cf\",\r\n        \"url\": \"http://a34ald73bhz625jhdaksnlq6rnbjrqgjxq52j6ms3atx7vqdhgp7sxyd.onion/v2\"\r\n    },\r\n    \"explorer\": {\r\n        \"type\": \"explorer.btc_rpc_explorer\",\r\n        \"url\": \"http://it3nnxof4ad7zi2xi33j4iwedy6grkdikwwfcco2sd7yudkosu2ruvid.onion\"\r\n    }\r\n}",
-      "pairing_details": "{\n    \"pairing\": {\n        \"type\": \"dojo.api\",\n        \"version\": \"1.29.1\",\n        \"apikey\": \"55368b8cd74d67d49a31002a5ab500cf\",\n        \"url\": \"http://a34ald73bhz625jhdaksnlq6rnbjrqgjxq52j6ms3atx7vqdhgp7sxyd.onion/v2\"\n    },\n    \"explorer\": {\n        \"type\": \"explorer.btc_rpc_explorer\",\n        \"url\": \"http://it3nnxof4ad7zi2xi33j4iwedy6grkdikwwfcco2sd7yudkosu2ruvid.onion\"\n    }\n}"
+      "pairing_details": "{\r\n    \"pairing\": {\r\n        \"type\": \"dojo.api\",\r\n        \"version\": \"1.29.1\",\r\n        \"apikey\": \"55368b8cd74d67d49a31002a5ab500cf\",\r\n        \"url\": \"http://a34ald73bhz625jhdaksnlq6rnbjrqgjxq52j6ms3atx7vqdhgp7sxyd.onion/v2\"\r\n    },\r\n    \"explorer\": {\r\n        \"type\": \"explorer.btc_rpc_explorer\",\r\n        \"url\": \"http://it3nnxof4ad7zi2xi33j4iwedy6grkdikwwfcco2sd7yudkosu2ruvid.onion\"\r\n    }\r\n}"
     },
     {
       "name": "Arkad",
@@ -267,7 +267,28 @@
         "url": "http://mempoolhqx4isw62xs7abwphsq7ldayuidyx2v2oethdhhj6mlo2r6ad.onion"
       },
       "signature": "{\r\n    \"pairing\": {\r\n        \"type\": \"dojo.api\",\r\n        \"version\": \"1.29.2\",\r\n        \"apikey\": \"ff7fd7bc4c6db6279f013017a05b3a22\",\r\n        \"url\": \"http://e7le2zji4z5fxlxzyv2cbuuwl65o2gaie5s3vob6hfvkngupqcmixkad.onion/v2\"\r\n    },\r\n    \"explorer\": {\r\n        \"type\": \"explorer.null\",\r\n        \"url\": \"http://mempoolhqx4isw62xs7abwphsq7ldayuidyx2v2oethdhhj6mlo2r6ad.onion\"\r\n    }\r\n}",
-      "pairing_details": "{\n    \"pairing\": {\n        \"type\": \"dojo.api\",\n        \"version\": \"1.29.2\",\n        \"apikey\": \"ff7fd7bc4c6db6279f013017a05b3a22\",\n        \"url\": \"http://e7le2zji4z5fxlxzyv2cbuuwl65o2gaie5s3vob6hfvkngupqcmixkad.onion/v2\"\n    },\n    \"explorer\": {\n        \"type\": \"explorer.null\",\n        \"url\": \"http://mempoolhqx4isw62xs7abwphsq7ldayuidyx2v2oethdhhj6mlo2r6ad.onion\"\n    }\n}"
+      "pairing_details": "{\r\n    \"pairing\": {\r\n        \"type\": \"dojo.api\",\r\n        \"version\": \"1.29.2\",\r\n        \"apikey\": \"ff7fd7bc4c6db6279f013017a05b3a22\",\r\n        \"url\": \"http://e7le2zji4z5fxlxzyv2cbuuwl65o2gaie5s3vob6hfvkngupqcmixkad.onion/v2\"\r\n    },\r\n    \"explorer\": {\r\n        \"type\": \"explorer.null\",\r\n        \"url\": \"http://mempoolhqx4isw62xs7abwphsq7ldayuidyx2v2oethdhhj6mlo2r6ad.onion\"\r\n    }\r\n}"
+    },
+    {
+      "name": "RoninDojoES",
+      "paynym": "+91xTx93x3",
+      "paynym_url": "https://paynym.rs/+91xTx93x3",
+      "jurisdiction": "EU",
+      "hardware": "Tanto",
+      "image": "/static/images/qr/RoninDojoES_04f17977.png",
+      "pairing": {
+        "type": "dojo.api",
+        "version": "1.28.2",
+        "apikey": "hQ1LmAQIfOzgwqHm0qR89RDuqSHIcYRMtfXkbvC5aUdZjzd9viC7nBp2N4dhYySQ5qo4K",
+        "url": "http://xkjpwzcmk7nmn6vttii5uz4khsc45wh5pwypaxq25ofx3rkomuicazyd.onion/v2"
+      },
+      "explorer": {
+        "type": "explorer.btc_rpc_explorer",
+        "url": "http://jzym2wd4arlincp3bztdjz3mqh6uhh63sqeexgv6jy6xwtug4lmm3yqd.onion"
+      },
+      "electrum_server": "3xmxfolrxdyaqbfwohdxsntem4agugpbozb2u5re2vrwhpgkl6c5ufqd.onion",
+      "pairing_details": "{\n  \"pairing\": {\n    \"type\": \"dojo.api\",\n    \"version\": \"1.28.2\",\n    \"apikey\": \"hQ1LmAQIfOzgwqHm0qR89RDuqSHIcYRMtfXkbvC5aUdZjzd9viC7nBp2N4dhYySQ5qo4K\",\n    \"url\": \"http://xkjpwzcmk7nmn6vttii5uz4khsc45wh5pwypaxq25ofx3rkomuicazyd.onion/v2\"\n  },\n  \"explorer\": {\n    \"type\": \"explorer.btc_rpc_explorer\",\n    \"url\": \"http://jzym2wd4arlincp3bztdjz3mqh6uhh63sqeexgv6jy6xwtug4lmm3yqd.onion\"\n  }\n}",
+      "signature": "H44eTowDn76YT2yGN7SF8bXhvbCSMGwxP79dZfZz7sFJCZy8ak1e57Kzn672RaKDI+cryFTeE5e+J3guVUZL1c8="
     }
   ],
   "testnet": [
@@ -343,7 +364,7 @@
       },
       "electrum_server": "xnkshos5cd6skc3mdzwrfj6erddo24hm4myfsb6b6qyedvroptijg6id.onion",
       "signature": "{\r\n    \"pairing\": {\r\n        \"type\": \"dojo.api\",\r\n        \"version\": \"1.29.2\",\r\n        \"apikey\": \"cdb0d29377c9088275817fcd7d643013\",\r\n        \"url\": \"http://4f6hya64dcofjavp66illnynpoxjdfc2bnvwduleqkvjuqq633d2fiyd.onion/test/v2\"\r\n    },\r\n    \"explorer\": {\r\n        \"type\": \"explorer.btc_rpc_explorer\",\r\n        \"url\": \"http://p7wvh24b6mdt3gqa2b2ynyei4ib6xahvk5wzqlgu6olamyvej6fkczqd.onion\"\r\n    }\r\n}",
-      "pairing_details": "{\n    \"pairing\": {\n        \"type\": \"dojo.api\",\n        \"version\": \"1.29.2\",\n        \"apikey\": \"cdb0d29377c9088275817fcd7d643013\",\n        \"url\": \"http://4f6hya64dcofjavp66illnynpoxjdfc2bnvwduleqkvjuqq633d2fiyd.onion/test/v2\"\n    },\n    \"explorer\": {\n        \"type\": \"explorer.btc_rpc_explorer\",\n        \"url\": \"http://p7wvh24b6mdt3gqa2b2ynyei4ib6xahvk5wzqlgu6olamyvej6fkczqd.onion\"\n    }\n}"
+      "pairing_details": "{\r\n    \"pairing\": {\r\n        \"type\": \"dojo.api\",\r\n        \"version\": \"1.29.2\",\r\n        \"apikey\": \"cdb0d29377c9088275817fcd7d643013\",\r\n        \"url\": \"http://4f6hya64dcofjavp66illnynpoxjdfc2bnvwduleqkvjuqq633d2fiyd.onion/test/v2\"\r\n    },\r\n    \"explorer\": {\r\n        \"type\": \"explorer.btc_rpc_explorer\",\r\n        \"url\": \"http://p7wvh24b6mdt3gqa2b2ynyei4ib6xahvk5wzqlgu6olamyvej6fkczqd.onion\"\r\n    }\r\n}"
     },
     {
       "name": "91xTx93x3 Blue",

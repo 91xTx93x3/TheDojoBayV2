@@ -806,10 +806,6 @@
                   font-size: 0.78rem;
                 "
               ></textarea>
-              <div style="color: #555; font-size: 0.75rem; margin-top: 0.3rem">
-                For armored signatures (-----BEGIN BITCOIN SIGNED MESSAGE-----)
-                the message is extracted automatically.
-              </div>
             </div>
             <div class="mb-3">
               <label
@@ -957,20 +953,6 @@
         }
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-shield-check me-1"></i>Verify';
-      }
-
-      function showSignature(network, index) {
-        const signatureDiv = document.getElementById(
-          `signature-${network}-${index}`,
-        );
-        if (
-          signatureDiv.style.display === "none" ||
-          signatureDiv.style.display === ""
-        ) {
-          signatureDiv.style.display = "block";
-        } else {
-          signatureDiv.style.display = "none";
-        }
       }
 
       function copySignature(button, index, network) {
@@ -1195,7 +1177,7 @@
                                         ${
                                           dojo.image
                                             ? `
-                                            ${dojo.signature ? `<i class="bi bi-shield-check" onclick="showSignature('mainnet', ${index})" style="position: absolute; top: 1rem; right: 300px; color: #00ff00; font-size: 1.5rem; z-index: 10; cursor: pointer;" title="View Signature"></i>` : ""}
+
                                             <div style="position: absolute; top: 1rem; right: 1rem; background-color: #fff; border: 1px solid #00ff00; border-radius: 8px; padding: 1.5rem; width: 280px; height: 280px; display: flex; align-items: center; justify-content: center;">
                                                 <img src="${dojo.image}" alt="QR Code" style="width: 250px; height: 250px; object-fit: contain; display: block;">
                                             </div>
@@ -1303,7 +1285,7 @@
                                                 "-----BEGIN BITCOIN SIGNED MESSAGE-----",
                                               )
                                               ? `
-                                            <div id="signature-mainnet-${index}" style="display: none; background-color: var(--card-bg); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin-top: 1rem; max-width: 750px;">
+                                            <div id="signature-mainnet-${index}" style="background-color: var(--card-bg); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin-top: 1rem; max-width: 750px;">
                                                 <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0.75rem;">
                                                     <div style="color: #00ff00; font-weight: 600; font-size: 0.95rem;">
                                                         <i class="bi bi-shield-check"></i> SIGNATURE
@@ -1321,7 +1303,7 @@
                                             </div>
                                               `
                                               : `
-                                            <div id="signature-mainnet-${index}" style="display: none; background-color: var(--card-bg); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin-top: 1rem; max-width: 750px;">
+                                            <div id="signature-mainnet-${index}" style="background-color: var(--card-bg); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin-top: 1rem; max-width: 750px;">
                                                 <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0.75rem;">
                                                     <div style="color: #00ff00; font-weight: 600; font-size: 0.95rem;">
                                                         <i class="bi bi-shield-check"></i> SIGNATURE
@@ -1398,7 +1380,7 @@
                                         ${
                                           dojo.image
                                             ? `
-                                            ${dojo.signature ? `<i class="bi bi-shield-check" onclick="showSignature('testnet', ${index})" style="position: absolute; top: 1rem; right: 300px; color: #00ff00; font-size: 1.5rem; z-index: 10; cursor: pointer;" title="View Signature"></i>` : ""}
+
                                             <div style="position: absolute; top: 1rem; right: 1rem; background-color: #fff; border: 1px solid #00ff00; border-radius: 8px; padding: 1.5rem; width: 280px; height: 280px; display: flex; align-items: center; justify-content: center;">
                                                 <img src="${dojo.image}" alt="QR Code" style="width: 250px; height: 250px; object-fit: contain; display: block;">
                                             </div>
@@ -1506,7 +1488,7 @@
                                                 "-----BEGIN BITCOIN SIGNED MESSAGE-----",
                                               )
                                               ? `
-                                            <div id="signature-testnet-${index}" style="display: none; background-color: var(--card-bg); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin-top: 1rem; max-width: 750px;">
+                                            <div id="signature-testnet-${index}" style="background-color: var(--card-bg); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin-top: 1rem; max-width: 750px;">
                                                 <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0.75rem;">
                                                     <div style="color: #00ff00; font-weight: 600; font-size: 0.95rem;">
                                                         <i class="bi bi-shield-check"></i> SIGNATURE
@@ -1524,7 +1506,7 @@
                                             </div>
                                               `
                                               : `
-                                            <div id="signature-testnet-${index}" style="display: none; background-color: var(--card-bg); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin-top: 1rem; max-width: 750px;">
+                                            <div id="signature-testnet-${index}" style="background-color: var(--card-bg); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin-top: 1rem; max-width: 750px;">
                                                 <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0.75rem;">
                                                     <div style="color: #00ff00; font-weight: 600; font-size: 0.95rem;">
                                                         <i class="bi bi-shield-check"></i> SIGNATURE

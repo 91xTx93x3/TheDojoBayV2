@@ -94,5 +94,22 @@
     "updated_at": "2026-07-06T15:26:30.629714",
     "status": "approved",
     "qr_filename": "91xTx93x3_Blue_fd5ef85e.png"
+  },
+  {
+    "id": "04f17977-fa5f-4b78-b3c0-53f9bf7663db",
+    "paynym": "PM8TJQwkgoVeogzAQe431Bn3FSsXiCqjmFCpysFuSTjB7FaxfrJGtMAEfsA5dvptjMAAxLXKM6bDAen5tFp326EHBmRH6jQ9vJDPnSwARLmUcJoucQtd",
+    "paynym_alias": "+91xTx93x3",
+    "name": "RoninDojoES",
+    "network": "mainnet",
+    "jurisdiction": "EU",
+    "hardware": "Tanto",
+    "pairing_details": "{\n  \"pairing\": {\n    \"type\": \"dojo.api\",\n    \"version\": \"1.28.2\",\n    \"apikey\": \"hQ1LmAQIfOzgwqHm0qR89RDuqSHIcYRMtfXkbvC5aUdZjzd9viC7nBp2N4dhYySQ5qo4K\",\n    \"url\": \"http://xkjpwzcmk7nmn6vttii5uz4khsc45wh5pwypaxq25ofx3rkomuicazyd.onion/v2\"\n  },\n  \"explorer\": {\n    \"type\": \"explorer.btc_rpc_explorer\",\n    \"url\": \"http://jzym2wd4arlincp3bztdjz3mqh6uhh63sqeexgv6jy6xwtug4lmm3yqd.onion\"\n  }\n}",
+    "pairing_signature": "H44eTowDn76YT2yGN7SF8bXhvbCSMGwxP79dZfZz7sFJCZy8ak1e57Kzn672RaKDI+cryFTeE5e+J3guVUZL1c8=",
+    "electrum_server": "3xmxfolrxdyaqbfwohdxsntem4agugpbozb2u5re2vrwhpgkl6c5ufqd.onion",
+    "image_file": null,
+    "submitted_at": "2026-07-06T17:34:17.211937",
+    "updated_at": "2026-07-06T17:34:26.069415",
+    "status": "approved",
+    "qr_filename": "RoninDojoES_04f17977.png"
   }
 ]
