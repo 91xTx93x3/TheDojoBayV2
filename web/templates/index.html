@@ -723,10 +723,241 @@
       </div>
     </footer>
 
+    <!-- Verify Signature Modal -->
+    <div
+      class="modal fade"
+      id="verifyModal"
+      tabindex="-1"
+      aria-labelledby="verifyModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div
+          class="modal-content"
+          style="
+            background: var(--card-bg);
+            border: 1px solid #00ff00;
+            color: #e0e0e0;
+          "
+        >
+          <div class="modal-header" style="border-bottom: 1px solid #333">
+            <h5
+              class="modal-title"
+              id="verifyModalLabel"
+              style="color: #00ff00"
+            >
+              <i class="bi bi-shield-check me-2"></i>Verify Signature
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label
+                for="verify-nym"
+                style="
+                  color: #aaa;
+                  font-size: 0.82rem;
+                  font-weight: 600;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                "
+                >Payment Code / PayNym</label
+              >
+              <input
+                id="verify-nym"
+                type="text"
+                class="form-control mt-1"
+                style="
+                  background: #111;
+                  border: 1px solid #333;
+                  color: #e0e0e0;
+                  font-family: monospace;
+                  font-size: 0.82rem;
+                "
+                placeholder="PM8T... or +username"
+              />
+            </div>
+            <div class="mb-3">
+              <label
+                for="verify-message"
+                style="
+                  color: #aaa;
+                  font-size: 0.82rem;
+                  font-weight: 600;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                "
+                >Message</label
+              >
+              <textarea
+                id="verify-message"
+                class="form-control mt-1"
+                rows="7"
+                style="
+                  background: #111;
+                  border: 1px solid #333;
+                  color: #e0e0e0;
+                  font-family: monospace;
+                  font-size: 0.78rem;
+                "
+              ></textarea>
+              <div style="color: #555; font-size: 0.75rem; margin-top: 0.3rem">
+                For armored signatures (-----BEGIN BITCOIN SIGNED MESSAGE-----)
+                the message is extracted automatically.
+              </div>
+            </div>
+            <div class="mb-3">
+              <label
+                for="verify-signature"
+                style="
+                  color: #aaa;
+                  font-size: 0.82rem;
+                  font-weight: 600;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                "
+                >Signature (BIP-137)</label
+              >
+              <textarea
+                id="verify-signature"
+                class="form-control mt-1"
+                rows="4"
+                style="
+                  background: #111;
+                  border: 1px solid #333;
+                  color: #e0e0e0;
+                  font-family: monospace;
+                  font-size: 0.78rem;
+                "
+              ></textarea>
+            </div>
+            <div id="verify-result" style="display: none"></div>
+          </div>
+          <div class="modal-footer" style="border-top: 1px solid #333">
+            <button
+              type="button"
+              class="btn btn-sm"
+              data-bs-dismiss="modal"
+              style="
+                background: transparent;
+                border: 1px solid #555;
+                color: #aaa;
+                padding: 0.35rem 0.9rem;
+              "
+            >
+              Close
+            </button>
+            <button
+              type="button"
+              class="btn btn-sm"
+              id="verify-btn"
+              onclick="runVerification()"
+              style="
+                background: transparent;
+                border: 1px solid #00ff00;
+                color: #00ff00;
+                padding: 0.35rem 0.9rem;
+              "
+            >
+              <i class="bi bi-shield-check me-1"></i>Verify
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
       let updateInterval;
       let lastUpdate = null;
+      const _verifyData = {};
+
+      function buildPairingMessage(dojo) {
+        // Use the exact original text that was signed if available
+        if (dojo.pairing_details) return dojo.pairing_details;
+        if (!dojo.pairing) return "";
+        return (
+          '{\n  "pairing": {\n    "type": "' +
+          (dojo.pairing.type || "N/A") +
+          '",\n    "version": "' +
+          (dojo.pairing.version || "N/A") +
+          '",\n    "apikey": "' +
+          (dojo.pairing.apikey || "N/A") +
+          '",\n    "url": "' +
+          (dojo.pairing.url || "N/A") +
+          '"\n  },\n  "explorer": {\n    "type": "' +
+          (dojo.explorer ? dojo.explorer.type || "N/A" : "N/A") +
+          '",\n    "url": "' +
+          (dojo.explorer ? dojo.explorer.url || "N/A" : "N/A") +
+          '"\n  }\n}'
+        );
+      }
+
+      function openVerifyModal(network, index) {
+        const d = _verifyData[network + "-" + index];
+        if (!d) return;
+        document.getElementById("verify-nym").value = d.nym || "";
+        document.getElementById("verify-message").value = d.message || "";
+        document.getElementById("verify-signature").value = d.signature || "";
+        const result = document.getElementById("verify-result");
+        result.style.display = "none";
+        result.innerHTML = "";
+        const btn = document.getElementById("verify-btn");
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-shield-check me-1"></i>Verify';
+        new bootstrap.Modal(document.getElementById("verifyModal")).show();
+      }
+
+      async function runVerification() {
+        const btn = document.getElementById("verify-btn");
+        const result = document.getElementById("verify-result");
+        btn.disabled = true;
+        btn.innerHTML =
+          '<i class="bi bi-hourglass-split me-1"></i>Verifying...';
+        result.style.display = "none";
+
+        const nym = document.getElementById("verify-nym").value.trim();
+        const message = document.getElementById("verify-message").value.trim();
+        const signature = document
+          .getElementById("verify-signature")
+          .value.trim();
+
+        try {
+          const resp = await fetch("/api/verify-message", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ nym, message, signature }),
+          });
+          const data = await resp.json();
+          result.style.display = "block";
+          if (data.valid) {
+            result.innerHTML = `
+              <div style="background: rgba(0,255,0,0.07); border: 1px solid #00ff00; border-radius: 8px; padding: 0.9rem;">
+                <div style="color: #00ff00; font-weight: 600;"><i class="bi bi-check-circle-fill me-2"></i>Signature is valid</div>
+                <div style="color: #aaa; font-size: 0.8rem; margin-top: 0.4rem; word-break: break-all;">
+                  Payment code: <code style="color: #00ff00;">${data.payment_code || ""}</code>
+                </div>
+              </div>`;
+          } else {
+            result.innerHTML = `
+              <div style="background: rgba(231,76,60,0.07); border: 1px solid #e74c3c; border-radius: 8px; padding: 0.9rem;">
+                <div style="color: #e74c3c; font-weight: 600;"><i class="bi bi-x-circle-fill me-2"></i>Signature is invalid</div>
+                ${data.error ? `<div style="color: #aaa; font-size: 0.8rem; margin-top: 0.4rem;">${data.error}</div>` : ""}
+              </div>`;
+          }
+        } catch (e) {
+          result.style.display = "block";
+          result.innerHTML =
+            '<div style="background: rgba(231,76,60,0.07); border: 1px solid #e74c3c; border-radius: 8px; padding: 0.9rem; color: #e74c3c;"><i class="bi bi-x-circle-fill me-2"></i>Request failed</div>';
+        }
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-shield-check me-1"></i>Verify';
+      }
 
       function showSignature(network, index) {
         const signatureDiv = document.getElementById(
@@ -882,6 +1113,26 @@
       }
 
       function renderStatus(data) {
+        // Populate verify data for all dojos
+        data.mainnet.forEach((dojo, index) => {
+          if (dojo.signature) {
+            _verifyData["mainnet-" + index] = {
+              nym: dojo.paynym || "",
+              message: buildPairingMessage(dojo),
+              signature: dojo.signature,
+            };
+          }
+        });
+        data.testnet.forEach((dojo, index) => {
+          if (dojo.signature) {
+            _verifyData["testnet-" + index] = {
+              nym: dojo.paynym || "",
+              message: buildPairingMessage(dojo),
+              signature: dojo.signature,
+            };
+          }
+        });
+
         const stats = data.stats || {
           mainnet_active: 0,
           mainnet_total: data.mainnet.length,
@@ -1057,15 +1308,36 @@
                                                     <div style="color: #00ff00; font-weight: 600; font-size: 0.95rem;">
                                                         <i class="bi bi-shield-check"></i> SIGNATURE
                                                     </div>
-                                                    <button class="btn btn-sm" style="background-color: transparent; border: 1px solid #00ff00; color: #00ff00; padding: 0.25rem 0.75rem; font-size: 0.8rem;" onclick="copySignature(this, ${index}, 'mainnet')" title="Copy to clipboard">
-                                                        <i class="bi bi-clipboard"></i> Copy
-                                                    </button>
+                                                    <div class="d-flex gap-2">
+                                                        <button class="btn btn-sm" style="background-color: transparent; border: 1px solid #00ff00; color: #00ff00; padding: 0.25rem 0.75rem; font-size: 0.8rem;" onclick="openVerifyModal('mainnet', ${index})" title="Verify signature">
+                                                            <i class="bi bi-patch-check"></i> Verify
+                                                        </button>
+                                                        <button class="btn btn-sm" style="background-color: transparent; border: 1px solid #00ff00; color: #00ff00; padding: 0.25rem 0.75rem; font-size: 0.8rem;" onclick="copySignature(this, ${index}, 'mainnet')" title="Copy to clipboard">
+                                                            <i class="bi bi-clipboard"></i> Copy
+                                                        </button>
+                                                    </div>
                                                 </div>
                                                 <pre id="signature-text-mainnet-${index}" style="background-color: #000; color: #00ff00; padding: 1rem; border-radius: 6px; font-size: 0.7rem; margin: 0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; border: 1px solid #00ff00;">${dojo.signature}</pre>
                                             </div>
                                               `
                                               : `
                                             <div id="signature-mainnet-${index}" style="display: none; background-color: var(--card-bg); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin-top: 1rem; max-width: 750px;">
+                                                <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0.75rem;">
+                                                    <div style="color: #00ff00; font-weight: 600; font-size: 0.95rem;">
+                                                        <i class="bi bi-shield-check"></i> SIGNATURE
+                                                    </div>
+                                                    <div class="d-flex gap-2">
+                                                        <button class="btn btn-sm" style="background-color: transparent; border: 1px solid #00ff00; color: #00ff00; padding: 0.25rem 0.75rem; font-size: 0.8rem;" onclick="openVerifyModal('mainnet', ${index})" title="Verify signature">
+                                                            <i class="bi bi-patch-check"></i> Verify
+                                                        </button>
+                                                        <button class="btn btn-sm" style="background-color: transparent; border: 1px solid #00ff00; color: #00ff00; padding: 0.25rem 0.75rem; font-size: 0.8rem;" onclick="copySignature(this, ${index}, 'mainnet')" title="Copy to clipboard">
+                                                            <i class="bi bi-clipboard"></i> Copy
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <pre id="signature-text-mainnet-${index}" style="background-color: #000; color: #00ff00; padding: 1rem; border-radius: 6px; font-size: 0.7rem; margin: 0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; border: 1px solid #00ff00;">${dojo.signature}</pre>
+                                            </div>
+                                            <div style="background-color: var(--card-bg); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin-top: 1rem; max-width: 750px;">
                                                 <div class="d-flex align-items-center gap-3">
                                                     <img src="https://paynym.rs/${dojo.paynym}/avatar" alt="${dojo.paynym} avatar"
                                                          style="width: 64px; height: 64px; border-radius: 50%; border: 2px solid #00ff00; object-fit: cover; flex-shrink: 0;"
@@ -1239,15 +1511,36 @@
                                                     <div style="color: #00ff00; font-weight: 600; font-size: 0.95rem;">
                                                         <i class="bi bi-shield-check"></i> SIGNATURE
                                                     </div>
-                                                    <button class="btn btn-sm" style="background-color: transparent; border: 1px solid #00ff00; color: #00ff00; padding: 0.25rem 0.75rem; font-size: 0.8rem;" onclick="copySignature(this, ${index}, 'testnet')" title="Copy to clipboard">
-                                                        <i class="bi bi-clipboard"></i> Copy
-                                                    </button>
+                                                    <div class="d-flex gap-2">
+                                                        <button class="btn btn-sm" style="background-color: transparent; border: 1px solid #00ff00; color: #00ff00; padding: 0.25rem 0.75rem; font-size: 0.8rem;" onclick="openVerifyModal('testnet', ${index})" title="Verify signature">
+                                                            <i class="bi bi-patch-check"></i> Verify
+                                                        </button>
+                                                        <button class="btn btn-sm" style="background-color: transparent; border: 1px solid #00ff00; color: #00ff00; padding: 0.25rem 0.75rem; font-size: 0.8rem;" onclick="copySignature(this, ${index}, 'testnet')" title="Copy to clipboard">
+                                                            <i class="bi bi-clipboard"></i> Copy
+                                                        </button>
+                                                    </div>
                                                 </div>
                                                 <pre id="signature-text-testnet-${index}" style="background-color: #000; color: #00ff00; padding: 1rem; border-radius: 6px; font-size: 0.7rem; margin: 0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; border: 1px solid #00ff00;">${dojo.signature}</pre>
                                             </div>
                                               `
                                               : `
                                             <div id="signature-testnet-${index}" style="display: none; background-color: var(--card-bg); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin-top: 1rem; max-width: 750px;">
+                                                <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0.75rem;">
+                                                    <div style="color: #00ff00; font-weight: 600; font-size: 0.95rem;">
+                                                        <i class="bi bi-shield-check"></i> SIGNATURE
+                                                    </div>
+                                                    <div class="d-flex gap-2">
+                                                        <button class="btn btn-sm" style="background-color: transparent; border: 1px solid #00ff00; color: #00ff00; padding: 0.25rem 0.75rem; font-size: 0.8rem;" onclick="openVerifyModal('testnet', ${index})" title="Verify signature">
+                                                            <i class="bi bi-patch-check"></i> Verify
+                                                        </button>
+                                                        <button class="btn btn-sm" style="background-color: transparent; border: 1px solid #00ff00; color: #00ff00; padding: 0.25rem 0.75rem; font-size: 0.8rem;" onclick="copySignature(this, ${index}, 'testnet')" title="Copy to clipboard">
+                                                            <i class="bi bi-clipboard"></i> Copy
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <pre id="signature-text-testnet-${index}" style="background-color: #000; color: #00ff00; padding: 1rem; border-radius: 6px; font-size: 0.7rem; margin: 0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; border: 1px solid #00ff00;">${dojo.signature}</pre>
+                                            </div>
+                                            <div style="background-color: var(--card-bg); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin-top: 1rem; max-width: 750px;">
                                                 <div class="d-flex align-items-center gap-3">
                                                     <img src="https://paynym.rs/${dojo.paynym}/avatar" alt="${dojo.paynym} avatar"
                                                          style="width: 64px; height: 64px; border-radius: 50%; border: 2px solid #00ff00; object-fit: cover; flex-shrink: 0;"

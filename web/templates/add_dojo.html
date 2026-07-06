@@ -24,8 +24,15 @@ transform: translateY(-1px); } .alert-error { background-color: rgba(231, 76,
 60, 0.15); border: 1.5px solid var(--primary); border-radius: 8px; color:
 #f1948a; padding: 0.65rem 1rem; font-size: 0.88rem; margin-bottom: 1rem; }
 .privacy-note { font-size: 0.78rem; color: var(--text-muted); text-align:
-center; margin-top: 1.5rem; line-height: 1.5; } {% endblock %} {% block content
-%}
+center; margin-top: 1.5rem; line-height: 1.5; } .uri-box { background: #111;
+border: 1.5px solid var(--border); border-radius: 8px; padding: 0.5rem 0.75rem;
+font-size: 0.72rem; font-family: monospace; color: #aaa; word-break: break-all;
+text-align: left; } .btn-copy { background: transparent; border: 1px solid
+var(--border); border-radius: 6px; color: var(--text-muted); font-size: 0.75rem;
+padding: 0.2rem 0.6rem; cursor: pointer; transition: background 0.2s, color
+0.2s; } .btn-copy:hover { background: var(--border); color: #eee; }
+.btn-copy.copied { color: #4caf50; border-color: #4caf50; } {% endblock %} {%
+block content %}
 <div class="container my-5">
   <div class="row justify-content-center">
     <div class="col-lg-5 col-md-7">
@@ -83,6 +90,25 @@ center; margin-top: 1.5rem; line-height: 1.5; } {% endblock %} {% block content
             <strong>Samourai / Ashigaru</strong> &rarr; PayNym &rarr; ⋮ &rarr;
             Auth47 &rarr; scan
           </p>
+          <!-- Copyable URI -->
+          <div
+            id="uri-box-wrap"
+            class="mt-3 w-100"
+            style="max-width: 320px; margin: 0 auto"
+          >
+            <div class="d-flex justify-content-end align-items-center mb-1">
+              <button class="btn-copy" id="btn-copy-uri" onclick="copyUri()">
+                <i class="bi bi-clipboard me-1"></i>Copiar
+              </button>
+            </div>
+            <div
+              class="uri-box"
+              id="uri-text"
+              style="min-height: 2.5rem; color: #555"
+            >
+              Generando…
+            </div>
+          </div>
           <p
             id="status-msg"
             class="mt-1 mb-0"
@@ -118,7 +144,10 @@ center; margin-top: 1.5rem; line-height: 1.5; } {% endblock %} {% block content
     }
   }
 
+  let currentUri = null;
+
   function displayQR(uri, secondsRemaining) {
+    currentUri = uri;
     const container = document.getElementById("qr-container");
     container.innerHTML = "";
     // QR must have white background so wallet camera can read it
@@ -130,7 +159,26 @@ center; margin-top: 1.5rem; line-height: 1.5; } {% endblock %} {% block content
       colorLight: "#ffffff",
       correctLevel: QRCode.CorrectLevel.M,
     });
+    // Show copyable URI below QR
+    const uriText = document.getElementById("uri-text");
+    if (uriText) {
+      uriText.textContent = uri;
+      uriText.style.color = "#aaa";
+    }
     updateCountdown(secondsRemaining);
+  }
+
+  function copyUri() {
+    if (!currentUri) return;
+    navigator.clipboard.writeText(currentUri).then(() => {
+      const btn = document.getElementById("btn-copy-uri");
+      btn.classList.add("copied");
+      btn.innerHTML = '<i class="bi bi-clipboard-check me-1"></i>Copiado';
+      setTimeout(() => {
+        btn.classList.remove("copied");
+        btn.innerHTML = '<i class="bi bi-clipboard me-1"></i>Copiar';
+      }, 2000);
+    });
   }
 
   function updateCountdown(secs) {

@@ -19,6 +19,7 @@ from cache import StatusCache
 from checker import DojoChecker
 from data_loader import DojoDataLoader
 from background_checker import BackgroundChecker
+from bip47_verify import verify_pairing_signature, derive_notification_address
 
 
 # Initialize Flask app
@@ -333,7 +334,8 @@ def dojo_new():
         return redirect(url_for('add_dojo'))
     if request.method == 'POST':
         name          = request.form.get('name', '').strip()
-        pairing_details = request.form.get('pairing_details', '').strip()
+        pairing_details = request.form.get('pairing_details', '').strip().replace('\r\n', '\n').replace('\r', '\n')
+        pairing_signature = request.form.get('pairing_signature', '').strip()
         if not name:
             return render_template('dojo_form.html', mode='new',
                                    error='Dojo name is required.',
@@ -341,6 +343,14 @@ def dojo_new():
         if not pairing_details:
             return render_template('dojo_form.html', mode='new',
                                    error='Pairing details are required.',
+                                   form_data=request.form)
+        if not pairing_signature:
+            return render_template('dojo_form.html', mode='new',
+                                   error='Ownership proof (signature) is required.',
+                                   form_data=request.form)
+        if not verify_pairing_signature(paynym, pairing_details, pairing_signature):
+            return render_template('dojo_form.html', mode='new',
+                                   error='Signature verification failed. Please sign the exact pairing details with your notification address.',
                                    form_data=request.form)
         image_file = _save_dojo_image(request.files.get('image'))
         entry = {
@@ -352,6 +362,7 @@ def dojo_new():
             'jurisdiction': request.form.get('jurisdiction', '').strip(),
             'hardware': request.form.get('hardware', '').strip(),
             'pairing_details': pairing_details,
+            'pairing_signature': pairing_signature,
             'electrum_server': request.form.get('electrum_server', '').strip(),
             'image_file': image_file,
             'submitted_at': datetime.now().isoformat(),
@@ -378,7 +389,8 @@ def dojo_edit(dojo_id):
         return redirect(url_for('dojo_dashboard'))
     if request.method == 'POST':
         name          = request.form.get('name', '').strip()
-        pairing_details = request.form.get('pairing_details', '').strip()
+        pairing_details = request.form.get('pairing_details', '').strip().replace('\r\n', '\n').replace('\r', '\n')
+        pairing_signature = request.form.get('pairing_signature', '').strip()
         if not name:
             return render_template('dojo_form.html', mode='edit', dojo=dojo,
                                    error='Dojo name is required.',
@@ -386,6 +398,14 @@ def dojo_edit(dojo_id):
         if not pairing_details:
             return render_template('dojo_form.html', mode='edit', dojo=dojo,
                                    error='Pairing details are required.',
+                                   form_data=request.form)
+        if not pairing_signature:
+            return render_template('dojo_form.html', mode='edit', dojo=dojo,
+                                   error='Ownership proof (signature) is required.',
+                                   form_data=request.form)
+        if not verify_pairing_signature(paynym, pairing_details, pairing_signature):
+            return render_template('dojo_form.html', mode='edit', dojo=dojo,
+                                   error='Signature verification failed. Please sign the exact pairing details with your notification address.',
                                    form_data=request.form)
         new_image = _save_dojo_image(request.files.get('image'), dojo.get('image_file'))
         was_approved = dojo.get('status') == 'approved'
@@ -395,6 +415,7 @@ def dojo_edit(dojo_id):
         dojo['jurisdiction']   = request.form.get('jurisdiction', '').strip()
         dojo['hardware']       = request.form.get('hardware', '').strip()
         dojo['pairing_details'] = pairing_details
+        dojo['pairing_signature'] = pairing_signature
         dojo['electrum_server'] = request.form.get('electrum_server', '').strip()
         if not dojo.get('paynym_alias'):
             dojo['paynym_alias'] = _resolve_paynym_alias(dojo.get('paynym', ''))
@@ -618,8 +639,11 @@ def admin_approve(dojo_id):
             new_entry['explorer'] = inner_explorer
     if dojo.get('electrum_server'):
         new_entry['electrum_server'] = dojo['electrum_server']
-    # Use explicit signed message if provided, otherwise fall back to pairing_details
-    signature_content = dojo.get('signature_text') or dojo.get('pairing_details', '')
+    # Store the raw pairing_details text (needed for signature verification)
+    if dojo.get('pairing_details'):
+        new_entry['pairing_details'] = dojo['pairing_details']
+    # Store the BIP-137 pairing signature (use legacy signature_text as fallback)
+    signature_content = dojo.get('pairing_signature') or dojo.get('signature_text', '')
     if signature_content:
         new_entry['signature'] = signature_content
 
@@ -701,6 +725,97 @@ def admin_revoke(dojo_id):
     cache.invalidate()
 
     return redirect(url_for('admin_dojos'))
+
+
+@app.route('/api/verify-pairing-signature', methods=['POST'])
+def api_verify_pairing_signature():
+    """Verify a BIP-137 signature of pairing details against the logged-in PayNym."""
+    paynym = session.get('paynym')
+    if not paynym:
+        return jsonify({'valid': False, 'error': 'Not authenticated'}), 401
+    data = request.get_json(silent=True) or {}
+    message = data.get('message', '').strip()
+    signature = data.get('signature', '').strip()
+    if not message or not signature:
+        return jsonify({'valid': False, 'error': 'Missing message or signature'}), 400
+    try:
+        valid = verify_pairing_signature(paynym, message, signature)
+        return jsonify({'valid': valid})
+    except Exception as e:
+        return jsonify({'valid': False, 'error': str(e)}), 500
+
+
+@app.route('/api/verify-message', methods=['POST'])
+def api_verify_message():
+    """Public endpoint: verify a BIP-137 signature against a payment code or PayNym handle.
+
+    Accepts JSON body:
+      { "nym": "PM8T... or +handle", "message": "...", "signature": "..." }
+
+    The ``nym`` field is resolved via paynym.rs, so either a full BIP47 payment
+    code (PM8T…), a PayNym handle (+username), or a nymID are all accepted.
+
+    If ``signature`` is an armored Bitcoin signed message block
+    (-----BEGIN BITCOIN SIGNED MESSAGE-----) the message and compact signature
+    are parsed from it automatically and the ``message`` field is ignored.
+    """
+    import urllib.request as _urlreq
+    import ssl as _ssl
+
+    data = request.get_json(silent=True) or {}
+    nym_input = str(data.get('nym', '')).strip()
+    message = str(data.get('message', '')).strip()
+    signature = str(data.get('signature', '')).strip()
+
+    if not nym_input or not signature:
+        return jsonify({'valid': False, 'error': 'Missing nym or signature'}), 400
+
+    # Resolve payment code via paynym.rs (accepts +handle, PM8T…, or nymID)
+    try:
+        req_data = json.dumps({'nym': nym_input}).encode()
+        req = _urlreq.Request(
+            'https://paynym.rs/api/v1/nym',
+            data=req_data,
+            headers={'Content-Type': 'application/json'},
+            method='POST',
+        )
+        ctx = _ssl.create_default_context()
+        with _urlreq.urlopen(req, timeout=10, context=ctx) as resp:
+            info = json.loads(resp.read())
+        codes = info.get('codes') or []
+        payment_code = codes[0].get('code', '') if codes else ''
+        if not payment_code:
+            return jsonify({'valid': False, 'error': 'Could not resolve payment code from PayNym registry'}), 400
+    except Exception:
+        return jsonify({'valid': False, 'error': 'Could not reach PayNym registry'}), 503
+
+    # Parse armored Bitcoin signed message format
+    if signature.startswith('-----BEGIN BITCOIN SIGNED MESSAGE-----'):
+        lines = signature.splitlines()
+        try:
+            sig_start = next(
+                i for i, line in enumerate(lines)
+                if line.strip() == '-----BEGIN SIGNATURE-----'
+            )
+            message = '\n'.join(lines[1:sig_start])
+            after_header = [
+                line for line in lines[sig_start + 1:]
+                if not line.startswith('-----END')
+            ]
+            # Format: optional address line followed by base64 signature
+            compact_sig = after_header[-1].strip() if after_header else ''
+        except (StopIteration, IndexError):
+            return jsonify({'valid': False, 'error': 'Could not parse armored signature format'}), 400
+        signature = compact_sig
+
+    if not message:
+        return jsonify({'valid': False, 'error': 'Missing message'}), 400
+
+    try:
+        valid = verify_pairing_signature(payment_code, message, signature)
+        return jsonify({'valid': valid, 'payment_code': payment_code})
+    except Exception as e:
+        return jsonify({'valid': False, 'error': str(e)}), 500
 
 
 @app.route('/api/status')

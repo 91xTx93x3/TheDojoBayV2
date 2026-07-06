@@ -24,7 +24,14 @@ none; transition: border-color 0.2s, color 0.2s; } .btn-cancel:hover {
 border-color: #666; color: #e0e0e0; } .alert-error { background-color: rgba(231,
 76, 60, 0.15); border: 1.5px solid var(--primary); border-radius: 8px; color:
 #f1948a; padding: 0.65rem 1rem; font-size: 0.88rem; margin-bottom: 1.25rem; }
-.invalid-feedback { font-size: 0.82rem; } {% endblock %} {% block content %}
+.invalid-feedback { font-size: 0.82rem; }
+.field-locked { opacity: 0.6; cursor: not-allowed; background-color: #111 !important; color: #888 !important; }
+.btn-copy-small { display: inline-flex; align-items: center; background: transparent; border: 1px solid var(--border); border-radius: 6px; color: var(--text-muted); font-size: 0.75rem; padding: 0.2rem 0.6rem; cursor: pointer; transition: background 0.2s, color 0.2s; }
+.btn-copy-small:hover { background: var(--border); color: #eee; }
+.btn-copy-small.copied { color: #4caf50; border-color: #4caf50; }
+.sig-info { background: rgba(231,76,60,0.08); border: 1px solid rgba(231,76,60,0.25); border-radius: 8px; padding: 0.9rem 1rem; font-size: 0.85rem; color: #ccc; line-height: 1.6; }
+.sig-info ol { margin-bottom: 0; padding-left: 1.25rem; }
+.sig-info li { margin-bottom: 0.25rem; } {% endblock %} {% block content %}
 <div class="container my-5">
   <div class="row">
     <div class="col-lg-7 mx-auto">
@@ -145,9 +152,15 @@ border-color: #666; color: #e0e0e0; } .alert-error { background-color: rgba(231,
           </p>
 
           <div class="mb-4">
-            <label class="form-label" for="pairing_details">
-              Pairing Details <span class="required-star">*</span>
-            </label>
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label class="form-label mb-0" for="pairing_details">
+                Pairing Details <span class="required-star">*</span>
+              </label>
+              <button type="button" class="btn-copy-small" id="btn-copy-pairing"
+                style="display:none" onclick="copyPairing()">
+                <i class="bi bi-clipboard me-1"></i>Copy
+              </button>
+            </div>
             <textarea
               class="form-control"
               id="pairing_details"
@@ -165,12 +178,45 @@ border-color: #666; color: #e0e0e0; } .alert-error { background-color: rgba(231,
             <div class="invalid-feedback">Pairing details are required.</div>
           </div>
 
+          <!-- Ownership proof (shown after step 1) -->
+          <div id="sig-section" style="display:none">
+            <p class="section-label mt-4">
+              <i class="bi bi-shield-lock me-1"></i>Ownership Proof
+            </p>
+            <div class="sig-info mb-3">
+              <p class="mb-2" style="font-weight:500;color:#e0e0e0">Sign the pairing details to prove you own this Dojo:</p>
+              <ol>
+                <li>Copy the pairing details using the <strong>Copy</strong> button above</li>
+                <li>Open <strong>Samourai / Ashigaru</strong> &rarr; PayNym &rarr; ⋮ &rarr; <em>Sign message</em></li>
+                <li>Paste the pairing details as the message and sign with your <strong>notification address</strong></li>
+                <li>Paste the resulting signature below</li>
+              </ol>
+            </div>
+            <div class="mb-4">
+              <label class="form-label" for="pairing_signature">
+                Signature <span class="required-star">*</span>
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                id="pairing_signature"
+                name="pairing_signature"
+                placeholder="Base64 BIP-137 signature…"
+                autocomplete="off"
+              />
+              <div class="form-text mt-1">
+                The signature produced by signing the pairing details with your notification address.
+              </div>
+              <div class="invalid-feedback" id="sig-feedback">Signature is required.</div>
+            </div>
+          </div>
+
           <!-- Actions -->
           <div class="d-flex gap-3 justify-content-center mt-4">
             <a href="/add-dojo/dashboard" class="btn-cancel">
               <i class="bi bi-x-lg me-1"></i>Cancel
             </a>
-            <button type="submit" class="btn btn-save">
+            <button type="submit" id="btn-submit" class="btn btn-save">
               <i class="bi bi-floppy me-2"></i>{{ 'Save Changes' if mode ==
               'edit' else 'Submit Dojo' }}
             </button>
@@ -183,13 +229,122 @@ border-color: #666; color: #e0e0e0; } .alert-error { background-color: rgba(231,
 {% endblock %} {% block extra_js %}
 <script>
   const form = document.getElementById("dojoForm");
+  let formStep = 1;
 
   form.addEventListener("submit", function (e) {
-    if (!form.checkValidity()) {
+    if (formStep === 1) {
+      if (!form.checkValidity()) {
+        e.preventDefault();
+        e.stopPropagation();
+        form.classList.add("was-validated");
+        return;
+      }
+      // Valid — move to step 2 (lock fields, show signature section)
       e.preventDefault();
-      e.stopPropagation();
+      lockFields();
+      showSignatureSection();
+      formStep = 2;
+    } else {
+      // Step 2: verify signature via API before allowing the real submit
+      e.preventDefault();
+      const sigInput = document.getElementById("pairing_signature");
+      if (!sigInput.value.trim()) {
+        sigInput.classList.add("is-invalid");
+        document.getElementById("sig-feedback").textContent = "Signature is required.";
+        return;
+      }
+      const pairingText = document.getElementById("pairing_details").value.trim();
+      const btnSubmit = document.getElementById("btn-submit");
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Verifying…';
+      fetch("/api/verify-pairing-signature", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: pairingText, signature: sigInput.value.trim() }),
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.valid) {
+            // Mark as verified then submit for real
+            sigInput.classList.remove("is-invalid");
+            sigInput.classList.add("is-valid");
+            btnSubmit.innerHTML = '<i class="bi bi-check-circle me-2"></i>Verified! Submitting…';
+            setTimeout(function () { form.submit(); }, 600);
+          } else {
+            sigInput.classList.add("is-invalid");
+            document.getElementById("sig-feedback").textContent =
+              data.error === "Not authenticated"
+                ? "Session expired — please log in again."
+                : "Signature is invalid. Make sure you signed the exact pairing details with your notification address.";
+            btnSubmit.disabled = false;
+            btnSubmit.innerHTML = '<i class="bi bi-shield-check me-2"></i>Verify &amp; Submit';
+          }
+        })
+        .catch(function () {
+          sigInput.classList.add("is-invalid");
+          document.getElementById("sig-feedback").textContent = "Network error. Please try again.";
+          btnSubmit.disabled = false;
+          btnSubmit.innerHTML = '<i class="bi bi-shield-check me-2"></i>Verify &amp; Submit';
+        });
     }
-    form.classList.add("was-validated");
+  });
+
+  function lockFields() {
+    const fields = form.querySelectorAll(
+      'input:not([type="submit"]):not([type="hidden"]):not([type="button"]):not(#pairing_signature), textarea, select'
+    );
+    fields.forEach(function (field) {
+      // Preserve value in a hidden input so disabled fields still submit
+      if (field.type === "radio" || field.type === "checkbox") {
+        if (field.checked) {
+          appendHidden(field.name, field.value);
+        }
+      } else {
+        // Use trimmed value so it matches what the user signs
+        appendHidden(field.name, field.value.trim());
+      }
+      field.setAttribute("disabled", "");
+      field.classList.add("field-locked");
+    });
+    document.getElementById("btn-copy-pairing").style.display = "inline-flex";
+  }
+
+  function appendHidden(name, value) {
+    const h = document.createElement("input");
+    h.type = "hidden";
+    h.name = name;
+    h.value = value;
+    form.appendChild(h);
+  }
+
+  function showSignatureSection() {
+    const sec = document.getElementById("sig-section");
+    sec.style.display = "block";
+    const btn = document.getElementById("btn-submit");
+    btn.innerHTML = '<i class="bi bi-shield-check me-2"></i>Verify &amp; Submit';
+    sec.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function copyPairing() {
+    const text = document.getElementById("pairing_details").value.trim();
+    navigator.clipboard.writeText(text).then(function () {
+      const btn = document.getElementById("btn-copy-pairing");
+      btn.classList.add("copied");
+      btn.innerHTML = '<i class="bi bi-clipboard-check me-1"></i>Copied';
+      setTimeout(function () {
+        btn.classList.remove("copied");
+        btn.innerHTML = '<i class="bi bi-clipboard me-1"></i>Copy';
+      }, 2000);
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const sigInput = document.getElementById("pairing_signature");
+    if (sigInput) {
+      sigInput.addEventListener("input", function () {
+        this.classList.remove("is-invalid");
+      });
+    }
   });
 </script>
 {% endblock %}

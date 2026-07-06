@@ -37,6 +37,11 @@ class DojoChecker:
             entry["signature"] = str(dojo_info["signature"])
         elif "signature" in entry:
             entry.pop("signature")
+        # Preserve pairing_details if present (needed for signature verification)
+        if "pairing_details" in dojo_info and isinstance(dojo_info["pairing_details"], str):
+            entry["pairing_details"] = dojo_info["pairing_details"]
+        elif "pairing_details" in entry:
+            entry.pop("pairing_details")
         
         # Skip check if marked as out of service
         if dojo_info.get("status") == "out_of_service":

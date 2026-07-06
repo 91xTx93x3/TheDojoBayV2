@@ -1,21 +1,5 @@
 [
   {
-    "id": "cc3feec6-4e71-4f62-8505-ce7114504d7f",
-    "paynym": "PM8TJQwkgoVeogzAQe431Bn3FSsXiCqjmFCpysFuSTjB7FaxfrJGtMAEfsA5dvptjMAAxLXKM6bDAen5tFp326EHBmRH6jQ9vJDPnSwARLmUcJoucQtd",
-    "name": "91xTx93x3 Tanto E",
-    "network": "mainnet",
-    "jurisdiction": "EU",
-    "hardware": "Tanto",
-    "pairing_details": "{\r\n    \"pairing\": {\r\n        \"type\": \"dojo.api\",\r\n        \"version\": \"1.28.2\",\r\n        \"apikey\": \"da28cce51e3bc4d484349c109c9c12e6\",\r\n        \"url\": \"http://xkjpwzcmk7nmn6vttii5uz4khsc45wh5pwypaxq25ofx3rkomuicazyd.onion/v2\"\r\n    },\r\n    \"explorer\": {\r\n        \"type\": \"explorer.btc_rpc_explorer\",\r\n        \"url\": \"http://jzym2wd4arlincp3bztdjz3mqh6uhh63sqeexgv6jy6xwtug4lmm3yqd.onion\"\r\n    }\r\n}",
-    "electrum_server": "3xmxfolrxdyaqbfwohdxsntem4agugpbozb2u5re2vrwhpgkl6c5ufqd.onion",
-    "image_file": null,
-    "submitted_at": "2026-07-04T22:25:28.802757",
-    "updated_at": "2026-07-05T08:15:50.426461",
-    "status": "approved",
-    "qr_filename": "91xTx93x3_Tanto_E_cc3feec6.png",
-    "paynym_alias": "+91xTx93x3"
-  },
-  {
     "id": "16f48dd5-32aa-4f07-b2be-d3e410e279ed",
     "paynym": "PM8TJZWjNwYevrx2HuavUU8MpfTexzUUFP4ZpCRzbQvi65c35nn53PCGi5cujqjXUn6wQvQTkvCEvTJ1tesDqWpqmpBnYXHAheNKTy4Vh4jWzWgspwED",
     "name": "Arkad",
@@ -80,19 +64,35 @@
     "qr_filename": "91xTx93x3_Green_c422b6a1.png"
   },
   {
-    "id": "08532008-087a-47c8-863d-995294167276",
+    "id": "33ea3f40-145e-41ae-ba88-5f4bfe1bedd4",
+    "paynym": "PM8TJQwkgoVeogzAQe431Bn3FSsXiCqjmFCpysFuSTjB7FaxfrJGtMAEfsA5dvptjMAAxLXKM6bDAen5tFp326EHBmRH6jQ9vJDPnSwARLmUcJoucQtd",
+    "paynym_alias": "+91xTx93x3",
+    "name": "3333",
+    "network": "mainnet",
+    "jurisdiction": "",
+    "hardware": "",
+    "pairing_details": "3",
+    "electrum_server": "",
+    "image_file": null,
+    "submitted_at": "2026-07-06T13:42:52.085042",
+    "updated_at": "2026-07-06T15:01:04.801943",
+    "status": "deleted"
+  },
+  {
+    "id": "fd5ef85e-591c-45a9-87d2-385898c74255",
     "paynym": "PM8TJQwkgoVeogzAQe431Bn3FSsXiCqjmFCpysFuSTjB7FaxfrJGtMAEfsA5dvptjMAAxLXKM6bDAen5tFp326EHBmRH6jQ9vJDPnSwARLmUcJoucQtd",
     "paynym_alias": "+91xTx93x3",
     "name": "91xTx93x3 Blue",
     "network": "testnet",
     "jurisdiction": "EU",
     "hardware": "ThinkCentre M710q 8gb",
-    "pairing_details": "{\r\n    \"pairing\": {\r\n        \"type\": \"dojo.api\",\r\n        \"version\": \"1.29.1\",\r\n        \"apikey\": \"7fcdb00957d3ab314b710d48907b4629\",\r\n        \"url\": \"http://kjv62weg6bm34yf6244jcxl3sc3ntpsojdd5xrpzhv2c36b5u5u4gkad.onion/test/v2\"\r\n    },\r\n    \"explorer\": {\r\n        \"type\": \"explorer.btc_rpc_explorer\",\r\n        \"url\": \"http://vvxwpqyfi3tbqpkjszlt6rvwwiqr4s2f457myntkbk4lcihvt5oti7qd.onion\"\r\n    }\r\n}",
+    "pairing_details": "{\n    \"pairing\": {\n        \"type\": \"dojo.api\",\n        \"version\": \"1.29.1\",\n        \"apikey\": \"7fcdb00957d3ab314b710d48907b4629\",\n        \"url\": \"http://kjv62weg6bm34yf6244jcxl3sc3ntpsojdd5xrpzhv2c36b5u5u4gkad.onion/test/v2\"\n    },\n    \"explorer\": {\n        \"type\": \"explorer.btc_rpc_explorer\",\n        \"url\": \"http://vvxwpqyfi3tbqpkjszlt6rvwwiqr4s2f457myntkbk4lcihvt5oti7qd.onion\"\n    }\n}",
+    "pairing_signature": "H4aVbBUxfKZYYW4l//oMoxWIvp/hMxjrT83FUBTHMimOdSAq9Z4tTHQqOk1KC9atJIWlWBgWSR12ngFkyvlZ/2g=",
     "electrum_server": "",
     "image_file": null,
-    "submitted_at": "2026-07-05T10:05:44.629036",
-    "updated_at": "2026-07-05T10:05:51.506789",
+    "submitted_at": "2026-07-06T15:24:20.964696",
+    "updated_at": "2026-07-06T15:26:30.629714",
     "status": "approved",
-    "qr_filename": "91xTx93x3_Blue_08532008.png"
+    "qr_filename": "91xTx93x3_Blue_fd5ef85e.png"
   }
 ]
