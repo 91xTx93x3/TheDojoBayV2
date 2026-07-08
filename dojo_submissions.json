@@ -22,14 +22,15 @@
     "network": "mainnet",
     "jurisdiction": "EU",
     "hardware": "ThinkCentre M910 12gb",
-    "pairing_details": "{\r\n    \"pairing\": {\r\n        \"type\": \"dojo.api\",\r\n        \"version\": \"1.29.1\",\r\n        \"apikey\": \"55368b8cd74d67d49a31002a5ab500cf\",\r\n        \"url\": \"http://a34ald73bhz625jhdaksnlq6rnbjrqgjxq52j6ms3atx7vqdhgp7sxyd.onion/v2\"\r\n    },\r\n    \"explorer\": {\r\n        \"type\": \"explorer.btc_rpc_explorer\",\r\n        \"url\": \"http://it3nnxof4ad7zi2xi33j4iwedy6grkdikwwfcco2sd7yudkosu2ruvid.onion\"\r\n    }\r\n}",
+    "pairing_details": "{\n    \"pairing\": {\n        \"type\": \"dojo.api\",\n        \"version\": \"1.29.1\",\n        \"apikey\": \"55368b8cd74d67d49a31002a5ab500cf\",\n        \"url\": \"http://a34ald73bhz625jhdaksnlq6rnbjrqgjxq52j6ms3atx7vqdhgp7sxyd.onion/v2\"\n    },\n    \"explorer\": {\n        \"type\": \"explorer.btc_rpc_explorer\",\n        \"url\": \"http://it3nnxof4ad7zi2xi33j4iwedy6grkdikwwfcco2sd7yudkosu2ruvid.onion\"\n    }\n}",
     "electrum_server": "tmie4ggcjawm53fh2yvvmznqwahgvwuqpip7acp63ruw2ct5wagddzyd.onion",
     "image_file": null,
     "submitted_at": "2026-07-05T07:39:43.439399",
-    "updated_at": "2026-07-05T08:07:04.576722",
+    "updated_at": "2026-07-08T13:31:03.834807",
     "status": "approved",
     "qr_filename": "91xTx93x3_Red_7844d7a7.png",
-    "paynym_alias": "+91xTx93x3"
+    "paynym_alias": "+91xTx93x3",
+    "pairing_signature": "H1Ia5L1LDTe6Ej68poKeFpjcMLjlFb127hhMPM383phrNTzlMweZs35Z6uCJOPNmSOGeHGoY+jLcWJUyct2smmU="
   },
   {
     "id": "abb3e7a8-ead4-4299-9cd2-d99d1c729c4d",
@@ -38,14 +39,15 @@
     "network": "mainnet",
     "jurisdiction": "EU",
     "hardware": "ThinkCentre",
-    "pairing_details": "{\r\n    \"pairing\": {\r\n        \"type\": \"dojo.api\",\r\n        \"version\": \"1.29.1\",\r\n        \"apikey\": \"3321cf8da75c4a2a51dfe2e7f34740d5\",\r\n        \"url\": \"http://udwtsxnrqtnodfk5xdmx75oeqfotoiyw6hovj2fwn542kfk6r4gxkwyd.onion/v2\"\r\n    },\r\n    \"explorer\": {\r\n        \"type\": \"explorer.btc_rpc_explorer\",\r\n        \"url\": \"http://lmn4glvizcicqvioxibel44hgmrhxsrs57omu2gvmhdx5itk73r33xqd.onion\"\r\n    }\r\n}",
+    "pairing_details": "{\n    \"pairing\": {\n        \"type\": \"dojo.api\",\n        \"version\": \"1.29.1\",\n        \"apikey\": \"3321cf8da75c4a2a51dfe2e7f34740d5\",\n        \"url\": \"http://udwtsxnrqtnodfk5xdmx75oeqfotoiyw6hovj2fwn542kfk6r4gxkwyd.onion/v2\"\n    },\n    \"explorer\": {\n        \"type\": \"explorer.btc_rpc_explorer\",\n        \"url\": \"http://lmn4glvizcicqvioxibel44hgmrhxsrs57omu2gvmhdx5itk73r33xqd.onion\"\n    }\n}",
     "electrum_server": "x444eboylam4gmun3dcozm25edjrr6kd3a4n6rlvazazb5vxdyx3o7qd.onion",
     "image_file": null,
     "submitted_at": "2026-07-05T07:41:30.253242",
-    "updated_at": "2026-07-05T07:42:15.008449",
+    "updated_at": "2026-07-08T13:32:44.285994",
     "status": "approved",
     "qr_filename": "91xTx93x3_Yellow_abb3e7a8.png",
-    "paynym_alias": "+91xTx93x3"
+    "paynym_alias": "+91xTx93x3",
+    "pairing_signature": "H+hNp5Q5HGhxXEoL8djhu8ecY+T6HFfbKTP/1YsuhLlsOOJKUW2GFrt3x4DxCf8N66qhf/S/AHNWc/PXY2x5iQQ="
   },
   {
     "id": "c422b6a1-8ca2-45c9-a151-2253ee0d1363",
@@ -55,13 +57,14 @@
     "network": "testnet",
     "jurisdiction": "EU",
     "hardware": "Think Centre M900 8gb",
-    "pairing_details": "{\r\n    \"pairing\": {\r\n        \"type\": \"dojo.api\",\r\n        \"version\": \"1.29.2\",\r\n        \"apikey\": \"cdb0d29377c9088275817fcd7d643013\",\r\n        \"url\": \"http://4f6hya64dcofjavp66illnynpoxjdfc2bnvwduleqkvjuqq633d2fiyd.onion/test/v2\"\r\n    },\r\n    \"explorer\": {\r\n        \"type\": \"explorer.btc_rpc_explorer\",\r\n        \"url\": \"http://p7wvh24b6mdt3gqa2b2ynyei4ib6xahvk5wzqlgu6olamyvej6fkczqd.onion\"\r\n    }\r\n}",
+    "pairing_details": "{\n    \"pairing\": {\n        \"type\": \"dojo.api\",\n        \"version\": \"1.29.2\",\n        \"apikey\": \"cdb0d29377c9088275817fcd7d643013\",\n        \"url\": \"http://4f6hya64dcofjavp66illnynpoxjdfc2bnvwduleqkvjuqq633d2fiyd.onion/test/v2\"\n    },\n    \"explorer\": {\n        \"type\": \"explorer.btc_rpc_explorer\",\n        \"url\": \"http://p7wvh24b6mdt3gqa2b2ynyei4ib6xahvk5wzqlgu6olamyvej6fkczqd.onion\"\n    }\n}",
     "electrum_server": "xnkshos5cd6skc3mdzwrfj6erddo24hm4myfsb6b6qyedvroptijg6id.onion",
     "image_file": null,
     "submitted_at": "2026-07-05T08:47:01.563369",
-    "updated_at": "2026-07-05T08:47:15.004132",
+    "updated_at": "2026-07-08T13:33:50.227319",
     "status": "approved",
-    "qr_filename": "91xTx93x3_Green_c422b6a1.png"
+    "qr_filename": "91xTx93x3_Green_c422b6a1.png",
+    "pairing_signature": "IDu6cKGFyqHHNG8AfVCyvy8nR1bOSWC/VP/H51jXZr30QFEVlcW4Pw3GdLLCM4SVn0tBeDKsQU1+KHGIu9UHo9k="
   },
   {
     "id": "33ea3f40-145e-41ae-ba88-5f4bfe1bedd4",
@@ -75,7 +78,7 @@
     "electrum_server": "",
     "image_file": null,
     "submitted_at": "2026-07-06T13:42:52.085042",
-    "updated_at": "2026-07-06T15:01:04.801943",
+    "updated_at": "2026-07-06T20:32:56.785887",
     "status": "deleted"
   },
   {

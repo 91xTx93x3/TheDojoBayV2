@@ -69,6 +69,19 @@ flex-wrap: wrap; margin-bottom: 1rem; } .meta-item { min-width: 0; } {% endblock
   <!-- Dojo list -->
   {% if dojos %} {% for dojo in dojos %}
   <div class="dojo-card">
+    {% if dojo.name %}
+    <div
+      style="
+        font-size: 1rem;
+        font-weight: 700;
+        color: #e0e0e0;
+        margin-bottom: 0.6rem;
+      "
+    >
+      <i class="bi bi-hdd-network me-1" style="color: var(--primary)"></i>{{
+      dojo.name }}
+    </div>
+    {% endif %}
     <div class="d-flex align-items-start justify-content-between gap-2 mb-3">
       <span class="status-badge status-{{ dojo.status }}">
         {% if dojo.status == 'pending' %}<i
