@@ -1192,41 +1192,14 @@
                                                 <i class="bi bi-person-badge" style="color: var(--primary);"></i> 
                                                 <strong>PayNym:</strong> 
                                                 <a href="${dojo.paynym_url}" target="_blank" style="color: var(--primary);">${dojo.paynym}</a>
+                                                ${dojo.nostr_x ? `<span style="font-size: 0.85em; color: #aaa; margin-left: 0.75rem;">${dojo.nostr_x}</span>` : ''}
                                             </div>
                                         `
-                                            : ""
-                                        }
-                                        ${
-                                          dojo.nostr
-                                            ? `
+                                            : dojo.nostr_x ? `
                                             <div class="mb-2">
-                                                <i class="bi bi-lightning" style="color: var(--primary);"></i> 
-                                                <strong>Nostr:</strong> 
-                                                <a href="${dojo.nostr_url}" target="_blank" style="color: var(--primary);">${dojo.nostr}</a>
+                                                <span style="font-size: 0.9rem; color: #aaa;">${dojo.nostr_x}</span>
                                             </div>
-                                        `
-                                            : ""
-                                        }
-                                        ${
-                                          dojo.x
-                                            ? `
-                                            <div class="mb-2">
-                                                <i class="bi bi-twitter-x" style="color: var(--primary);"></i> 
-                                                <strong>X:</strong> 
-                                                <a href="${dojo.x_url}" target="_blank" style="color: var(--primary);">${dojo.x}</a>
-                                            </div>
-                                        `
-                                            : ""
-                                        }
-                                        ${
-                                          dojo.nym
-                                            ? `
-                                            <div class="mb-2">
-                                                <i class="bi bi-person" style="color: var(--primary);"></i> 
-                                                <strong>Nym:</strong> ${dojo.nym}
-                                            </div>
-                                        `
-                                            : ""
+                                        ` : ""
                                         }
                                         ${
                                           dojo.jurisdiction
@@ -1395,41 +1368,14 @@
                                                 <i class="bi bi-person-badge" style="color: var(--primary);"></i> 
                                                 <strong>PayNym:</strong> 
                                                 <a href="${dojo.paynym_url}" target="_blank" style="color: var(--primary);">${dojo.paynym}</a>
+                                                ${dojo.nostr_x ? `<span style="font-size: 0.85em; color: #aaa; margin-left: 0.75rem;">${dojo.nostr_x}</span>` : ''}
                                             </div>
                                         `
-                                            : ""
-                                        }
-                                        ${
-                                          dojo.nostr
-                                            ? `
+                                            : dojo.nostr_x ? `
                                             <div class="mb-2">
-                                                <i class="bi bi-lightning" style="color: var(--primary);"></i> 
-                                                <strong>Nostr:</strong> 
-                                                <a href="${dojo.nostr_url}" target="_blank" style="color: var(--primary);">${dojo.nostr}</a>
+                                                <span style="font-size: 0.9rem; color: #aaa;">${dojo.nostr_x}</span>
                                             </div>
-                                        `
-                                            : ""
-                                        }
-                                        ${
-                                          dojo.x
-                                            ? `
-                                            <div class="mb-2">
-                                                <i class="bi bi-twitter-x" style="color: var(--primary);"></i> 
-                                                <strong>X:</strong> 
-                                                <a href="${dojo.x_url}" target="_blank" style="color: var(--primary);">${dojo.x}</a>
-                                            </div>
-                                        `
-                                            : ""
-                                        }
-                                        ${
-                                          dojo.nym
-                                            ? `
-                                            <div class="mb-2">
-                                                <i class="bi bi-person" style="color: var(--primary);"></i> 
-                                                <strong>Nym:</strong> ${dojo.nym}
-                                            </div>
-                                        `
-                                            : ""
+                                        ` : ""
                                         }
                                         ${
                                           dojo.jurisdiction
@@ -1442,6 +1388,7 @@
                                             : ""
                                         }
                                         ${
+
                                           dojo.hardware
                                             ? `
                                             <div class="mb-2">

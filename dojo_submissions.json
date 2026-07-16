@@ -26,11 +26,12 @@
     "electrum_server": "tmie4ggcjawm53fh2yvvmznqwahgvwuqpip7acp63ruw2ct5wagddzyd.onion",
     "image_file": null,
     "submitted_at": "2026-07-05T07:39:43.439399",
-    "updated_at": "2026-07-08T13:31:03.834807",
+    "updated_at": "2026-07-16T21:20:28.002504",
     "status": "approved",
     "qr_filename": "91xTx93x3_Red_7844d7a7.png",
     "paynym_alias": "+91xTx93x3",
-    "pairing_signature": "H1Ia5L1LDTe6Ej68poKeFpjcMLjlFb127hhMPM383phrNTzlMweZs35Z6uCJOPNmSOGeHGoY+jLcWJUyct2smmU="
+    "pairing_signature": "H1Ia5L1LDTe6Ej68poKeFpjcMLjlFb127hhMPM383phrNTzlMweZs35Z6uCJOPNmSOGeHGoY+jLcWJUyct2smmU=",
+    "nostr_x": ""
   },
   {
     "id": "abb3e7a8-ead4-4299-9cd2-d99d1c729c4d",

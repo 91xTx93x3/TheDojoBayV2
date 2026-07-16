@@ -249,27 +249,6 @@
       "signature": "H44eTowDn76YT2yGN7SF8bXhvbCSMGwxP79dZfZz7sFJCZy8ak1e57Kzn672RaKDI+cryFTeE5e+J3guVUZL1c8="
     },
     {
-      "name": "91xTx93x3 Red",
-      "paynym": "+91xTx93x3",
-      "paynym_url": "https://paynym.rs/+91xTx93x3",
-      "jurisdiction": "EU",
-      "hardware": "ThinkCentre M910 12gb",
-      "image": "/static/images/qr/91xTx93x3_Red_7844d7a7.png",
-      "pairing": {
-        "type": "dojo.api",
-        "version": "1.29.1",
-        "apikey": "55368b8cd74d67d49a31002a5ab500cf",
-        "url": "http://a34ald73bhz625jhdaksnlq6rnbjrqgjxq52j6ms3atx7vqdhgp7sxyd.onion/v2"
-      },
-      "explorer": {
-        "type": "explorer.btc_rpc_explorer",
-        "url": "http://it3nnxof4ad7zi2xi33j4iwedy6grkdikwwfcco2sd7yudkosu2ruvid.onion"
-      },
-      "electrum_server": "tmie4ggcjawm53fh2yvvmznqwahgvwuqpip7acp63ruw2ct5wagddzyd.onion",
-      "pairing_details": "{\n    \"pairing\": {\n        \"type\": \"dojo.api\",\n        \"version\": \"1.29.1\",\n        \"apikey\": \"55368b8cd74d67d49a31002a5ab500cf\",\n        \"url\": \"http://a34ald73bhz625jhdaksnlq6rnbjrqgjxq52j6ms3atx7vqdhgp7sxyd.onion/v2\"\n    },\n    \"explorer\": {\n        \"type\": \"explorer.btc_rpc_explorer\",\n        \"url\": \"http://it3nnxof4ad7zi2xi33j4iwedy6grkdikwwfcco2sd7yudkosu2ruvid.onion\"\n    }\n}",
-      "signature": "H1Ia5L1LDTe6Ej68poKeFpjcMLjlFb127hhMPM383phrNTzlMweZs35Z6uCJOPNmSOGeHGoY+jLcWJUyct2smmU="
-    },
-    {
       "name": "91xTx93x3 Yellow",
       "paynym": "+91xTx93x3",
       "paynym_url": "https://paynym.rs/+91xTx93x3",
@@ -289,6 +268,27 @@
       "electrum_server": "x444eboylam4gmun3dcozm25edjrr6kd3a4n6rlvazazb5vxdyx3o7qd.onion",
       "pairing_details": "{\n    \"pairing\": {\n        \"type\": \"dojo.api\",\n        \"version\": \"1.29.1\",\n        \"apikey\": \"3321cf8da75c4a2a51dfe2e7f34740d5\",\n        \"url\": \"http://udwtsxnrqtnodfk5xdmx75oeqfotoiyw6hovj2fwn542kfk6r4gxkwyd.onion/v2\"\n    },\n    \"explorer\": {\n        \"type\": \"explorer.btc_rpc_explorer\",\n        \"url\": \"http://lmn4glvizcicqvioxibel44hgmrhxsrs57omu2gvmhdx5itk73r33xqd.onion\"\n    }\n}",
       "signature": "H+hNp5Q5HGhxXEoL8djhu8ecY+T6HFfbKTP/1YsuhLlsOOJKUW2GFrt3x4DxCf8N66qhf/S/AHNWc/PXY2x5iQQ="
+    },
+    {
+      "name": "91xTx93x3 Red",
+      "paynym": "+91xTx93x3",
+      "paynym_url": "https://paynym.rs/+91xTx93x3",
+      "jurisdiction": "EU",
+      "hardware": "ThinkCentre M910 12gb",
+      "image": "/static/images/qr/91xTx93x3_Red_7844d7a7.png",
+      "pairing": {
+        "type": "dojo.api",
+        "version": "1.29.1",
+        "apikey": "55368b8cd74d67d49a31002a5ab500cf",
+        "url": "http://a34ald73bhz625jhdaksnlq6rnbjrqgjxq52j6ms3atx7vqdhgp7sxyd.onion/v2"
+      },
+      "explorer": {
+        "type": "explorer.btc_rpc_explorer",
+        "url": "http://it3nnxof4ad7zi2xi33j4iwedy6grkdikwwfcco2sd7yudkosu2ruvid.onion"
+      },
+      "electrum_server": "tmie4ggcjawm53fh2yvvmznqwahgvwuqpip7acp63ruw2ct5wagddzyd.onion",
+      "pairing_details": "{\n    \"pairing\": {\n        \"type\": \"dojo.api\",\n        \"version\": \"1.29.1\",\n        \"apikey\": \"55368b8cd74d67d49a31002a5ab500cf\",\n        \"url\": \"http://a34ald73bhz625jhdaksnlq6rnbjrqgjxq52j6ms3atx7vqdhgp7sxyd.onion/v2\"\n    },\n    \"explorer\": {\n        \"type\": \"explorer.btc_rpc_explorer\",\n        \"url\": \"http://it3nnxof4ad7zi2xi33j4iwedy6grkdikwwfcco2sd7yudkosu2ruvid.onion\"\n    }\n}",
+      "signature": "H1Ia5L1LDTe6Ej68poKeFpjcMLjlFb127hhMPM383phrNTzlMweZs35Z6uCJOPNmSOGeHGoY+jLcWJUyct2smmU="
     }
   ],
   "testnet": [

@@ -75,6 +75,21 @@ border-color: #666; color: #e0e0e0; } .alert-error { background-color: rgba(231,
             <div class="invalid-feedback">Dojo name is required.</div>
           </div>
 
+          <div class="mb-4">
+            <label class="form-label" for="nostr_x">Nostr / X</label>
+            <input
+              type="text"
+              class="form-control"
+              id="nostr_x"
+              name="nostr_x"
+              placeholder="e.g. npub1... or @handle"
+              value="{{ form_data.nostr_x if form_data else (dojo.nostr_x if dojo else '') }}"
+            />
+            <div class="form-text mt-1">
+              Your Nostr npub or X (Twitter) handle (optional).
+            </div>
+          </div>
+
           <!-- Node info -->
           <p class="section-label">
             <i class="bi bi-server me-1"></i>Node Info

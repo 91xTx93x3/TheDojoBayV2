@@ -365,6 +365,7 @@ def dojo_new():
             'network': request.form.get('network', 'mainnet').strip(),
             'jurisdiction': request.form.get('jurisdiction', '').strip(),
             'hardware': request.form.get('hardware', '').strip(),
+            'nostr_x': request.form.get('nostr_x', '').strip(),
             'pairing_details': pairing_details,
             'pairing_signature': pairing_signature,
             'electrum_server': request.form.get('electrum_server', '').strip(),
@@ -418,6 +419,7 @@ def dojo_edit(dojo_id):
         dojo['network']        = request.form.get('network', 'mainnet').strip()
         dojo['jurisdiction']   = request.form.get('jurisdiction', '').strip()
         dojo['hardware']       = request.form.get('hardware', '').strip()
+        dojo['nostr_x']        = request.form.get('nostr_x', '').strip()
         dojo['pairing_details'] = pairing_details
         dojo['pairing_signature'] = pairing_signature
         dojo['electrum_server'] = request.form.get('electrum_server', '').strip()
@@ -643,6 +645,8 @@ def admin_approve(dojo_id):
             new_entry['explorer'] = inner_explorer
     if dojo.get('electrum_server'):
         new_entry['electrum_server'] = dojo['electrum_server']
+    if dojo.get('nostr_x'):
+        new_entry['nostr_x'] = dojo['nostr_x']
     # Store the raw pairing_details text (needed for signature verification)
     if dojo.get('pairing_details'):
         new_entry['pairing_details'] = dojo['pairing_details']
