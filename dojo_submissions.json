@@ -100,5 +100,23 @@
     "updated_at": "2026-07-06T17:34:26.069415",
     "status": "approved",
     "qr_filename": "RoninDojoES_04f17977.png"
+  },
+  {
+    "id": "211a0c84-921e-48d2-acee-34b70651a103",
+    "paynym": "PM8TJgutCtE1GK1Lf6WUTRLzVNcBvNRXjKueKgpQ36dc6Dry3w5oCYz5NEVk7GvNpXAMdrioi6DVytk1P4RBGjXpLw1VFfTm2dNrdtTUWQCQtcjDwPVm",
+    "paynym_alias": "+otto",
+    "name": "otto",
+    "network": "mainnet",
+    "jurisdiction": "",
+    "hardware": "ThinkPad i5-8365U / 16 GB RAM / Debian 12 / Dojo v1.29.0",
+    "nostr_x": "npub10tt00tt07exx7mgf9td0026mx454hq6dyl9vwm72aeyf0tljf8msjs3z28 / ottosch_",
+    "pairing_details": "{\n  \"pairing\": {\n    \"type\": \"dojo.api\",\n    \"version\": \"1.28.0\",\n    \"apikey\": \"8yRaARBxrEmjV9QIdgv0Et285CwF1ZlJEkG91Ok2iLFeLBIPU9k4QAtRETN3ys1y\",\n    \"url\": \"http://w4rvo4pxmghm24e2wz64xycwrvp4nsqo3itykezrydlqvzylqn3ov6id.onion/v2\"\n  },\n  \"explorer\": {\n    \"type\": \"explorer.btc_rpc_explorer\",\n    \"url\": \"http://rnyttli6nmymyxfghvh7amzebfkgxq22mthhrsc3ybsioogbka6sg4yd.onion\"\n  }\n}",
+    "pairing_signature": "H/66zV4facDHnJYEfYMDEkxasIDFSgf75NKAtyxOdbwCfgFGKjyWtv7FNoSoSXvzoplF5sNd5ox+WMj+AzNjtYk=",
+    "electrum_server": "",
+    "image_file": null,
+    "submitted_at": "2026-07-16T21:37:03.173954",
+    "updated_at": "2026-07-16T21:44:48.619555",
+    "status": "approved",
+    "qr_filename": "otto_211a0c84.png"
   }
 ]

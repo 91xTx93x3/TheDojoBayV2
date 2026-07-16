@@ -289,6 +289,26 @@
       "electrum_server": "tmie4ggcjawm53fh2yvvmznqwahgvwuqpip7acp63ruw2ct5wagddzyd.onion",
       "pairing_details": "{\n    \"pairing\": {\n        \"type\": \"dojo.api\",\n        \"version\": \"1.29.1\",\n        \"apikey\": \"55368b8cd74d67d49a31002a5ab500cf\",\n        \"url\": \"http://a34ald73bhz625jhdaksnlq6rnbjrqgjxq52j6ms3atx7vqdhgp7sxyd.onion/v2\"\n    },\n    \"explorer\": {\n        \"type\": \"explorer.btc_rpc_explorer\",\n        \"url\": \"http://it3nnxof4ad7zi2xi33j4iwedy6grkdikwwfcco2sd7yudkosu2ruvid.onion\"\n    }\n}",
       "signature": "H1Ia5L1LDTe6Ej68poKeFpjcMLjlFb127hhMPM383phrNTzlMweZs35Z6uCJOPNmSOGeHGoY+jLcWJUyct2smmU="
+    },
+    {
+      "name": "otto",
+      "paynym": "+otto",
+      "paynym_url": "https://paynym.rs/+otto",
+      "hardware": "ThinkPad i5-8365U / 16 GB RAM / Debian 12 / Dojo v1.29.0",
+      "image": "/static/images/qr/otto_211a0c84.png",
+      "pairing": {
+        "type": "dojo.api",
+        "version": "1.28.0",
+        "apikey": "8yRaARBxrEmjV9QIdgv0Et285CwF1ZlJEkG91Ok2iLFeLBIPU9k4QAtRETN3ys1y",
+        "url": "http://w4rvo4pxmghm24e2wz64xycwrvp4nsqo3itykezrydlqvzylqn3ov6id.onion/v2"
+      },
+      "explorer": {
+        "type": "explorer.btc_rpc_explorer",
+        "url": "http://rnyttli6nmymyxfghvh7amzebfkgxq22mthhrsc3ybsioogbka6sg4yd.onion"
+      },
+      "nostr_x": "npub10tt00tt07exx7mgf9td0026mx454hq6dyl9vwm72aeyf0tljf8msjs3z28 / ottosch_",
+      "pairing_details": "{\n  \"pairing\": {\n    \"type\": \"dojo.api\",\n    \"version\": \"1.28.0\",\n    \"apikey\": \"8yRaARBxrEmjV9QIdgv0Et285CwF1ZlJEkG91Ok2iLFeLBIPU9k4QAtRETN3ys1y\",\n    \"url\": \"http://w4rvo4pxmghm24e2wz64xycwrvp4nsqo3itykezrydlqvzylqn3ov6id.onion/v2\"\n  },\n  \"explorer\": {\n    \"type\": \"explorer.btc_rpc_explorer\",\n    \"url\": \"http://rnyttli6nmymyxfghvh7amzebfkgxq22mthhrsc3ybsioogbka6sg4yd.onion\"\n  }\n}",
+      "signature": "H/66zV4facDHnJYEfYMDEkxasIDFSgf75NKAtyxOdbwCfgFGKjyWtv7FNoSoSXvzoplF5sNd5ox+WMj+AzNjtYk="
     }
   ],
   "testnet": [
