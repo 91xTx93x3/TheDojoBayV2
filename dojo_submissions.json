@@ -118,5 +118,23 @@
     "updated_at": "2026-07-16T21:44:48.619555",
     "status": "approved",
     "qr_filename": "otto_211a0c84.png"
+  },
+  {
+    "id": "ccc66c67-6e94-41ec-a116-277307e9c23d",
+    "paynym": "PM8TJQwkgoVeogzAQe431Bn3FSsXiCqjmFCpysFuSTjB7FaxfrJGtMAEfsA5dvptjMAAxLXKM6bDAen5tFp326EHBmRH6jQ9vJDPnSwARLmUcJoucQtd",
+    "paynym_alias": "+91xTx93x3",
+    "name": "RoninDojoIE v3.0.0-beta.18",
+    "network": "mainnet",
+    "jurisdiction": "EU",
+    "hardware": "Tanto",
+    "nostr_x": "",
+    "pairing_details": "{\n  \"pairing\": {\n    \"type\": \"dojo.api\",\n    \"version\": \"1.29.2\",\n    \"apikey\": \"YgKR9zNfmLlBgctmIuvqrGNolXRX6HqinOoOr4fcqqXBJI6avzsnIKkZF4Mc8uRoLs29z\",\n    \"url\": \"http://qhebewa46qex6ukuka5tsmhryr3exrgeerzt6nrowrczazdotxytlzqd.onion/v2\"\n  }\n}",
+    "pairing_signature": "IIw1W9/xOLx1zwqm56ThuKQ2zMxQjpmAX70S5YABVSxAK+UQhCLXndyJOP7KkDyU3aBm0UqTatHCEYB7EuIgCJU=",
+    "electrum_server": "u2xw6db5hgsmn23rsoijal5z2zzsvnk6bihlmblntoygedstywmdzcad.onion",
+    "image_file": null,
+    "submitted_at": "2026-07-17T15:38:55.985283",
+    "updated_at": "2026-07-17T15:39:12.280485",
+    "status": "approved",
+    "qr_filename": "RoninDojoIE_v3_0_0-beta_18_ccc66c67.png"
   }
 ]

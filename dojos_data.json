@@ -289,6 +289,23 @@
       "nostr_x": "npub10tt00tt07exx7mgf9td0026mx454hq6dyl9vwm72aeyf0tljf8msjs3z28 / ottosch_",
       "pairing_details": "{\n  \"pairing\": {\n    \"type\": \"dojo.api\",\n    \"version\": \"1.28.0\",\n    \"apikey\": \"8yRaARBxrEmjV9QIdgv0Et285CwF1ZlJEkG91Ok2iLFeLBIPU9k4QAtRETN3ys1y\",\n    \"url\": \"http://w4rvo4pxmghm24e2wz64xycwrvp4nsqo3itykezrydlqvzylqn3ov6id.onion/v2\"\n  },\n  \"explorer\": {\n    \"type\": \"explorer.btc_rpc_explorer\",\n    \"url\": \"http://rnyttli6nmymyxfghvh7amzebfkgxq22mthhrsc3ybsioogbka6sg4yd.onion\"\n  }\n}",
       "signature": "H/66zV4facDHnJYEfYMDEkxasIDFSgf75NKAtyxOdbwCfgFGKjyWtv7FNoSoSXvzoplF5sNd5ox+WMj+AzNjtYk="
+    },
+    {
+      "name": "RoninDojoIE v3.0.0-beta.18",
+      "paynym": "+91xTx93x3",
+      "paynym_url": "https://paynym.rs/+91xTx93x3",
+      "jurisdiction": "EU",
+      "hardware": "Tanto",
+      "image": "/static/images/qr/RoninDojoIE_v3_0_0-beta_18_ccc66c67.png",
+      "pairing": {
+        "type": "dojo.api",
+        "version": "1.29.2",
+        "apikey": "YgKR9zNfmLlBgctmIuvqrGNolXRX6HqinOoOr4fcqqXBJI6avzsnIKkZF4Mc8uRoLs29z",
+        "url": "http://qhebewa46qex6ukuka5tsmhryr3exrgeerzt6nrowrczazdotxytlzqd.onion/v2"
+      },
+      "electrum_server": "u2xw6db5hgsmn23rsoijal5z2zzsvnk6bihlmblntoygedstywmdzcad.onion",
+      "pairing_details": "{\n  \"pairing\": {\n    \"type\": \"dojo.api\",\n    \"version\": \"1.29.2\",\n    \"apikey\": \"YgKR9zNfmLlBgctmIuvqrGNolXRX6HqinOoOr4fcqqXBJI6avzsnIKkZF4Mc8uRoLs29z\",\n    \"url\": \"http://qhebewa46qex6ukuka5tsmhryr3exrgeerzt6nrowrczazdotxytlzqd.onion/v2\"\n  }\n}",
+      "signature": "IIw1W9/xOLx1zwqm56ThuKQ2zMxQjpmAX70S5YABVSxAK+UQhCLXndyJOP7KkDyU3aBm0UqTatHCEYB7EuIgCJU="
     }
   ],
   "testnet": [
