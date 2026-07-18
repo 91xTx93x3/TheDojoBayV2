@@ -456,11 +456,31 @@ def dojo_delete(dojo_id):
     if not paynym:
         return redirect(url_for('add_dojo'))
     submissions = _load_submissions()
-    for d in submissions:
-        if d.get('id') == dojo_id and d.get('paynym') == paynym:
-            d['status']     = 'deleted'
-            d['updated_at'] = datetime.now().isoformat()
-            break
+    dojo = next((d for d in submissions
+                 if d.get('id') == dojo_id and d.get('paynym') == paynym), None)
+    if dojo:
+        was_approved = dojo.get('status') == 'approved'
+        dojo['status']     = 'deleted'
+        dojo['updated_at'] = datetime.now().isoformat()
+        # If the dojo was live, remove it from dojos_data.json immediately
+        if was_approved:
+            network = dojo.get('network', 'mainnet')
+            name    = dojo.get('name', '')
+            with open(DOJOS_DATA_FILE) as f:
+                dojos_data = json.load(f)
+            before = len(dojos_data.get(network, []))
+            dojos_data[network] = [
+                d for d in dojos_data.get(network, [])
+                if d.get('name') != name
+            ]
+            if len(dojos_data[network]) < before:
+                with open(DOJOS_DATA_FILE, 'w') as f:
+                    json.dump(dojos_data, f, indent=2, ensure_ascii=False)
+            global mainnet_dojos, testnet_dojos
+            mainnet_dojos, testnet_dojos = data_loader.load()
+            background_checker.mainnet_dojos = mainnet_dojos
+            background_checker.testnet_dojos = testnet_dojos
+            cache.invalidate()
     _save_submissions(submissions)
     return redirect(url_for('dojo_dashboard'))
 
