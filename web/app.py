@@ -853,8 +853,13 @@ def api_status():
         cached = cache.get()
         if cached:
             return jsonify(cached)
-        
-        # No cache available, return loading message
+
+        # Cache expired — serve stale data with a flag while background checker runs
+        stale = cache.get_stale()
+        if stale:
+            return jsonify({**stale, "stale": True})
+
+        # No data at all yet
         return jsonify({"loading": True, "message": "Updating node status..."})
     except Exception as e:
         return jsonify({"error": str(e)}), 500

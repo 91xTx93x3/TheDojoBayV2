@@ -84,6 +84,22 @@ class StatusCache:
         except (IOError, OSError) as e:
             print(f"Failed to save cache to file: {e}")
 
+    def get_stale(self) -> Optional[Dict[str, Any]]:
+        """Return cached data regardless of age (stale fallback)."""
+        with self._lock:
+            if self._memory_cache["data"]:
+                return self._memory_cache["data"]
+
+        if not self.cache_file.exists():
+            return None
+
+        try:
+            with open(self.cache_file, 'r') as f:
+                cache = json.load(f)
+                return cache.get('data')
+        except (json.JSONDecodeError, KeyError, ValueError):
+            return None
+
     def invalidate(self) -> None:
         """Clear in-memory cache and delete the cache file."""
         with self._lock:

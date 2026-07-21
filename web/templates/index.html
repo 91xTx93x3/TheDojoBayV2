@@ -1058,7 +1058,16 @@
           lastUpdateTime = data.last_update;
 
           if (data.loading) {
-            // Server is still building data — keep previous content visible and retry
+            // No data at all yet — keep initial spinner and retry
+            setTimeout(loadStatus, 5000);
+            return;
+          }
+
+          if (data.stale) {
+            // Expired cache — show old data with syncing badge while background checker runs
+            cachedData = data;
+            renderStatus(data);
+            showUpdatingBadge();
             setTimeout(loadStatus, 5000);
             return;
           }
