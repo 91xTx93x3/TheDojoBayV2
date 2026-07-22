@@ -23,6 +23,7 @@ jobs:
             git pull origin main
             source venv/bin/activate
             pip install -r requirements.txt --quiet
+
             sudo systemctl restart dojobay.service
             sudo systemctl restart dojobay-api.service
             echo "Deploy completed successfully"
