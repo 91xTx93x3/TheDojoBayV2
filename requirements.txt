@@ -7,3 +7,6 @@ beautifulsoup4
 gunicorn
 qrcode[pil]
 Pillow
+base58
+coincurve
+bitcoin-utils
