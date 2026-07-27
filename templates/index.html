@@ -1257,6 +1257,16 @@
                                         `
                                             : ""
                                         }
+                                        ${
+                                          dojo.dojo_version
+                                            ? `
+                                            <div class="mb-2">
+                                                <i class="bi bi-gear" style="color: var(--primary);"></i> 
+                                                <strong>Dojo Version:</strong> ${dojo.dojo_version}
+                                            </div>
+                                        `
+                                            : ""
+                                        }
                                         <div style="font-size: 0.85rem; margin-top: 1rem; color: #e0e0e0;">
                                             <i class="bi bi-clock"></i> Checked at: ${dojo.checked_at}
                                         </div>
@@ -1431,6 +1441,16 @@
                                             <div class="mb-2">
                                                 <i class="bi bi-cpu" style="color: var(--primary);"></i> 
                                                 <strong>Hardware:</strong> ${dojo.hardware}
+                                            </div>
+                                        `
+                                            : ""
+                                        }
+                                        ${
+                                          dojo.dojo_version
+                                            ? `
+                                            <div class="mb-2">
+                                                <i class="bi bi-gear" style="color: var(--primary);"></i> 
+                                                <strong>Dojo Version:</strong> ${dojo.dojo_version}
                                             </div>
                                         `
                                             : ""

@@ -48,8 +48,7 @@ class DojoChecker:
             entry["status"] = "Out of Service"
             return entry
         
-        # Extract and validate URL
-        url = self._extract_onion_url(dojo_info)
+        url = dojo_info.get("pairing", {}).get("url") or dojo_info.get("url")
         if not url:
             entry["error"] = "Missing or invalid URL"
             print(f"[ERROR] Invalid URL for node: {dojo_info.get('name', 'Unknown')}")
@@ -100,6 +99,8 @@ class DojoChecker:
             # Only mark inactive if we can't connect at all
             if resp.status_code < 500:
                 entry["status"] = "Active"
+                # Extract Dojo version
+                entry["dojo_version"] = resp.headers.get("X-Dojo-Version")
             else:
                 entry["status"] = "Inactive"
                 entry["error"] = f"HTTP {resp.status_code}"
