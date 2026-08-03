@@ -899,6 +899,52 @@
       let lastUpdate = null;
       const _verifyData = {};
 
+      // ── Output escaping ──────────────────────────────────────────────────
+      // Node fields (name, jurisdiction, hardware, nostr_x, …) are operator
+      // submitted and the card markup below is built by string interpolation
+      // into innerHTML, so an unescaped value is executable markup. Escaping
+      // happens here, once, at the boundary rather than at each of the ~40
+      // interpolation sites, so a field added to a card later cannot reopen
+      // the hole by being forgotten.
+      function escHtml(value) {
+        return String(value === null || value === undefined ? "" : value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      // Escaping keeps a value inside its attribute, but href and src are live
+      // regardless: href="javascript:…" needs no quote to fire. These are the
+      // only two fields rendered into an attribute, and the server generates
+      // both, so pin them to the shapes it actually produces.
+      function safeUrl(value) {
+        const url = String(value === null || value === undefined ? "" : value).trim();
+        if (/^\/static\/[\w\-./]*$/.test(url)) return url; // locally generated QR
+        if (/^https:\/\/paynym\.rs\/[\w+.\-/]*$/.test(url)) return url; // PayNym profile
+        return "";
+      }
+
+      const ATTR_URL_FIELDS = ["image", "paynym_url"];
+
+      // Deep copy with every string escaped. Numbers, booleans and null pass
+      // through untouched, so stats and counters are unaffected.
+      function escapeForRender(value) {
+        if (Array.isArray(value)) return value.map(escapeForRender);
+        if (value && typeof value === "object") {
+          const out = {};
+          for (const key of Object.keys(value)) {
+            out[key] = ATTR_URL_FIELDS.includes(key)
+              ? safeUrl(value[key])
+              : escapeForRender(value[key]);
+          }
+          return out;
+        }
+        if (typeof value === "string") return escHtml(value);
+        return value;
+      }
+
       function buildPairingMessage(dojo) {
         // Use the exact original text that was signed if available
         if (dojo.pairing_details) return dojo.pairing_details;
@@ -962,14 +1008,14 @@
               <div style="background: rgba(0,255,0,0.07); border: 1px solid #00ff00; border-radius: 8px; padding: 0.9rem;">
                 <div style="color: #00ff00; font-weight: 600;"><i class="bi bi-check-circle-fill me-2"></i>Signature is valid</div>
                 <div style="color: #aaa; font-size: 0.8rem; margin-top: 0.4rem; word-break: break-all;">
-                  Payment code: <code style="color: #00ff00;">${data.payment_code || ""}</code>
+                  Payment code: <code style="color: #00ff00;">${escHtml(data.payment_code || "")}</code>
                 </div>
               </div>`;
           } else {
             result.innerHTML = `
               <div style="background: rgba(231,76,60,0.07); border: 1px solid #e74c3c; border-radius: 8px; padding: 0.9rem;">
                 <div style="color: #e74c3c; font-weight: 600;"><i class="bi bi-x-circle-fill me-2"></i>Signature is invalid</div>
-                ${data.error ? `<div style="color: #aaa; font-size: 0.8rem; margin-top: 0.4rem;">${data.error}</div>` : ""}
+                ${data.error ? `<div style="color: #aaa; font-size: 0.8rem; margin-top: 0.4rem;">${escHtml(data.error)}</div>` : ""}
               </div>`;
           }
         } catch (e) {
@@ -1123,14 +1169,18 @@
         document.getElementById("status-container").innerHTML = `
                 <div class="alert alert-danger" role="alert" style="background-color: var(--card-bg); border-color: #dc3545;">
                     <i class="bi bi-exclamation-triangle-fill"></i> 
-                    <strong>Error:</strong> ${message}
+                    <strong>Error:</strong> ${escHtml(message)}
                 </div>
             `;
       }
 
-      function renderStatus(data) {
-        // Populate verify data for all dojos
-        data.mainnet.forEach((dojo, index) => {
+      function renderStatus(rawData) {
+        // Populate verify data for all dojos.
+        // NOTE: this uses the RAW data on purpose. The verify modal puts these
+        // strings into input .value and posts them to /api/verify-message,
+        // where they must be the exact bytes that were signed; escaped text
+        // would fail verification. Only the HTML built below is escaped.
+        rawData.mainnet.forEach((dojo, index) => {
           if (dojo.signature) {
             _verifyData["mainnet-" + index] = {
               nym: dojo.paynym || "",
@@ -1139,7 +1189,7 @@
             };
           }
         });
-        data.testnet.forEach((dojo, index) => {
+        rawData.testnet.forEach((dojo, index) => {
           if (dojo.signature) {
             _verifyData["testnet-" + index] = {
               nym: dojo.paynym || "",
@@ -1148,6 +1198,9 @@
             };
           }
         });
+
+        // From here on every value reaches the page through innerHTML.
+        const data = escapeForRender(rawData);
 
         const stats = data.stats || {
           mainnet_active: 0,
