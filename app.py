@@ -555,6 +555,11 @@ def admin_approve(dojo_id):
     if not dojo:
         return redirect(url_for('admin_dojos'))
 
+    # ── 0. Check if already approved ──────────────────────────────────────────
+    if dojo.get('status') == 'approved':
+        # Already approved, skip processing and redirect
+        return redirect(url_for('admin_dojos'))
+
     # ── 1. Parse pairing_details JSON ─────────────────────────────────────────
     try:
         pairing_obj = json.loads(dojo.get('pairing_details', '{}'))
@@ -646,23 +651,47 @@ def admin_approve(dojo_id):
     if signature_content:
         new_entry['signature'] = signature_content
 
-    # Load, append, save dojos_data.json
-    with open(DOJOS_DATA_FILE) as f:
-        dojos_data = json.load(f)
+    # ── 5. Load and verify dojos_data.json exists ────────────────────────────
+    try:
+        with open(DOJOS_DATA_FILE) as f:
+            dojos_data = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        dojos_data = {}
+    
     dojos_data.setdefault('mainnet', [])
     dojos_data.setdefault('testnet', [])
-    dojos_data[network].append(new_entry)
-    with open(DOJOS_DATA_FILE, 'w') as f:
-        json.dump(dojos_data, f, indent=2, ensure_ascii=False)
+    
+    # ── 6. Check if entry already exists to prevent duplicates ───────────────
+    dojo_name = dojo.get('name', '')
+    existing_idx = next(
+        (i for i, d in enumerate(dojos_data[network])
+         if d.get('name') == dojo_name),
+        None
+    )
+    
+    if existing_idx is not None:
+        # Update existing entry instead of creating duplicate
+        dojos_data[network][existing_idx] = new_entry
+    else:
+        # Add new entry
+        dojos_data[network].append(new_entry)
+    
+    # ── 7. Save dojos_data.json ──────────────────────────────────────────────
+    try:
+        with open(DOJOS_DATA_FILE, 'w') as f:
+            json.dump(dojos_data, f, indent=2, ensure_ascii=False)
+    except Exception:
+        # If save fails, don't mark submission as approved
+        return redirect(url_for('admin_dojos'))
 
-    # ── 5. Mark submission approved and store qr filename ────────────────────
+    # ── 8. Mark submission approved and store qr filename ────────────────────
     dojo['status']      = 'approved'
     dojo['updated_at']  = datetime.now().isoformat()
     if qr_filename:
         dojo['qr_filename'] = qr_filename
     _save_submissions(submissions)
 
-    # ── 6. Reload in-memory data so new node is checked immediately ───────────
+    # ── 9. Reload in-memory data so new node is checked immediately ───────────
     global mainnet_dojos, testnet_dojos
     mainnet_dojos, testnet_dojos = data_loader.load()
     background_checker.mainnet_dojos = mainnet_dojos
