@@ -19,11 +19,36 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             set -e
-            cd /root/dojobay
-            git pull origin main
+
+            APP_DIR="$(systemctl show dojobay.service --property=WorkingDirectory --value)"
+            if [ -z "$APP_DIR" ] || [ ! -d "$APP_DIR/.git" ]; then
+              MAIN_PID="$(systemctl show dojobay.service --property=MainPID --value)"
+              APP_DIR="$(readlink -f "/proc/${MAIN_PID}/cwd")"
+            fi
+            if [ -z "$APP_DIR" ] || [ ! -d "$APP_DIR/.git" ]; then
+              APP_DIR="/root/dojobay"
+            fi
+
+            echo "Deploying to runtime directory: $APP_DIR"
+            cd "$APP_DIR"
+            git pull --ff-only origin main
             source venv/bin/activate
             pip install -r requirements.txt --quiet
 
             sudo systemctl restart dojobay.service
             sudo systemctl restart dojobay-api.service
-            echo "Deploy completed successfully"
+
+            for attempt in 1 2 3 4 5 6; do
+              status="$(curl -sS -o /dev/null -w '%{http_code}' \
+                -X POST -H 'Content-Type: application/json' -d '{}' \
+                https://dojobay.pw/api/pairing-signing-message)"
+              if [ "$status" = "401" ]; then
+                echo "Production verification succeeded"
+                exit 0
+              fi
+              echo "Production returned HTTP $status; retrying..."
+              sleep 5
+            done
+
+            echo "Production verification failed"
+            exit 1
