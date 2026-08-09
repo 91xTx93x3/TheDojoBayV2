@@ -1154,6 +1154,36 @@
           </div>`;
       }
 
+      function renderPayNymProof(dojo) {
+        if (!dojo.paynym) return "";
+        const verified = Boolean(dojo.signature);
+        const color = verified ? "#00ff00" : "#f39c12";
+        const title = verified
+          ? "OWNERSHIP VERIFIED"
+          : "PAYNYM AUTHENTICATED";
+        const description = verified
+          ? "Pairing details signed by the notification address derived from PayNym"
+          : "Node submitted by the authenticated owner of PayNym";
+        return `
+          <div style="background-color: var(--card-bg); border: 1px solid ${color}; border-radius: 8px; padding: 1rem; margin-top: 1rem; max-width: 750px;">
+            <div class="d-flex align-items-center gap-3">
+              <img src="https://paynym.rs/${dojo.paynym}/avatar" alt="${dojo.paynym} avatar"
+                   style="width: 64px; height: 64px; border-radius: 50%; border: 2px solid ${color}; object-fit: cover; flex-shrink: 0;"
+                   onerror="this.style.display='none'">
+              <div>
+                <div style="color: ${color}; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem;">
+                  <i class="bi ${verified ? "bi-person-check" : "bi-person-lock"}"></i> ${title}
+                </div>
+                <div style="color: #ccc; font-size: 0.85rem;">
+                  ${description}
+                  <a href="https://paynym.rs/${dojo.paynym}" target="_blank" rel="noopener noreferrer"
+                     style="color: ${color}; text-decoration: none; font-weight: 600;">${dojo.paynym}</a>
+                </div>
+              </div>
+            </div>
+          </div>`;
+      }
+
       let cachedData = null;
       let lastUpdateTime = null;
 
@@ -1466,28 +1496,10 @@
                                                 </div>
                                                 <pre id="signature-text-mainnet-${index}" style="background-color: #000; color: #00ff00; padding: 1rem; border-radius: 6px; font-size: 0.7rem; margin: 0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; border: 1px solid #00ff00;">${dojo.signature}</pre>
                                             </div>
-                                            <div style="background-color: var(--card-bg); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin-top: 1rem; max-width: 750px;">
-                                                <div class="d-flex align-items-center gap-3">
-                                                    <img src="https://paynym.rs/${dojo.paynym}/avatar" alt="${dojo.paynym} avatar"
-                                                         style="width: 64px; height: 64px; border-radius: 50%; border: 2px solid #00ff00; object-fit: cover; flex-shrink: 0;"
-                                                         onerror="this.style.display='none'">
-                                                    <div>
-                                                        <div style="color: #00ff00; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem;">
-                                                            <i class="bi bi-person-check"></i> OWNERSHIP VERIFIED
-                                                        </div>
-                                                        <div style="color: #ccc; font-size: 0.85rem;">
-                                                            Pairing details signed by the notification address derived from PayNym
-                                                            <a href="https://paynym.rs/${dojo.paynym}" target="_blank" rel="noopener noreferrer"
-                                                               style="color: #00ff00; text-decoration: none; font-weight: 600;">
-                                                                ${dojo.paynym}
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
                                               `
                                             : ""
                                         }
+                                        ${renderPayNymProof(dojo)}
                                         </div>
                                     </div>
                                 </div>
@@ -1656,28 +1668,10 @@
                                                 </div>
                                                 <pre id="signature-text-testnet-${index}" style="background-color: #000; color: #00ff00; padding: 1rem; border-radius: 6px; font-size: 0.7rem; margin: 0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; border: 1px solid #00ff00;">${dojo.signature}</pre>
                                             </div>
-                                            <div style="background-color: var(--card-bg); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin-top: 1rem; max-width: 750px;">
-                                                <div class="d-flex align-items-center gap-3">
-                                                    <img src="https://paynym.rs/${dojo.paynym}/avatar" alt="${dojo.paynym} avatar"
-                                                         style="width: 64px; height: 64px; border-radius: 50%; border: 2px solid #00ff00; object-fit: cover; flex-shrink: 0;"
-                                                         onerror="this.style.display='none'">
-                                                    <div>
-                                                        <div style="color: #00ff00; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem;">
-                                                            <i class="bi bi-person-check"></i> OWNERSHIP VERIFIED
-                                                        </div>
-                                                        <div style="color: #ccc; font-size: 0.85rem;">
-                                                            Pairing details signed by the notification address derived from PayNym
-                                                            <a href="https://paynym.rs/${dojo.paynym}" target="_blank" rel="noopener noreferrer"
-                                                               style="color: #00ff00; text-decoration: none; font-weight: 600;">
-                                                                ${dojo.paynym}
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
                                               `
                                             : ""
                                         }
+                                        ${renderPayNymProof(dojo)}
                                         </div>
                                     </div>
                                 </div>

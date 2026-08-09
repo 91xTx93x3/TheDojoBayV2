@@ -148,6 +148,10 @@ sandbox.renderStatus({
 check("a normal node still shows its name", rendered.includes("Compiler"));
 check("a normal node still links its PayNym",
   rendered.includes('href="https://paynym.rs/+bumpyblank89"'));
+check("an authenticated PayNym without a pairing signature is labelled accurately",
+  rendered.includes("PAYNYM AUTHENTICATED") &&
+  rendered.includes("Node submitted by the authenticated owner of PayNym") &&
+  !rendered.includes("OWNERSHIP VERIFIED"));
 check("a normal node still shows its QR image",
   rendered.includes('src="/static/images/qr/compiler_1234abcd.png"'));
 check("the apikey is still shown", rendered.includes("deadbeef"));
