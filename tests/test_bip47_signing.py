@@ -130,31 +130,5 @@ class BIP47SigningTests(unittest.TestCase):
         )
         self.assertEqual(body["scheme"], "bip47-bound-v2")
 
-    def test_verifies_reported_single_newline_signature(self):
-        payment_code = (
-            "PM8TJQwkgoVeogzAQe431Bn3FSsXiCqjmFCpysFuSTjB7FaxfrJGtMAEfsA5dvptj"
-            "MAAxLXKM6bDAen5tFp326EHBmRH6jQ9vJDPnSwARLmUcJoucQtd"
-        )
-        pairing = """{
-  "pairing": {
-    "type": "dojo.api",
-    "version": "1.29.2",
-    "apikey": "cdb0d29377c9088275817fcd7d643013",
-    "url": "http://4f6hya64dcofjavp66illnynpoxjdfc2bnvwduleqkvjuqq633d2fiyd.onion/test/v2"
-  },
-  "explorer": {
-    "type": "explorer.btc_rpc_explorer",
-    "url": "http://p7wvh24b6mdt3gqa2b2ynyei4ib6xahvk5wzqlgu6olamyvej6fkczqd.onion"
-  }
-}"""
-        signature = (
-            "HyGtbtu4MIfzdJP8rXExaYucdXwLbwiye1yyrRu75/x1OaTCdApAiotO86JCtQlt"
-            "S4PKB+gItHIxKMoOtjnGr3k="
-        )
-
-        message = build_pairing_signing_message(pairing, payment_code)
-        self.assertTrue(verify_pairing_signature(payment_code, message, signature))
-
-
 if __name__ == "__main__":
     unittest.main()

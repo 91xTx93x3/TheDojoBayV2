@@ -17,7 +17,7 @@ class StatusMergeTests(unittest.TestCase):
         }
         current_testnet = [
             {'name': 'Existing', 'pairing': {'url': 'http://existing.onion'}},
-            {'name': '91xTx93x3 Green Testnet', 'pairing': {'url': 'http://green.onion'}},
+            {'name': 'New Node', 'pairing': {'url': 'http://new-node.onion'}},
         ]
 
         with (
@@ -28,7 +28,7 @@ class StatusMergeTests(unittest.TestCase):
 
         self.assertEqual(
             [entry['name'] for entry in merged['testnet']],
-            ['Existing', '91xTx93x3 Green Testnet'],
+            ['Existing', 'New Node'],
         )
         self.assertEqual(merged['testnet'][0]['status'], 'Active')
         self.assertEqual(merged['testnet'][1]['status'], 'Checking')
