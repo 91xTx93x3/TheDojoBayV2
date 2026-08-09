@@ -293,22 +293,6 @@
   ],
   "testnet": [
     {
-      "name": "@Libertarian",
-      "paynym": "+belligerentprinciple63",
-      "paynym_url": "https://paynym.rs/+belligerentprinciple63",
-      "image": "/static/images/qr/@Libertarian_libtest.png",
-      "pairing": {
-        "type": "dojo.api",
-        "version": "1.26.0",
-        "apikey": "78945612",
-        "url": "http://hdflycre2gb6l3yxolofi7thtw7p2cfymfmq2bqsxhx7pjuk6sj23tyd.onion/v2"
-      },
-      "explorer": {
-        "type": "explorer.btc_rpc_explorer",
-        "url": "http://jfpzciobq5iysusamzuyj6ijj67wzlclxphknco467ljban5h7jilhad.onion"
-      }
-    },
-    {
       "name": "wanderinKing072",
       "nym": "wanderinKing072",
       "image": "/static/images/qr/wanderinKing072_image-1.png",

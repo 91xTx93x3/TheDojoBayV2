@@ -209,6 +209,39 @@ def _save_submissions(data):
         json.dump(data, f, indent=2)
 
 
+def _load_dojos_data():
+    """Load dojos_data.json and normalize its structure for the admin routes."""
+    try:
+        with open(DOJOS_DATA_FILE) as f:
+            data = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {'mainnet': [], 'testnet': []}
+
+    if isinstance(data, dict):
+        normalized = {}
+        for network in ('mainnet', 'testnet'):
+            value = data.get(network)
+            if isinstance(value, list):
+                normalized[network] = value
+            elif isinstance(value, dict):
+                normalized[network] = [value] if value else []
+            else:
+                normalized[network] = []
+        return normalized
+
+    if isinstance(data, list):
+        print('[WARN] dojos_data.json had a list payload; treating it as mainnet entries.')
+        return {'mainnet': data, 'testnet': []}
+
+    print(f"[WARN] dojos_data.json had unexpected structure: {type(data).__name__}; resetting to defaults.")
+    return {'mainnet': [], 'testnet': []}
+
+
+def _save_dojos_data(dojos_data):
+    with open(DOJOS_DATA_FILE, 'w') as f:
+        json.dump(dojos_data, f, indent=2, ensure_ascii=False)
+
+
 def _require_login():
     """Return paynym from session or None if not logged in."""
     return session.get('paynym')
@@ -560,6 +593,30 @@ def admin_approve(dojo_id):
         # Already approved, skip processing and redirect
         return redirect(url_for('admin_dojos'))
 
+    # ── 0b. SECURITY: Validate signature before approval ─────────────────────
+    # If a signature is provided, it MUST be valid before approval
+    signature_text = dojo.get('pairing_signature') or dojo.get('signature_text', '')
+    if signature_text:
+        payment_code = dojo.get('paynym', '')
+        try:
+            is_valid = verify_pairing_signature(payment_code, dojo.get('pairing_details', ''), signature_text)
+            if not is_valid:
+                # Signature exists but is INVALID — REJECT approval
+                print(f"[ADMIN REJECT] Dojo {dojo.get('name')} has INVALID signature; rejecting approval")
+                dojo['status'] = 'rejected'
+                dojo['rejection_reason'] = 'Invalid pairing signature'
+                dojo['updated_at'] = datetime.now().isoformat()
+                _save_submissions(submissions)
+                return redirect(url_for('admin_dojos'))
+        except Exception as e:
+            print(f"[ADMIN ERROR] Signature verification error for {dojo.get('name')}: {e}")
+            # On error, also reject to be safe
+            dojo['status'] = 'rejected'
+            dojo['rejection_reason'] = 'Signature verification error'
+            dojo['updated_at'] = datetime.now().isoformat()
+            _save_submissions(submissions)
+            return redirect(url_for('admin_dojos'))
+
     # ── 1. Parse pairing_details JSON ─────────────────────────────────────────
     try:
         pairing_obj = json.loads(dojo.get('pairing_details', '{}'))
@@ -652,14 +709,7 @@ def admin_approve(dojo_id):
         new_entry['signature'] = signature_content
 
     # ── 5. Load and verify dojos_data.json exists ────────────────────────────
-    try:
-        with open(DOJOS_DATA_FILE) as f:
-            dojos_data = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        dojos_data = {}
-    
-    dojos_data.setdefault('mainnet', [])
-    dojos_data.setdefault('testnet', [])
+    dojos_data = _load_dojos_data()
     
     # ── 6. Check if entry already exists to prevent duplicates ───────────────
     dojo_name = dojo.get('name', '')
@@ -678,8 +728,7 @@ def admin_approve(dojo_id):
     
     # ── 7. Save dojos_data.json ──────────────────────────────────────────────
     try:
-        with open(DOJOS_DATA_FILE, 'w') as f:
-            json.dump(dojos_data, f, indent=2, ensure_ascii=False)
+        _save_dojos_data(dojos_data)
     except Exception:
         # If save fails, don't mark submission as approved
         return redirect(url_for('admin_dojos'))
@@ -729,16 +778,14 @@ def admin_revoke(dojo_id):
     # Remove from dojos_data.json by matching name + network
     network = dojo.get('network', 'mainnet')
     name    = dojo.get('name', '')
-    with open(DOJOS_DATA_FILE) as f:
-        dojos_data = json.load(f)
+    dojos_data = _load_dojos_data()
     before = len(dojos_data.get(network, []))
     dojos_data[network] = [
         d for d in dojos_data.get(network, [])
         if d.get('name') != name
     ]
     if len(dojos_data[network]) < before:
-        with open(DOJOS_DATA_FILE, 'w') as f:
-            json.dump(dojos_data, f, indent=2, ensure_ascii=False)
+        _save_dojos_data(dojos_data)
 
     # Mark submission as rejected
     dojo['status']     = 'rejected'
