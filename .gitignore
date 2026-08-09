@@ -12,6 +12,7 @@ ENV/
 instance/
 .webassets-cache
 .env
+.secret_key
 .DS_Store
 *.swp
 *.swo

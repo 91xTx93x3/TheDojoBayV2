@@ -30,8 +30,17 @@ jobs:
             fi
 
             echo "Deploying to runtime directory: $APP_DIR"
+            git -C "$APP_DIR" fetch origin main
+            RELEASE_ARCHIVE="$(mktemp)"
+            trap 'rm -f "$RELEASE_ARCHIVE"' EXIT
+            git -C "$APP_DIR" archive --format=tar origin/main -o "$RELEASE_ARCHIVE"
+            tar -xf "$RELEASE_ARCHIVE" -C "$APP_DIR" \
+              --exclude='.secret_key' \
+              --exclude='dojos_data.json' \
+              --exclude='dojo_submissions.json' \
+              --exclude='status_cache.json'
+
             cd "$APP_DIR"
-            git pull --ff-only origin main
             source venv/bin/activate
             pip install -r requirements.txt --quiet
 
