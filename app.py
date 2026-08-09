@@ -21,6 +21,8 @@ from data_loader import DojoDataLoader
 from background_checker import BackgroundChecker
 from bip47_verify import (
     PAIRING_SIGNATURE_SCHEME,
+    LEGACY_PAIRING_SIGNATURE_SCHEME,
+    build_legacy_pairing_signing_message,
     build_pairing_signing_message,
     canonicalize_pairing_details,
     derive_notification_address,
@@ -625,6 +627,8 @@ def admin_approve(dojo_id):
             signed_message = dojo.get('pairing_details', '')
             if dojo.get('pairing_signature_scheme') == PAIRING_SIGNATURE_SCHEME:
                 signed_message = build_pairing_signing_message(signed_message, payment_code)
+            elif dojo.get('pairing_signature_scheme') == LEGACY_PAIRING_SIGNATURE_SCHEME:
+                signed_message = build_legacy_pairing_signing_message(signed_message, payment_code)
             is_valid = verify_pairing_signature(payment_code, signed_message, signature_text)
             if not is_valid:
                 # Signature exists but is INVALID — REJECT approval
@@ -731,8 +735,9 @@ def admin_approve(dojo_id):
     # Store the raw pairing_details text (needed for signature verification)
     if dojo.get('pairing_details'):
         new_entry['pairing_details'] = dojo['pairing_details']
-    if dojo.get('pairing_signature_scheme') == PAIRING_SIGNATURE_SCHEME:
-        new_entry['pairing_signature_scheme'] = PAIRING_SIGNATURE_SCHEME
+    signature_scheme = dojo.get('pairing_signature_scheme')
+    if signature_scheme in (PAIRING_SIGNATURE_SCHEME, LEGACY_PAIRING_SIGNATURE_SCHEME):
+        new_entry['pairing_signature_scheme'] = signature_scheme
         new_entry['payment_code'] = payment_code
     # Store the BIP-137 pairing signature (use legacy signature_text as fallback)
     signature_content = dojo.get('pairing_signature') or dojo.get('signature_text', '')

@@ -20,7 +20,8 @@ from bitcoinutils.keys import PublicKey as _BTCPublicKey
 
 _btc_setup('mainnet')
 
-PAIRING_SIGNATURE_SCHEME = "bip47-bound-v1"
+PAIRING_SIGNATURE_SCHEME = "bip47-bound-v2"
+LEGACY_PAIRING_SIGNATURE_SCHEME = "bip47-bound-v1"
 
 
 # ---------------------------------------------------------------------------
@@ -122,7 +123,16 @@ def build_pairing_signing_message(pairing_details: str, payment_code: str) -> st
     """Bind canonical pairing JSON to the authenticated BIP47 payment code."""
     _decode_payment_code(payment_code)
     canonical_pairing = canonicalize_pairing_details(pairing_details)
-    return f"{canonical_pairing}\n\nBIP47:\n{payment_code}"
+    return f"{canonical_pairing}\nBIP47:\n{payment_code}"
+
+
+def build_legacy_pairing_signing_message(pairing_details: str, payment_code: str) -> str:
+    """Rebuild the short-lived v1 format, which included a blank separator line."""
+    return build_pairing_signing_message(pairing_details, payment_code).replace(
+        "\nBIP47:\n",
+        "\n\nBIP47:\n",
+        1,
+    )
 
 
 # ---------------------------------------------------------------------------

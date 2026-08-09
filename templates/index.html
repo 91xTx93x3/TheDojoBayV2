@@ -949,6 +949,12 @@
         // Use the exact original text that was signed if available
         if (dojo.pairing_details) {
           if (
+            dojo.pairing_signature_scheme === "bip47-bound-v2" &&
+            dojo.payment_code
+          ) {
+            return dojo.pairing_details + "\nBIP47:\n" + dojo.payment_code;
+          }
+          if (
             dojo.pairing_signature_scheme === "bip47-bound-v1" &&
             dojo.payment_code
           ) {
