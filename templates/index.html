@@ -946,6 +946,22 @@
       }
 
       function buildPairingMessage(dojo) {
+        if (
+          dojo.signature &&
+          dojo.signature.startsWith("-----BEGIN BITCOIN SIGNED MESSAGE-----")
+        ) {
+          const lines = dojo.signature
+            .replace(/\r\n?/g, "\n")
+            .split("\n");
+          const signatureStart = lines.findIndex(
+            (line) =>
+              line.trim() === "-----BEGIN SIGNATURE-----" ||
+              line.trim() === "-----BEGIN BITCOIN SIGNATURE-----",
+          );
+          if (signatureStart > 0) {
+            return lines.slice(1, signatureStart).join("\n");
+          }
+        }
         // Use the exact original text that was signed if available
         if (dojo.pairing_details) {
           if (

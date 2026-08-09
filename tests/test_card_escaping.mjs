@@ -185,5 +185,27 @@ check("the card describes ownership verification precisely",
   rendered.includes("OWNERSHIP VERIFIED") &&
   rendered.includes("notification address derived from PayNym"));
 
+const armoredMessage = '{"pairing":{"url":"http://historical.onion/v2"}}\nBIP47:\nPM8THistorical';
+sandbox.renderStatus({
+  mainnet: [{
+    name: "Historical", status: "Active", checked_at: "now",
+    paynym: "+historical",
+    pairing_details: '{"pairing":{"url":"http://newer.onion/v2"}}',
+    signature:
+      "-----BEGIN BITCOIN SIGNED MESSAGE-----\n" +
+      armoredMessage +
+      "\n-----BEGIN BITCOIN SIGNATURE-----\nHsignature\n" +
+      "-----END BITCOIN SIGNATURE-----",
+  }],
+  testnet: [],
+  last_update: "now",
+  stats: { mainnet_active: 1, mainnet_total: 1, testnet_active: 0, testnet_total: 0 },
+});
+const historicalVerifyData = vm.runInContext("_verifyData", sandbox);
+check("armored proofs display their embedded signed message",
+  historicalVerifyData["mainnet-0"].message === armoredMessage &&
+  rendered.includes("historical.onion") &&
+  !rendered.includes("newer.onion"));
+
 console.log(failures ? `\n${failures} check(s) failed` : `\nall checks passed`);
 process.exit(failures ? 1 : 0);
