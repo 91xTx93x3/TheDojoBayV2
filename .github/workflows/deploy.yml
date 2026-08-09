@@ -45,21 +45,6 @@ jobs:
             cd "$APP_DIR"
             source venv/bin/activate
             pip install -r requirements.txt --quiet
-            python - "$APP_DIR/dojo_submissions.json" <<'PY'
-            import json
-            import sys
-
-            with open(sys.argv[1]) as source:
-                submissions = json.load(source)
-            for submission in submissions:
-                if "green" in submission.get("name", "").lower():
-                    print(
-                        "Green submission:",
-                        repr(submission.get("name")),
-                        submission.get("status"),
-                        submission.get("rejection_reason", ""),
-                    )
-            PY
             python - "$RELEASE_DATA" "$APP_DIR/dojos_data.json" <<'PY'
             import json
             import sys

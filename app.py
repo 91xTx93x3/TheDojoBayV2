@@ -953,17 +953,54 @@ def api_status():
     try:
         cached = cache.get()
         if cached:
-            return jsonify(cached)
+            return jsonify(_merge_status_with_directory(cached))
 
         # Cache expired — serve stale data with a flag while background checker runs
         stale = cache.get_stale()
         if stale:
-            return jsonify({**stale, "stale": True})
+            return jsonify({**_merge_status_with_directory(stale), "stale": True})
 
         # No data at all yet
         return jsonify({"loading": True, "message": "Updating node status..."})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+def _merge_status_with_directory(status):
+    """Keep cached health results while showing directory additions immediately."""
+    merged = dict(status)
+    sources = {
+        'mainnet': mainnet_dojos,
+        'testnet': testnet_dojos,
+    }
+    status_fields = ('status', 'checked_at', 'dojo_version', 'error')
+
+    for network, current_entries in sources.items():
+        cached_by_name = {
+            entry.get('name'): entry
+            for entry in status.get(network, [])
+            if entry.get('name')
+        }
+        entries = []
+        for source in current_entries:
+            entry = dict(source)
+            cached_entry = cached_by_name.get(source.get('name'))
+            if cached_entry:
+                for field in status_fields:
+                    if field in cached_entry:
+                        entry[field] = cached_entry[field]
+            else:
+                entry['status'] = 'Checking'
+            entries.append(entry)
+        merged[network] = entries
+
+    merged['stats'] = {
+        'mainnet_active': sum(d.get('status') == 'Active' for d in merged['mainnet']),
+        'mainnet_total': len(merged['mainnet']),
+        'testnet_active': sum(d.get('status') == 'Active' for d in merged['testnet']),
+        'testnet_total': len(merged['testnet']),
+    }
+    return merged
 
 
 @app.route('/health')
