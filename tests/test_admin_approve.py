@@ -2,6 +2,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import app as app_module
 
@@ -54,7 +55,8 @@ class AdminApproveTests(unittest.TestCase):
             with client.session_transaction() as session:
                 session['paynym'] = next(iter(app_module.ADMIN_PAYNMS))
 
-            response = client.post('/admin/dojos/pending-node-1/approve', follow_redirects=False)
+            with patch.object(app_module, 'verify_pairing_signature', return_value=True):
+                response = client.post('/admin/dojos/pending-node-1/approve', follow_redirects=False)
 
             self.assertEqual(response.status_code, 302)
             self.assertEqual(response.headers['Location'], '/admin/dojos')

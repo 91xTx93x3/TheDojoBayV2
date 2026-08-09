@@ -19,7 +19,14 @@ from cache import StatusCache
 from checker import DojoChecker
 from data_loader import DojoDataLoader
 from background_checker import BackgroundChecker
-from bip47_verify import verify_pairing_signature, derive_notification_address
+from bip47_verify import (
+    PAIRING_SIGNATURE_SCHEME,
+    build_pairing_signing_message,
+    canonicalize_pairing_details,
+    derive_notification_address,
+    parse_armored_signed_message,
+    verify_pairing_signature,
+)
 
 
 # Initialize Flask app
@@ -356,9 +363,16 @@ def dojo_new():
             return render_template('dojo_form.html', mode='new',
                                    error='Ownership proof (signature) is required.',
                                    form_data=request.form)
-        if not verify_pairing_signature(paynym, pairing_details, pairing_signature):
+        try:
+            pairing_details = canonicalize_pairing_details(pairing_details)
+            signing_message = build_pairing_signing_message(pairing_details, paynym)
+        except ValueError as exc:
             return render_template('dojo_form.html', mode='new',
-                                   error='Signature verification failed. Please sign the exact pairing details with your notification address.',
+                                   error=str(exc),
+                                   form_data=request.form)
+        if not verify_pairing_signature(paynym, signing_message, pairing_signature):
+            return render_template('dojo_form.html', mode='new',
+                                   error='Signature verification failed. Please sign the exact generated message with your notification address.',
                                    form_data=request.form)
         image_file = _save_dojo_image(request.files.get('image'))
         entry = {
@@ -372,6 +386,7 @@ def dojo_new():
             'nostr_x': request.form.get('nostr_x', '').strip(),
             'pairing_details': pairing_details,
             'pairing_signature': pairing_signature,
+            'pairing_signature_scheme': PAIRING_SIGNATURE_SCHEME,
             'electrum_server': request.form.get('electrum_server', '').strip(),
             'image_file': image_file,
             'submitted_at': datetime.now().isoformat(),
@@ -412,9 +427,16 @@ def dojo_edit(dojo_id):
             return render_template('dojo_form.html', mode='edit', dojo=dojo,
                                    error='Ownership proof (signature) is required.',
                                    form_data=request.form)
-        if not verify_pairing_signature(paynym, pairing_details, pairing_signature):
+        try:
+            pairing_details = canonicalize_pairing_details(pairing_details)
+            signing_message = build_pairing_signing_message(pairing_details, paynym)
+        except ValueError as exc:
             return render_template('dojo_form.html', mode='edit', dojo=dojo,
-                                   error='Signature verification failed. Please sign the exact pairing details with your notification address.',
+                                   error=str(exc),
+                                   form_data=request.form)
+        if not verify_pairing_signature(paynym, signing_message, pairing_signature):
+            return render_template('dojo_form.html', mode='edit', dojo=dojo,
+                                   error='Signature verification failed. Please sign the exact generated message with your notification address.',
                                    form_data=request.form)
         new_image = _save_dojo_image(request.files.get('image'), dojo.get('image_file'))
         was_approved = dojo.get('status') == 'approved'
@@ -426,6 +448,7 @@ def dojo_edit(dojo_id):
         dojo['nostr_x']        = request.form.get('nostr_x', '').strip()
         dojo['pairing_details'] = pairing_details
         dojo['pairing_signature'] = pairing_signature
+        dojo['pairing_signature_scheme'] = PAIRING_SIGNATURE_SCHEME
         dojo['electrum_server'] = request.form.get('electrum_server', '').strip()
         if not dojo.get('paynym_alias'):
             dojo['paynym_alias'] = _resolve_paynym_alias(dojo.get('paynym', ''))
@@ -599,7 +622,10 @@ def admin_approve(dojo_id):
     if signature_text:
         payment_code = dojo.get('paynym', '')
         try:
-            is_valid = verify_pairing_signature(payment_code, dojo.get('pairing_details', ''), signature_text)
+            signed_message = dojo.get('pairing_details', '')
+            if dojo.get('pairing_signature_scheme') == PAIRING_SIGNATURE_SCHEME:
+                signed_message = build_pairing_signing_message(signed_message, payment_code)
+            is_valid = verify_pairing_signature(payment_code, signed_message, signature_text)
             if not is_valid:
                 # Signature exists but is INVALID — REJECT approval
                 print(f"[ADMIN REJECT] Dojo {dojo.get('name')} has INVALID signature; rejecting approval")
@@ -681,6 +707,8 @@ def admin_approve(dojo_id):
     if paynym_alias:
         new_entry['paynym']     = paynym_alias
         new_entry['paynym_url'] = paynym_url
+    elif payment_code:
+        new_entry['paynym'] = payment_code
     if dojo.get('jurisdiction'):
         new_entry['jurisdiction'] = dojo['jurisdiction']
     if dojo.get('hardware'):
@@ -703,6 +731,9 @@ def admin_approve(dojo_id):
     # Store the raw pairing_details text (needed for signature verification)
     if dojo.get('pairing_details'):
         new_entry['pairing_details'] = dojo['pairing_details']
+    if dojo.get('pairing_signature_scheme') == PAIRING_SIGNATURE_SCHEME:
+        new_entry['pairing_signature_scheme'] = PAIRING_SIGNATURE_SCHEME
+        new_entry['payment_code'] = payment_code
     # Store the BIP-137 pairing signature (use legacy signature_text as fallback)
     signature_content = dojo.get('pairing_signature') or dojo.get('signature_text', '')
     if signature_content:
@@ -804,20 +835,43 @@ def admin_revoke(dojo_id):
 
 @app.route('/api/verify-pairing-signature', methods=['POST'])
 def api_verify_pairing_signature():
-    """Verify a BIP-137 signature of pairing details against the logged-in PayNym."""
+    """Verify the standard BIP47-bound pairing message for the logged-in PayNym."""
     paynym = session.get('paynym')
     if not paynym:
         return jsonify({'valid': False, 'error': 'Not authenticated'}), 401
     data = request.get_json(silent=True) or {}
-    message = data.get('message', '').strip()
+    pairing_details = str(data.get('pairing_details', '')).strip()
     signature = data.get('signature', '').strip()
-    if not message or not signature:
-        return jsonify({'valid': False, 'error': 'Missing message or signature'}), 400
+    if not pairing_details or not signature:
+        return jsonify({'valid': False, 'error': 'Missing pairing details or signature'}), 400
     try:
+        message = build_pairing_signing_message(pairing_details, paynym)
         valid = verify_pairing_signature(paynym, message, signature)
         return jsonify({'valid': valid})
-    except Exception as e:
-        return jsonify({'valid': False, 'error': str(e)}), 500
+    except ValueError as exc:
+        return jsonify({'valid': False, 'error': str(exc)}), 400
+
+
+@app.route('/api/pairing-signing-message', methods=['POST'])
+def api_pairing_signing_message():
+    """Generate the exact standard message the authenticated owner must sign."""
+    paynym = session.get('paynym')
+    if not paynym:
+        return jsonify({'error': 'Not authenticated'}), 401
+    data = request.get_json(silent=True) or {}
+    pairing_details = str(data.get('pairing_details', '')).strip()
+    if not pairing_details:
+        return jsonify({'error': 'Missing pairing details'}), 400
+    try:
+        message = build_pairing_signing_message(pairing_details, paynym)
+        canonical_pairing = canonicalize_pairing_details(pairing_details)
+    except ValueError as exc:
+        return jsonify({'error': str(exc)}), 400
+    return jsonify({
+        'message': message,
+        'pairing_details': canonical_pairing,
+        'scheme': PAIRING_SIGNATURE_SCHEME,
+    })
 
 
 @app.route('/api/verify-message', methods=['POST'])
@@ -845,43 +899,38 @@ def api_verify_message():
     if not nym_input or not signature:
         return jsonify({'valid': False, 'error': 'Missing nym or signature'}), 400
 
-    # Resolve payment code via paynym.rs (accepts +handle, PM8T…, or nymID)
-    try:
-        req_data = json.dumps({'nym': nym_input}).encode()
-        req = _urlreq.Request(
-            'https://paynym.rs/api/v1/nym',
-            data=req_data,
-            headers={'Content-Type': 'application/json'},
-            method='POST',
-        )
-        ctx = _ssl.create_default_context()
-        with _urlreq.urlopen(req, timeout=10, context=ctx) as resp:
-            info = json.loads(resp.read())
-        codes = info.get('codes') or []
-        payment_code = codes[0].get('code', '') if codes else ''
-        if not payment_code:
-            return jsonify({'valid': False, 'error': 'Could not resolve payment code from PayNym registry'}), 400
-    except Exception:
-        return jsonify({'valid': False, 'error': 'Could not reach PayNym registry'}), 503
+    # Full payment codes verify locally; handles and nym IDs require registry resolution.
+    if nym_input.startswith('PM8T'):
+        payment_code = nym_input
+        try:
+            derive_notification_address(payment_code)
+        except ValueError as exc:
+            return jsonify({'valid': False, 'error': str(exc)}), 400
+    else:
+        try:
+            req_data = json.dumps({'nym': nym_input}).encode()
+            req = _urlreq.Request(
+                'https://paynym.rs/api/v1/nym',
+                data=req_data,
+                headers={'Content-Type': 'application/json'},
+                method='POST',
+            )
+            ctx = _ssl.create_default_context()
+            with _urlreq.urlopen(req, timeout=10, context=ctx) as resp:
+                info = json.loads(resp.read())
+            codes = info.get('codes') or []
+            payment_code = codes[0].get('code', '') if codes else ''
+            if not payment_code:
+                return jsonify({'valid': False, 'error': 'Could not resolve payment code from PayNym registry'}), 400
+        except Exception:
+            return jsonify({'valid': False, 'error': 'Could not reach PayNym registry'}), 503
 
     # Parse armored Bitcoin signed message format
     if signature.startswith('-----BEGIN BITCOIN SIGNED MESSAGE-----'):
-        lines = signature.splitlines()
         try:
-            sig_start = next(
-                i for i, line in enumerate(lines)
-                if line.strip() == '-----BEGIN SIGNATURE-----'
-            )
-            message = '\n'.join(lines[1:sig_start])
-            after_header = [
-                line for line in lines[sig_start + 1:]
-                if not line.startswith('-----END')
-            ]
-            # Format: optional address line followed by base64 signature
-            compact_sig = after_header[-1].strip() if after_header else ''
-        except (StopIteration, IndexError):
-            return jsonify({'valid': False, 'error': 'Could not parse armored signature format'}), 400
-        signature = compact_sig
+            message, signature = parse_armored_signed_message(signature)
+        except ValueError as exc:
+            return jsonify({'valid': False, 'error': str(exc)}), 400
 
     if not message:
         return jsonify({'valid': False, 'error': 'Missing message'}), 400

@@ -54,6 +54,7 @@ border-color: #666; color: #e0e0e0; } .alert-error { background-color: rgba(231,
           <i class="bi bi-exclamation-triangle me-1"></i>{{ error }}
         </div>
         {% endif %}
+        <div class="alert-error" id="client-error" style="display:none"></div>
 
         <form method="POST" id="dojoForm" novalidate>
           <!-- Identity -->
@@ -167,15 +168,9 @@ border-color: #666; color: #e0e0e0; } .alert-error { background-color: rgba(231,
           </p>
 
           <div class="mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-1">
-              <label class="form-label mb-0" for="pairing_details">
-                Pairing Details <span class="required-star">*</span>
-              </label>
-              <button type="button" class="btn-copy-small" id="btn-copy-pairing"
-                style="display:none" onclick="copyPairing()">
-                <i class="bi bi-clipboard me-1"></i>Copy
-              </button>
-            </div>
+            <label class="form-label mb-1" for="pairing_details">
+              Pairing Details <span class="required-star">*</span>
+            </label>
             <textarea
               class="form-control"
               id="pairing_details"
@@ -199,26 +194,38 @@ border-color: #666; color: #e0e0e0; } .alert-error { background-color: rgba(231,
               <i class="bi bi-shield-lock me-1"></i>Ownership Proof
             </p>
             <div class="sig-info mb-3">
-              <p class="mb-2" style="font-weight:500;color:#e0e0e0">Sign the pairing details to prove you own this Dojo:</p>
+              <p class="mb-2" style="font-weight:500;color:#e0e0e0">Sign the generated message to prove you own this Dojo:</p>
               <ol>
-                <li>Copy the pairing details using the <strong>Copy</strong> button above</li>
+                <li>Copy the complete message shown below</li>
                 <li>Open <strong>Samourai / Ashigaru</strong> &rarr; PayNym &rarr; ⋮ &rarr; <em>Sign message</em></li>
-                <li>Paste the pairing details as the message and sign with your <strong>notification address</strong></li>
+                <li>Paste it exactly and sign with your <strong>notification address</strong></li>
                 <li>Paste the resulting signature below</li>
               </ol>
+            </div>
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label class="form-label mb-0" for="signing_message">Message to sign</label>
+                <button type="button" class="btn-copy-small" id="btn-copy-signing" onclick="copySigningMessage()">
+                  <i class="bi bi-clipboard me-1"></i>Copy
+                </button>
+              </div>
+              <textarea class="form-control" id="signing_message" rows="12" readonly></textarea>
+              <div class="form-text mt-1">
+                This standard message binds the canonical pairing JSON to your authenticated BIP47 payment code.
+              </div>
             </div>
             <div class="mb-4">
               <label class="form-label" for="pairing_signature">
                 Signature <span class="required-star">*</span>
               </label>
-              <input
-                type="text"
+              <textarea
                 class="form-control"
                 id="pairing_signature"
                 name="pairing_signature"
                 placeholder="Base64 BIP-137 signature…"
                 autocomplete="off"
-              />
+                rows="5"
+              ></textarea>
               <div class="form-text mt-1">
                 The signature produced by signing the pairing details with your notification address.
               </div>
@@ -246,7 +253,7 @@ border-color: #666; color: #e0e0e0; } .alert-error { background-color: rgba(231,
   const form = document.getElementById("dojoForm");
   let formStep = 1;
 
-  form.addEventListener("submit", function (e) {
+  form.addEventListener("submit", async function (e) {
     if (formStep === 1) {
       if (!form.checkValidity()) {
         e.preventDefault();
@@ -254,11 +261,33 @@ border-color: #666; color: #e0e0e0; } .alert-error { background-color: rgba(231,
         form.classList.add("was-validated");
         return;
       }
-      // Valid — move to step 2 (lock fields, show signature section)
       e.preventDefault();
-      lockFields();
-      showSignatureSection();
-      formStep = 2;
+      const btnSubmit = document.getElementById("btn-submit");
+      const clientError = document.getElementById("client-error");
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Generating…';
+      clientError.style.display = "none";
+      try {
+        const response = await fetch("/api/pairing-signing-message", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            pairing_details: document.getElementById("pairing_details").value.trim(),
+          }),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Could not generate signing message.");
+        document.getElementById("pairing_details").value = data.pairing_details;
+        document.getElementById("signing_message").value = data.message;
+        lockFields();
+        showSignatureSection();
+        formStep = 2;
+      } catch (error) {
+        clientError.textContent = error.message;
+        clientError.style.display = "block";
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = '<i class="bi bi-floppy me-2"></i>Submit Dojo';
+      }
     } else {
       // Step 2: verify signature via API before allowing the real submit
       e.preventDefault();
@@ -275,7 +304,7 @@ border-color: #666; color: #e0e0e0; } .alert-error { background-color: rgba(231,
       fetch("/api/verify-pairing-signature", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: pairingText, signature: sigInput.value.trim() }),
+        body: JSON.stringify({ pairing_details: pairingText, signature: sigInput.value.trim() }),
       })
         .then(function (r) { return r.json(); })
         .then(function (data) {
@@ -306,7 +335,7 @@ border-color: #666; color: #e0e0e0; } .alert-error { background-color: rgba(231,
 
   function lockFields() {
     const fields = form.querySelectorAll(
-      'input:not([type="submit"]):not([type="hidden"]):not([type="button"]):not(#pairing_signature), textarea, select'
+      'input:not([type="submit"]):not([type="hidden"]):not([type="button"]), textarea:not(#pairing_signature):not(#signing_message), select'
     );
     fields.forEach(function (field) {
       // Preserve value in a hidden input so disabled fields still submit
@@ -321,7 +350,6 @@ border-color: #666; color: #e0e0e0; } .alert-error { background-color: rgba(231,
       field.setAttribute("disabled", "");
       field.classList.add("field-locked");
     });
-    document.getElementById("btn-copy-pairing").style.display = "inline-flex";
   }
 
   function appendHidden(name, value) {
@@ -336,14 +364,15 @@ border-color: #666; color: #e0e0e0; } .alert-error { background-color: rgba(231,
     const sec = document.getElementById("sig-section");
     sec.style.display = "block";
     const btn = document.getElementById("btn-submit");
+    btn.disabled = false;
     btn.innerHTML = '<i class="bi bi-shield-check me-2"></i>Verify &amp; Submit';
     sec.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  function copyPairing() {
-    const text = document.getElementById("pairing_details").value.trim();
+  function copySigningMessage() {
+    const text = document.getElementById("signing_message").value;
     navigator.clipboard.writeText(text).then(function () {
-      const btn = document.getElementById("btn-copy-pairing");
+      const btn = document.getElementById("btn-copy-signing");
       btn.classList.add("copied");
       btn.innerHTML = '<i class="bi bi-clipboard-check me-1"></i>Copied';
       setTimeout(function () {

@@ -24,6 +24,8 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict
 
+from bip47_verify import verify_pairing_signature
+
 
 # In-memory challenge store  { challenge_id → Auth47Challenge }
 # Challenges expire after TTL_MINUTES; store is cleaned up on every generation.
@@ -109,29 +111,21 @@ def verify_signature(challenge_id: str, payment_code: str, signature: str) -> bo
     private key of the BIP47 notification address derived from the payment code.
     The resulting signature is a BIP-137 compact base64-encoded signature.
 
-    TODO – full BIP-137 verification (requires python-bitcoinutils):
-        from bitcoinutils.utils import message_signature_verify
-        notification_addr = derive_notification_address(payment_code)
-        message = challenge.auth47_uri
-        return message_signature_verify(message, signature, notification_addr)
-
-    Currently accepted as valid if:
-      - Challenge exists and has not expired
-      - Payment code passes format check (PM8T…, 70-120 chars)
-      - Signature is at least 60 characters (BIP-137 compact base64 ≈ 88 chars)
+    The signed message must be the exact server-generated Auth47 URI.
     """
     # Lookup: try challenge_id first, then nonce (wallet sends the nonce)
     challenge = get_challenge(challenge_id) or get_challenge_by_nonce(challenge_id)
     if not challenge:
         return False
 
-    if not _is_valid_payment_code(payment_code):
+    if not _is_valid_payment_code(payment_code) or not signature:
         return False
 
-    if not signature or len(signature) < 60:
-        return False
-
-    return True
+    return verify_pairing_signature(
+        payment_code,
+        challenge.auth47_uri,
+        signature,
+    )
 
 
 def complete_challenge(challenge_id: str, payment_code: str) -> bool:

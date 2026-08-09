@@ -10,6 +10,7 @@ Dependencies: coincurve (secp256k1), base58 — both already in the venv.
 import base64
 import hashlib
 import hmac as _hmac
+import json
 import struct
 
 import base58
@@ -18,6 +19,8 @@ from bitcoinutils.setup import setup as _btc_setup
 from bitcoinutils.keys import PublicKey as _BTCPublicKey
 
 _btc_setup('mainnet')
+
+PAIRING_SIGNATURE_SCHEME = "bip47-bound-v1"
 
 
 # ---------------------------------------------------------------------------
@@ -41,11 +44,21 @@ def _decode_payment_code(payment_code: str) -> tuple[bytes, bytes]:
     except Exception as exc:
         raise ValueError(f"Invalid payment code: {exc}") from exc
 
-    if len(raw) < 68:
-        raise ValueError(f"Payment code payload too short: {len(raw)} bytes")
+    if len(raw) != 81:
+        raise ValueError(f"Invalid payment code payload length: {len(raw)} bytes")
+    if raw[:3] != b"\x47\x01\x00":
+        raise ValueError("Unsupported payment code prefix, version, or features")
+    if raw[3] not in (2, 3):
+        raise ValueError("Payment code contains an invalid compressed public key")
+    if raw[68:] != b"\x00" * 13:
+        raise ValueError("Payment code reserved bytes must be zero")
 
     pubkey = raw[3:36]
     chain_code = raw[36:68]
+    try:
+        coincurve.PublicKey(pubkey)
+    except ValueError as exc:
+        raise ValueError("Payment code contains an invalid public key") from exc
     return pubkey, chain_code
 
 
@@ -90,6 +103,28 @@ def derive_notification_address(payment_code: str) -> str:
     return _pubkey_to_p2pkh(child_pubkey)
 
 
+def canonicalize_pairing_details(pairing_details: str) -> str:
+    """Return the standard, deterministic JSON representation of a pairing payload."""
+    try:
+        payload = json.loads(pairing_details)
+    except (json.JSONDecodeError, TypeError) as exc:
+        raise ValueError("Pairing details must be valid JSON") from exc
+
+    if not isinstance(payload, dict) or not isinstance(payload.get("pairing"), dict):
+        raise ValueError('Pairing details must contain a "pairing" object')
+    if "explorer" in payload and not isinstance(payload["explorer"], dict):
+        raise ValueError('"explorer" must be an object')
+
+    return json.dumps(payload, indent=2, ensure_ascii=False)
+
+
+def build_pairing_signing_message(pairing_details: str, payment_code: str) -> str:
+    """Bind canonical pairing JSON to the authenticated BIP47 payment code."""
+    _decode_payment_code(payment_code)
+    canonical_pairing = canonicalize_pairing_details(pairing_details)
+    return f"{canonical_pairing}\n\nBIP47:\n{payment_code}"
+
+
 # ---------------------------------------------------------------------------
 # BIP-137 message signature verification
 # ---------------------------------------------------------------------------
@@ -114,6 +149,43 @@ def _bitcoin_msg_hash(message: str) -> bytes:
     return hashlib.sha256(hashlib.sha256(prefixed).digest()).digest()
 
 
+def parse_armored_signed_message(armored: str) -> tuple[str, str]:
+    """Extract the message and compact signature from common Bitcoin armor variants."""
+    lines = armored.replace("\r\n", "\n").replace("\r", "\n").splitlines()
+    if not lines or lines[0].strip() != "-----BEGIN BITCOIN SIGNED MESSAGE-----":
+        raise ValueError("Not an armored Bitcoin signed message")
+
+    signature_markers = {
+        "-----BEGIN SIGNATURE-----",
+        "-----BEGIN BITCOIN SIGNATURE-----",
+    }
+    try:
+        signature_start = next(
+            index for index, line in enumerate(lines)
+            if line.strip() in signature_markers
+        )
+    except StopIteration as exc:
+        raise ValueError("Missing Bitcoin signature marker") from exc
+
+    message = "\n".join(lines[1:signature_start])
+    signature = ""
+    for line in reversed(lines[signature_start + 1:]):
+        candidate = line.strip()
+        if not candidate or candidate.startswith("-----END") or ":" in candidate:
+            continue
+        try:
+            decoded = base64.b64decode(candidate, validate=True)
+        except (ValueError, TypeError):
+            continue
+        if len(decoded) == 65:
+            signature = candidate
+            break
+
+    if not signature:
+        raise ValueError("Missing compact BIP-137 signature")
+    return message, signature
+
+
 def verify_pairing_signature(payment_code: str, message: str, signature_b64: str) -> bool:
     """
     Return True if *message* was signed by the BIP47 notification address of
@@ -124,7 +196,12 @@ def verify_pairing_signature(payment_code: str, message: str, signature_b64: str
       bytes[1:65]: compact ECDSA (r‖s, 32+32 bytes)
     """
     try:
-        sig_bytes = base64.b64decode(signature_b64)
+        if signature_b64.startswith("-----BEGIN BITCOIN SIGNED MESSAGE-----"):
+            armored_message, signature_b64 = parse_armored_signed_message(signature_b64)
+            if armored_message != message:
+                return False
+
+        sig_bytes = base64.b64decode(signature_b64, validate=True)
         if len(sig_bytes) != 65:
             return False
 
@@ -132,8 +209,9 @@ def verify_pairing_signature(payment_code: str, message: str, signature_b64: str
         if not (27 <= rec_byte <= 34):
             return False
 
-        compressed = rec_byte >= 31
-        rec_id = (rec_byte - (31 if compressed else 27)) & 0x01
+        header = rec_byte - 27
+        compressed = bool(header & 4)
+        rec_id = header & 3
 
         msg_hash = _bitcoin_msg_hash(message)
 
