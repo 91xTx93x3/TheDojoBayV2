@@ -32,47 +32,30 @@ jobs:
             echo "Deploying to runtime directory: $APP_DIR"
             git -C "$APP_DIR" fetch origin main
             RELEASE_ARCHIVE="$(mktemp)"
-            RELEASE_DATA="$(mktemp)"
-            trap 'rm -f "$RELEASE_ARCHIVE" "$RELEASE_DATA"' EXIT
+            trap 'rm -f "$RELEASE_ARCHIVE"' EXIT
             git -C "$APP_DIR" archive --format=tar origin/main -o "$RELEASE_ARCHIVE"
-            git -C "$APP_DIR" show origin/main:dojos_data.json > "$RELEASE_DATA"
             tar -xf "$RELEASE_ARCHIVE" -C "$APP_DIR" \
               --exclude='.secret_key' \
               --exclude='dojos_data.json' \
               --exclude='dojo_submissions.json' \
-              --exclude='status_cache.json'
+              --exclude='status_cache.json' \
+              --exclude='static/images/qr'
 
             cd "$APP_DIR"
             source venv/bin/activate
             pip install -r requirements.txt --quiet
-            python - "$RELEASE_DATA" "$APP_DIR/dojos_data.json" <<'PY'
-            import json
-            import sys
+            python - <<'PY'
+            from app import _delete_dojo_permanently, _load_submissions
 
-            release_path, runtime_path = sys.argv[1:]
-            with open(release_path) as source:
-                release_data = json.load(source)
-            with open(runtime_path) as source:
-                runtime_data = json.load(source)
-
-            added = []
-            for network in ("mainnet", "testnet"):
-                runtime_entries = runtime_data.setdefault(network, [])
-                existing_names = {entry.get("name") for entry in runtime_entries}
-                for entry in release_data.get(network, []):
-                    if entry.get("name") not in existing_names:
-                        runtime_entries.append(entry)
-                        existing_names.add(entry.get("name"))
-                        added.append(f"{network}:{entry.get('name')}")
-
-            if added:
-                with open(runtime_path, "w") as destination:
-                    json.dump(runtime_data, destination, indent=2, ensure_ascii=False)
-                print("Added repository nodes:", ", ".join(added))
-            else:
-                print("No repository nodes needed synchronization")
+            submissions = _load_submissions()
+            obsolete = [
+                entry for entry in submissions
+                if entry.get("status") in {"deleted", "rejected"}
+            ]
+            for entry in obsolete:
+                _delete_dojo_permanently(submissions, entry)
+            print(f"Purged {len(obsolete)} legacy deleted/rejected submissions")
             PY
-
             sudo systemctl restart dojobay.service
             sudo systemctl restart dojobay-api.service
 

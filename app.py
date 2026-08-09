@@ -179,7 +179,9 @@ def faq():
 # ── Image upload helper ──────────────────────────────────────────────────────
 
 DOJO_IMAGE_DIR = Path(__file__).parent / 'static' / 'images' / 'dojos'
+QR_IMAGE_DIR = Path(__file__).parent / 'static' / 'images' / 'qr'
 DOJO_IMAGE_DIR.mkdir(parents=True, exist_ok=True)
+QR_IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 MAX_IMAGE_BYTES = 1 * 1024 * 1024  # 1 MB
 ALLOWED_EXTS = {'jpg', 'jpeg', 'png', 'webp', 'gif'}
 
@@ -254,6 +256,75 @@ def _save_dojos_data(dojos_data):
 def _require_login():
     """Return paynym from session or None if not logged in."""
     return session.get('paynym')
+
+
+def _delete_dojo_permanently(submissions, dojo):
+    """Remove a submission, its public entry, cached status, and generated files."""
+    dojo_id = dojo.get('id')
+    name = dojo.get('name', '')
+    network = dojo.get('network', 'mainnet')
+    dojos_data = _load_dojos_data()
+    has_other_approved_owner = any(
+        entry.get('id') != dojo_id
+        and entry.get('name') == name
+        and entry.get('network', 'mainnet') == network
+        and entry.get('status') == 'approved'
+        for entry in submissions
+    )
+
+    def belongs_to_submission(entry):
+        submission_id = entry.get('submission_id')
+        if submission_id:
+            return submission_id == dojo_id
+        if dojo.get('status') != 'approved' or has_other_approved_owner:
+            return False
+        if dojo.get('qr_filename'):
+            return Path(entry.get('image', '')).name == dojo['qr_filename']
+        return entry.get('name') == name
+
+    removed_live = [
+        entry for entry in dojos_data.get(network, [])
+        if belongs_to_submission(entry)
+    ]
+    dojos_data[network] = [
+        entry for entry in dojos_data.get(network, [])
+        if not belongs_to_submission(entry)
+    ]
+    _save_dojos_data(dojos_data)
+
+    submissions[:] = [
+        entry for entry in submissions
+        if entry.get('id') != dojo_id
+    ]
+    _save_submissions(submissions)
+
+    paths = set()
+    if dojo.get('image_file'):
+        paths.add(DOJO_IMAGE_DIR / dojo['image_file'])
+    if dojo.get('qr_filename'):
+        paths.add(QR_IMAGE_DIR / dojo['qr_filename'])
+    for entry in removed_live:
+        image = entry.get('image', '')
+        if image.startswith('/static/images/qr/'):
+            paths.add(QR_IMAGE_DIR / Path(image).name)
+        elif image.startswith('/static/images/dojos/'):
+            paths.add(DOJO_IMAGE_DIR / Path(image).name)
+    for path in paths:
+        try:
+            path.unlink(missing_ok=True)
+        except OSError as exc:
+            print(f"[DELETE ERROR] Could not remove {path}: {exc}")
+
+    global mainnet_dojos, testnet_dojos
+    mainnet_dojos, testnet_dojos = data_loader.load()
+    background_checker.mainnet_dojos = mainnet_dojos
+    background_checker.testnet_dojos = testnet_dojos
+
+    stale = cache.get_stale()
+    if stale:
+        cache.save(_merge_status_with_directory(stale))
+    else:
+        cache.invalidate()
 
 
 # ── Dojo self-service routes ──────────────────────────────────────────────────
@@ -480,7 +551,7 @@ def dojo_edit(dojo_id):
 
 @app.route('/add-dojo/delete/<dojo_id>', methods=['POST'])
 def dojo_delete(dojo_id):
-    """Delete a dojo (owner only) — marks as deleted for deferred cleanup."""
+    """Permanently delete a dojo and all of its generated data (owner only)."""
     paynym = _require_login()
     if not paynym:
         return redirect(url_for('add_dojo'))
@@ -488,29 +559,7 @@ def dojo_delete(dojo_id):
     dojo = next((d for d in submissions
                  if d.get('id') == dojo_id and d.get('paynym') == paynym), None)
     if dojo:
-        was_approved = dojo.get('status') == 'approved'
-        dojo['status']     = 'deleted'
-        dojo['updated_at'] = datetime.now().isoformat()
-        # If the dojo was live, remove it from dojos_data.json immediately
-        if was_approved:
-            network = dojo.get('network', 'mainnet')
-            name    = dojo.get('name', '')
-            with open(DOJOS_DATA_FILE) as f:
-                dojos_data = json.load(f)
-            before = len(dojos_data.get(network, []))
-            dojos_data[network] = [
-                d for d in dojos_data.get(network, [])
-                if d.get('name') != name
-            ]
-            if len(dojos_data[network]) < before:
-                with open(DOJOS_DATA_FILE, 'w') as f:
-                    json.dump(dojos_data, f, indent=2, ensure_ascii=False)
-            global mainnet_dojos, testnet_dojos
-            mainnet_dojos, testnet_dojos = data_loader.load()
-            background_checker.mainnet_dojos = mainnet_dojos
-            background_checker.testnet_dojos = testnet_dojos
-            cache.invalidate()
-    _save_submissions(submissions)
+        _delete_dojo_permanently(submissions, dojo)
     return redirect(url_for('dojo_dashboard'))
 
 
@@ -561,7 +610,7 @@ def _cleanup_old_submissions():
                 for c in dojo.get('name', 'dojo')
             )
             qr_filename = f"{safe_name}_{dojo.get('id', '')[:8]}.png"
-        qr_path = Path(__file__).parent / 'static' / 'images' / 'qr' / qr_filename
+        qr_path = QR_IMAGE_DIR / qr_filename
         if qr_path.exists():
             try:
                 qr_path.unlink()
@@ -688,7 +737,7 @@ def admin_approve(dojo_id):
             safe_name = ''.join(c if c.isalnum() or c in '-_' else '_'
                                 for c in dojo.get('name', 'dojo'))
             qr_filename = f"{safe_name}_{dojo_id[:8]}.png"
-            qr_path = Path(__file__).parent / 'static' / 'images' / 'qr' / qr_filename
+            qr_path = QR_IMAGE_DIR / qr_filename
             qr_path.parent.mkdir(parents=True, exist_ok=True)
             qr_data = json.dumps(pairing_obj, separators=(',', ':'))
             qr = _qrcode.QRCode(
@@ -707,7 +756,10 @@ def admin_approve(dojo_id):
 
     # ── 4. Build dojos_data.json entry ────────────────────────────────────────
     network  = dojo.get('network', 'mainnet')
-    new_entry = {'name': dojo.get('name', '')}
+    new_entry = {
+        'name': dojo.get('name', ''),
+        'submission_id': dojo_id,
+    }
     if paynym_alias:
         new_entry['paynym']     = paynym_alias
         new_entry['paynym_url'] = paynym_url
@@ -791,18 +843,15 @@ def admin_reject(dojo_id):
     if not _require_admin():
         return redirect(url_for('index'))
     submissions = _load_submissions()
-    for d in submissions:
-        if d.get('id') == dojo_id:
-            d['status'] = 'rejected'
-            d['updated_at'] = datetime.now().isoformat()
-            break
-    _save_submissions(submissions)
+    dojo = next((d for d in submissions if d.get('id') == dojo_id), None)
+    if dojo:
+        _delete_dojo_permanently(submissions, dojo)
     return redirect(url_for('admin_dojos'))
 
 
 @app.route('/admin/dojos/<dojo_id>/revoke', methods=['POST'])
 def admin_revoke(dojo_id):
-    """Revoke an approved dojo: remove from dojos_data.json and mark rejected."""
+    """Permanently delete an approved dojo and all of its generated data."""
     if not _require_admin():
         return redirect(url_for('index'))
 
@@ -811,30 +860,7 @@ def admin_revoke(dojo_id):
     if not dojo:
         return redirect(url_for('admin_dojos'))
 
-    # Remove from dojos_data.json by matching name + network
-    network = dojo.get('network', 'mainnet')
-    name    = dojo.get('name', '')
-    dojos_data = _load_dojos_data()
-    before = len(dojos_data.get(network, []))
-    dojos_data[network] = [
-        d for d in dojos_data.get(network, [])
-        if d.get('name') != name
-    ]
-    if len(dojos_data[network]) < before:
-        _save_dojos_data(dojos_data)
-
-    # Mark submission as rejected
-    dojo['status']     = 'rejected'
-    dojo['updated_at'] = datetime.now().isoformat()
-    _save_submissions(submissions)
-
-    # Reload in-memory data and invalidate cache
-    global mainnet_dojos, testnet_dojos
-    mainnet_dojos, testnet_dojos = data_loader.load()
-    background_checker.mainnet_dojos = mainnet_dojos
-    background_checker.testnet_dojos = testnet_dojos
-    cache.invalidate()
-
+    _delete_dojo_permanently(submissions, dojo)
     return redirect(url_for('admin_dojos'))
 
 

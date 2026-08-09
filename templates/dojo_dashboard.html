@@ -100,7 +100,7 @@ flex-wrap: wrap; margin-bottom: 1rem; } .meta-item { min-width: 0; } {% endblock
         <form
           method="POST"
           action="/add-dojo/delete/{{ dojo.id }}"
-          onsubmit="return confirm('Delete this Dojo?');"
+          onsubmit="return confirm('Permanently delete this Dojo and all of its images? This cannot be undone.');"
           style="margin: 0"
         >
           <button type="submit" class="btn-icon btn-danger-outline">

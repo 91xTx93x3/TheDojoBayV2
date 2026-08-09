@@ -83,9 +83,10 @@ block content %}
             <i class="bi bi-check-lg me-1"></i>Approve
           </button>
         </form>
-        <form method="POST" action="/admin/dojos/{{ dojo.id }}/reject" style="display:inline">
+        <form method="POST" action="/admin/dojos/{{ dojo.id }}/reject" style="display:inline"
+              onsubmit="return confirm('Permanently delete {{ dojo.name }} and all of its files?')">
           <button type="submit" class="btn-reject">
-            <i class="bi bi-x-lg me-1"></i>Reject
+            <i class="bi bi-trash3 me-1"></i>Delete
           </button>
         </form>
       </div>
@@ -153,9 +154,9 @@ block content %}
       </div>
     </div>
     <form method="POST" action="/admin/dojos/{{ dojo.id }}/revoke" style="display:inline"
-          onsubmit="return confirm('Remove {{ dojo.name }} from the live directory?')">
+          onsubmit="return confirm('Permanently delete {{ dojo.name }} and all of its files? This cannot be undone.')">
       <button type="submit" class="btn-reject" style="font-size:0.78rem;padding:0.3rem 0.8rem">
-        <i class="bi bi-x-lg me-1"></i>Revoke
+        <i class="bi bi-trash3 me-1"></i>Delete
       </button>
     </form>
   </div>
