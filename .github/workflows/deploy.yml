@@ -52,9 +52,10 @@ jobs:
             with open(sys.argv[1]) as source:
                 submissions = json.load(source)
             for submission in submissions:
-                if submission.get("name") == "91xTx93x3 Green testnet":
+                if "green" in submission.get("name", "").lower():
                     print(
-                        "Green testnet submission:",
+                        "Green submission:",
+                        repr(submission.get("name")),
                         submission.get("status"),
                         submission.get("rejection_reason", ""),
                     )
