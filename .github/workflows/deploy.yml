@@ -45,41 +45,6 @@ jobs:
             cd "$APP_DIR"
             source venv/bin/activate
             pip install -r requirements.txt --quiet
-            python - "$APP_DIR" <<'PY'
-            import json
-            import sys
-            from pathlib import Path
-
-            app_dir = Path(sys.argv[1])
-            for filename in ("dojos_data.json", "status_cache.json"):
-                path = app_dir / filename
-                if not path.exists():
-                    continue
-                with path.open() as source:
-                    payload = json.load(source)
-                data = payload.get("data", payload)
-                for network in ("mainnet", "testnet"):
-                    for entry in data.get(network, []):
-                        if entry.get("name") == "Arkad":
-                            entry.pop("signature", None)
-                            entry.pop("pairing_signature_scheme", None)
-                with path.open("w") as destination:
-                    json.dump(payload, destination, indent=2, ensure_ascii=False)
-
-            submissions_path = app_dir / "dojo_submissions.json"
-            if submissions_path.exists():
-                with submissions_path.open() as source:
-                    submissions = json.load(source)
-                for entry in submissions:
-                    if entry.get("name") == "Arkad":
-                        entry.pop("pairing_signature", None)
-                        entry.pop("signature_text", None)
-                        entry.pop("pairing_signature_scheme", None)
-                with submissions_path.open("w") as destination:
-                    json.dump(submissions, destination, indent=2, ensure_ascii=False)
-
-            print("Removed Arkad pairing-signature claims")
-            PY
             python - "$RELEASE_DATA" "$APP_DIR/dojos_data.json" <<'PY'
             import json
             import sys
