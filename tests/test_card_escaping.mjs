@@ -155,13 +155,17 @@ check("the onion URL is still shown", rendered.includes("http://abc.onion/v2"));
 check("the jurisdiction is still shown", rendered.includes("North America"));
 
 // --- the verify modal must keep the exact signed bytes ----------------------
-const signedText = '{\n  "pairing": {\n    "url": "http://abc.onion/v2"\n  }\n}';
+const paymentCode = "PM8TExamplePaymentCode";
+const pairingText = '{\n  "pairing": {\n    "url": "http://abc.onion/v2"\n  }\n}';
+const signedText = pairingText + "\nBIP47:\n" + paymentCode;
 sandbox.renderStatus({
   mainnet: [{
     name: "Signed", status: "Active", checked_at: "now",
     paynym: "+bumpyblank89",
-    pairing_details: signedText,
-    signature: "-----BEGIN BITCOIN SIGNED MESSAGE-----\nx\n-----END BITCOIN SIGNATURE-----",
+    payment_code: paymentCode,
+    pairing_signature_scheme: "bip47-bound-v2",
+    pairing_details: pairingText,
+    signature: "HcompactSignature",
   }],
   testnet: [],
   last_update: "now",
@@ -173,6 +177,13 @@ check(
   verifyData["mainnet-0"] && verifyData["mainnet-0"].message === signedText,
   "escaping the verify payload would make every signature fail to verify",
 );
+check("the card shows the exact signed message",
+  rendered.includes("SIGNED MESSAGE") &&
+  rendered.includes("BIP47:") &&
+  rendered.includes(paymentCode));
+check("the card describes ownership verification precisely",
+  rendered.includes("OWNERSHIP VERIFIED") &&
+  rendered.includes("notification address derived from PayNym"));
 
 console.log(failures ? `\n${failures} check(s) failed` : `\nall checks passed`);
 process.exit(failures ? 1 : 0);
