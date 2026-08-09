@@ -44,18 +44,6 @@ jobs:
             cd "$APP_DIR"
             source venv/bin/activate
             pip install -r requirements.txt --quiet
-            python - <<'PY'
-            from app import _delete_dojo_permanently, _load_submissions
-
-            submissions = _load_submissions()
-            obsolete = [
-                entry for entry in submissions
-                if entry.get("status") in {"deleted", "rejected"}
-            ]
-            for entry in obsolete:
-                _delete_dojo_permanently(submissions, entry)
-            print(f"Purged {len(obsolete)} legacy deleted/rejected submissions")
-            PY
             sudo systemctl restart dojobay.service
             sudo systemctl restart dojobay-api.service
 
