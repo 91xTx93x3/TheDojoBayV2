@@ -18,5 +18,6 @@ instance/
 *.swo
 *~
 status_cache.json
+uptime_history.json
 dojo_submissions.json
 hs_ed25519_secret_key

@@ -8,6 +8,7 @@ from pathlib import Path
 
 from checker import DojoChecker
 from cache import StatusCache
+from uptime import UptimeHistory
 
 
 class BackgroundChecker:
@@ -17,6 +18,7 @@ class BackgroundChecker:
         self,
         checker: DojoChecker,
         cache: StatusCache,
+        uptime_history: UptimeHistory,
         mainnet_dojos: List[Dict[str, Any]],
         testnet_dojos: List[Dict[str, Any]],
         check_interval: int
@@ -27,12 +29,14 @@ class BackgroundChecker:
         Args:
             checker: DojoChecker instance
             cache: StatusCache instance
+            uptime_history: Persistent rolling availability history
             mainnet_dojos: List of mainnet Dojo configurations
             testnet_dojos: List of testnet Dojo configurations
             check_interval: Time between checks in seconds
         """
         self.checker = checker
         self.cache = cache
+        self.uptime_history = uptime_history
         self.mainnet_dojos = mainnet_dojos
         self.testnet_dojos = testnet_dojos
         self.check_interval = check_interval
@@ -83,6 +87,7 @@ class BackgroundChecker:
         # Perform initial check immediately
         try:
             results = self.checker.check_all(self.mainnet_dojos, self.testnet_dojos)
+            self.uptime_history.record(results)
             self.cache.save(results)
             print(f"[INFO] Initial status check completed at {results['last_update']}")
         except Exception as e:
@@ -98,6 +103,7 @@ class BackgroundChecker:
 
             try:
                 results = self.checker.check_all(self.mainnet_dojos, self.testnet_dojos)
+                self.uptime_history.record(results)
                 self.cache.save(results)
                 print(f"[INFO] Status check completed at {results['last_update']}")
             except Exception as e:

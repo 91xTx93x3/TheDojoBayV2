@@ -39,6 +39,7 @@ jobs:
               --exclude='dojos_data.json' \
               --exclude='dojo_submissions.json' \
               --exclude='status_cache.json' \
+              --exclude='uptime_history.json' \
               --exclude='static/images/qr'
 
             cd "$APP_DIR"

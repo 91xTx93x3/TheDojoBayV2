@@ -138,6 +138,9 @@ sandbox.renderStatus({
     paynym: "+bumpyblank89",
     paynym_url: "https://paynym.rs/+bumpyblank89",
     image: "/static/images/qr/compiler_1234abcd.png",
+    uptime_30d: 99.5,
+    uptime_checks: 200,
+    uptime_since: "2026-08-14T14:00:00+00:00",
     pairing: { type: "dojo.api", version: "1.27.0", apikey: "deadbeef", url: "http://abc.onion/v2" },
   }],
   testnet: [],
@@ -154,6 +157,8 @@ check("an authenticated PayNym without a pairing signature is labelled accuratel
   !rendered.includes("OWNERSHIP VERIFIED"));
 check("a normal node still shows its QR image",
   rendered.includes('src="/static/images/qr/compiler_1234abcd.png"'));
+check("a normal node shows its rolling uptime",
+  rendered.includes("99.5% / 30d") && rendered.includes("200 checks recorded"));
 check("the apikey is still shown", rendered.includes("deadbeef"));
 check("the onion URL is still shown", rendered.includes("http://abc.onion/v2"));
 check("the jurisdiction is still shown", rendered.includes("North America"));

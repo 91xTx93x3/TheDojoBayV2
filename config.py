@@ -5,6 +5,7 @@ import secrets as _secrets
 # Application paths
 BASE_DIR = Path(__file__).parent
 CACHE_FILE = BASE_DIR / "status_cache.json"
+UPTIME_HISTORY_FILE = BASE_DIR / "uptime_history.json"
 DOJOS_DATA_FILE = BASE_DIR / "dojos_data.json"
 
 # Tor proxy configuration

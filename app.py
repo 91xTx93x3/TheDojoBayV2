@@ -9,7 +9,7 @@ from datetime import datetime
 from config import (
     DEFAULT_PROXIES, CACHE_FILE, DOJOS_DATA_FILE,
     CACHE_DURATION, REQUEST_TIMEOUT, HOST, PORT, DEBUG,
-    SECRET_KEY, SUBMISSIONS_FILE, AUTH47_CALLBACK_URL,
+    SECRET_KEY, SUBMISSIONS_FILE, AUTH47_CALLBACK_URL, UPTIME_HISTORY_FILE,
 )
 from auth47 import (
     generate_challenge, get_challenge, verify_signature,
@@ -19,6 +19,7 @@ from cache import StatusCache
 from checker import DojoChecker
 from data_loader import DojoDataLoader
 from background_checker import BackgroundChecker
+from uptime import UptimeHistory
 from bip47_verify import (
     PAIRING_SIGNATURE_SCHEME,
     LEGACY_PAIRING_SIGNATURE_SCHEME,
@@ -41,10 +42,12 @@ mainnet_dojos, testnet_dojos = data_loader.load()
 
 cache = StatusCache(CACHE_FILE, CACHE_DURATION)
 checker = DojoChecker(DEFAULT_PROXIES, REQUEST_TIMEOUT)
+uptime_history = UptimeHistory(UPTIME_HISTORY_FILE)
 
 background_checker = BackgroundChecker(
     checker=checker,
     cache=cache,
+    uptime_history=uptime_history,
     mainnet_dojos=mainnet_dojos,
     testnet_dojos=testnet_dojos,
     check_interval=CACHE_DURATION
@@ -999,7 +1002,10 @@ def _merge_status_with_directory(status):
         'mainnet': mainnet_dojos,
         'testnet': testnet_dojos,
     }
-    status_fields = ('status', 'checked_at', 'dojo_version', 'error')
+    status_fields = (
+        'status', 'checked_at', 'dojo_version', 'error',
+        'uptime_30d', 'uptime_checks', 'uptime_since',
+    )
 
     for network, current_entries in sources.items():
         cached_by_name = {

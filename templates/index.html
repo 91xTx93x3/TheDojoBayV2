@@ -1359,6 +1359,13 @@
                                             <span class="badge badge-status ${dojo.status === "Active" ? "bg-success" : dojo.status === "Out of Service" ? "bg-secondary" : "bg-danger"} me-2">
                                                 ${dojo.status}
                                             </span>
+                                            ${
+                                              dojo.uptime_30d !== undefined
+                                                ? `<span class="badge bg-dark border border-secondary me-2" title="${dojo.uptime_checks} checks recorded since ${dojo.uptime_since}">
+                                                     <i class="bi bi-graph-up"></i> ${dojo.uptime_30d}% / 30d
+                                                   </span>`
+                                                : ""
+                                            }
                                         </div>
                                     </button>
                                 </h2>
@@ -1531,6 +1538,13 @@
                                             <span class="badge badge-status ${dojo.status === "Active" ? "bg-success" : dojo.status === "Out of Service" ? "bg-secondary" : "bg-danger"} me-2">
                                                 ${dojo.status}
                                             </span>
+                                            ${
+                                              dojo.uptime_30d !== undefined
+                                                ? `<span class="badge bg-dark border border-secondary me-2" title="${dojo.uptime_checks} checks recorded since ${dojo.uptime_since}">
+                                                     <i class="bi bi-graph-up"></i> ${dojo.uptime_30d}% / 30d
+                                                   </span>`
+                                                : ""
+                                            }
                                         </div>
                                     </button>
                                 </h2>
