@@ -32,8 +32,10 @@ jobs:
             echo "Deploying to runtime directory: $APP_DIR"
             git -C "$APP_DIR" fetch origin main
             RELEASE_ARCHIVE="$(mktemp)"
-            trap 'rm -f "$RELEASE_ARCHIVE"' EXIT
+            RELEASE_DATA="$(mktemp)"
+            trap 'rm -f "$RELEASE_ARCHIVE" "$RELEASE_DATA"' EXIT
             git -C "$APP_DIR" archive --format=tar origin/main -o "$RELEASE_ARCHIVE"
+            git -C "$APP_DIR" show origin/main:dojos_data.json > "$RELEASE_DATA"
             tar -xf "$RELEASE_ARCHIVE" -C "$APP_DIR" \
               --exclude='.secret_key' \
               --exclude='dojos_data.json' \
@@ -45,12 +47,13 @@ jobs:
             cd "$APP_DIR"
             source venv/bin/activate
             pip install -r requirements.txt --quiet
-            python - "$APP_DIR" <<'PY'
+            python - "$APP_DIR" "$RELEASE_DATA" <<'PY'
             import json
             import sys
             from pathlib import Path
 
             app_dir = Path(sys.argv[1]).resolve()
+            release_data_path = Path(sys.argv[2])
             removed_names = {"91xTx93x3 Green", "91xTx93x3 Green Testnet"}
             files_to_delete = set()
 
@@ -68,40 +71,31 @@ jobs:
             data_path = app_dir / "dojos_data.json"
             with data_path.open() as source:
                 dojo_data = json.load(source)
-            for network in ("mainnet", "testnet"):
-                dojo_data[network] = remove_entries(dojo_data.get(network, []))
+            dojo_data["mainnet"] = remove_entries(dojo_data.get("mainnet", []))
+            with release_data_path.open() as source:
+                release_data = json.load(source)
+            green_testnet = next(
+                entry for entry in release_data.get("testnet", [])
+                if entry.get("name") == "91xTx93x3 Green"
+            )
+            dojo_data["testnet"] = [
+                entry for entry in dojo_data.get("testnet", [])
+                if entry.get("name") != "91xTx93x3 Green"
+            ]
+            dojo_data["testnet"].append(green_testnet)
             with data_path.open("w") as destination:
                 json.dump(dojo_data, destination, indent=2, ensure_ascii=False)
-
-            submissions_path = app_dir / "dojo_submissions.json"
-            if submissions_path.exists():
-                with submissions_path.open() as source:
-                    submissions = json.load(source)
-                for entry in submissions:
-                    if entry.get("name") not in removed_names:
-                        continue
-                    if entry.get("image_file"):
-                        files_to_delete.add(
-                            app_dir / "static" / "images" / "dojos" / entry["image_file"]
-                        )
-                    if entry.get("qr_filename"):
-                        files_to_delete.add(
-                            app_dir / "static" / "images" / "qr" / entry["qr_filename"]
-                        )
-                submissions = [
-                    entry for entry in submissions
-                    if entry.get("name") not in removed_names
-                ]
-                with submissions_path.open("w") as destination:
-                    json.dump(submissions, destination, indent=2, ensure_ascii=False)
 
             cache_path = app_dir / "status_cache.json"
             if cache_path.exists():
                 with cache_path.open() as source:
                     cache_payload = json.load(source)
                 cache_data = cache_payload.get("data", cache_payload)
-                for network in ("mainnet", "testnet"):
-                    cache_data[network] = remove_entries(cache_data.get(network, []))
+                cache_data["mainnet"] = remove_entries(cache_data.get("mainnet", []))
+                cache_data["testnet"] = [
+                    entry for entry in cache_data.get("testnet", [])
+                    if entry.get("name") != "91xTx93x3 Green"
+                ]
                 stats = cache_data.get("stats")
                 if isinstance(stats, dict):
                     for network in ("mainnet", "testnet"):
@@ -113,16 +107,17 @@ jobs:
                 with cache_path.open("w") as destination:
                     json.dump(cache_payload, destination, indent=2, ensure_ascii=False)
 
-            qr_dir = app_dir / "static" / "images" / "qr"
-            for pattern in ("91xTx93x3_Green_*", "91xTx93x3_Green_Testnet_*"):
-                files_to_delete.update(qr_dir.glob(pattern))
             for path in files_to_delete:
                 resolved = path.resolve()
                 if resolved.is_relative_to(app_dir):
                     resolved.unlink(missing_ok=True)
 
-            print("Removed all Green node records and associated images")
+            print("Kept Green on testnet and removed it from mainnet")
             PY
+            mkdir -p "$APP_DIR/static/images/qr"
+            git -C "$APP_DIR" show \
+              origin/main:static/images/qr/91xTx93x3_Green_c422b6a1.png \
+              > "$APP_DIR/static/images/qr/91xTx93x3_Green_c422b6a1.png"
             sudo systemctl restart dojobay.service
             sudo systemctl restart dojobay-api.service
 

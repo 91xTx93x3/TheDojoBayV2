@@ -348,6 +348,27 @@
       "electrum_server": "xufljktdbo542e6jyc7hat6ybnxx6km57rhmw5qpbzyducdcofyx2kqd.onion",
       "pairing_details": "{\n    \"pairing\": {\n        \"type\": \"dojo.api\",\n        \"version\": \"1.29.1\",\n        \"apikey\": \"7fcdb00957d3ab314b710d48907b4629\",\n        \"url\": \"http://kjv62weg6bm34yf6244jcxl3sc3ntpsojdd5xrpzhv2c36b5u5u4gkad.onion/test/v2\"\n    },\n    \"explorer\": {\n        \"type\": \"explorer.btc_rpc_explorer\",\n        \"url\": \"http://vvxwpqyfi3tbqpkjszlt6rvwwiqr4s2f457myntkbk4lcihvt5oti7qd.onion\"\n    }\n}",
       "signature": "H4aVbBUxfKZYYW4l//oMoxWIvp/hMxjrT83FUBTHMimOdSAq9Z4tTHQqOk1KC9atJIWlWBgWSR12ngFkyvlZ/2g="
+    },
+    {
+      "name": "91xTx93x3 Green",
+      "paynym": "+91xTx93x3",
+      "paynym_url": "https://paynym.rs/+91xTx93x3",
+      "jurisdiction": "EU",
+      "hardware": "Think Centre M900 8gb",
+      "image": "/static/images/qr/91xTx93x3_Green_c422b6a1.png",
+      "pairing": {
+        "type": "dojo.api",
+        "version": "1.29.2",
+        "apikey": "cdb0d29377c9088275817fcd7d643013",
+        "url": "http://4f6hya64dcofjavp66illnynpoxjdfc2bnvwduleqkvjuqq633d2fiyd.onion/test/v2"
+      },
+      "explorer": {
+        "type": "explorer.btc_rpc_explorer",
+        "url": "http://p7wvh24b6mdt3gqa2b2ynyei4ib6xahvk5wzqlgu6olamyvej6fkczqd.onion"
+      },
+      "electrum_server": "xnkshos5cd6skc3mdzwrfj6erddo24hm4myfsb6b6qyedvroptijg6id.onion",
+      "pairing_details": "{\n    \"pairing\": {\n        \"type\": \"dojo.api\",\n        \"version\": \"1.29.2\",\n        \"apikey\": \"cdb0d29377c9088275817fcd7d643013\",\n        \"url\": \"http://4f6hya64dcofjavp66illnynpoxjdfc2bnvwduleqkvjuqq633d2fiyd.onion/test/v2\"\n    },\n    \"explorer\": {\n        \"type\": \"explorer.btc_rpc_explorer\",\n        \"url\": \"http://p7wvh24b6mdt3gqa2b2ynyei4ib6xahvk5wzqlgu6olamyvej6fkczqd.onion\"\n    }\n}",
+      "signature": "IDu6cKGFyqHHNG8AfVCyvy8nR1bOSWC/VP/H51jXZr30QFEVlcW4Pw3GdLLCM4SVn0tBeDKsQU1+KHGIu9UHo9k="
     }
   ]
 }
