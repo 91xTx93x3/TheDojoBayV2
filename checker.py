@@ -92,21 +92,22 @@ class DojoChecker:
     
     def _check_url(self, url: str, entry: Dict[str, Any]) -> Dict[str, Any]:
         """Check URL availability via Tor."""
-        try:
-            resp = requests.get(url, proxies=self.proxies, timeout=self.timeout)
-            # Consider service active if we get a response (2xx, 4xx, 5xx)
-            # 4xx means server is responding but endpoint/auth issue
-            # Only mark inactive if we can't connect at all
-            if resp.status_code < 500:
-                entry["status"] = "Active"
-                # Extract Dojo version
-                entry["dojo_version"] = resp.headers.get("X-Dojo-Version")
-            else:
-                entry["status"] = "Inactive"
-                entry["error"] = f"HTTP {resp.status_code}"
-        except requests.RequestException as e:
-            entry["error"] = f"{type(e).__name__}"
-            print(f"[ERROR] {url}: {type(e).__name__}")
+        last_error = None
+        for _attempt in range(2):
+            try:
+                resp = requests.get(url, proxies=self.proxies, timeout=self.timeout)
+                # Any response below 500 proves that the onion service is reachable.
+                if resp.status_code < 500:
+                    entry["status"] = "Active"
+                    entry["dojo_version"] = resp.headers.get("X-Dojo-Version")
+                    entry.pop("error", None)
+                    return entry
+                last_error = f"HTTP {resp.status_code}"
+            except requests.RequestException as exc:
+                last_error = type(exc).__name__
+
+        entry["error"] = last_error
+        print(f"[ERROR] {url}: {last_error} after 2 attempts")
         
         return entry
     
