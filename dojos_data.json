@@ -367,8 +367,11 @@
         "url": "http://p7wvh24b6mdt3gqa2b2ynyei4ib6xahvk5wzqlgu6olamyvej6fkczqd.onion"
       },
       "electrum_server": "xnkshos5cd6skc3mdzwrfj6erddo24hm4myfsb6b6qyedvroptijg6id.onion",
-      "pairing_details": "{\n    \"pairing\": {\n        \"type\": \"dojo.api\",\n        \"version\": \"1.29.2\",\n        \"apikey\": \"cdb0d29377c9088275817fcd7d643013\",\n        \"url\": \"http://4f6hya64dcofjavp66illnynpoxjdfc2bnvwduleqkvjuqq633d2fiyd.onion/test/v2\"\n    },\n    \"explorer\": {\n        \"type\": \"explorer.btc_rpc_explorer\",\n        \"url\": \"http://p7wvh24b6mdt3gqa2b2ynyei4ib6xahvk5wzqlgu6olamyvej6fkczqd.onion\"\n    }\n}",
-      "signature": "IDu6cKGFyqHHNG8AfVCyvy8nR1bOSWC/VP/H51jXZr30QFEVlcW4Pw3GdLLCM4SVn0tBeDKsQU1+KHGIu9UHo9k="
+      "pairing_details": "{\n  \"pairing\": {\n    \"type\": \"dojo.api\",\n    \"version\": \"1.29.2\",\n    \"apikey\": \"cdb0d29377c9088275817fcd7d643013\",\n    \"url\": \"http://4f6hya64dcofjavp66illnynpoxjdfc2bnvwduleqkvjuqq633d2fiyd.onion/test/v2\"\n  },\n  \"explorer\": {\n    \"type\": \"explorer.btc_rpc_explorer\",\n    \"url\": \"http://p7wvh24b6mdt3gqa2b2ynyei4ib6xahvk5wzqlgu6olamyvej6fkczqd.onion\"\n  }\n}",
+      "signature": "HyGtbtu4MIfzdJP8rXExaYucdXwLbwiye1yyrRu75/x1OaTCdApAiotO86JCtQltS4PKB+gItHIxKMoOtjnGr3k=",
+      "payment_code": "PM8TJQwkgoVeogzAQe431Bn3FSsXiCqjmFCpysFuSTjB7FaxfrJGtMAEfsA5dvptjMAAxLXKM6bDAen5tFp326EHBmRH6jQ9vJDPnSwARLmUcJoucQtd",
+      "pairing_signature_scheme": "bip47-bound-v2",
+      "submission_id": "c422b6a1-0000-4000-8000-000000000000"
     }
   ]
 }

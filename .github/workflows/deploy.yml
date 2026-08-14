@@ -86,6 +86,33 @@ jobs:
             with data_path.open("w") as destination:
                 json.dump(dojo_data, destination, indent=2, ensure_ascii=False)
 
+            submissions_path = app_dir / "dojo_submissions.json"
+            with submissions_path.open() as source:
+                submissions = json.load(source)
+            green_submission_id = "c422b6a1-0000-4000-8000-000000000000"
+            if not any(entry.get("id") == green_submission_id for entry in submissions):
+                submissions.append({
+                    "id": green_submission_id,
+                    "paynym": green_testnet["payment_code"],
+                    "paynym_alias": "+91xTx93x3",
+                    "name": green_testnet["name"],
+                    "network": "testnet",
+                    "jurisdiction": green_testnet["jurisdiction"],
+                    "hardware": green_testnet["hardware"],
+                    "nostr_x": "",
+                    "pairing_details": green_testnet["pairing_details"],
+                    "pairing_signature": green_testnet["signature"],
+                    "pairing_signature_scheme": green_testnet["pairing_signature_scheme"],
+                    "electrum_server": green_testnet["electrum_server"],
+                    "image_file": None,
+                    "qr_filename": Path(green_testnet["image"]).name,
+                    "submitted_at": "2026-08-09T00:00:00+02:00",
+                    "updated_at": "2026-08-14T16:27:20+02:00",
+                    "status": "approved",
+                })
+                with submissions_path.open("w") as destination:
+                    json.dump(submissions, destination, indent=2, ensure_ascii=False)
+
             cache_path = app_dir / "status_cache.json"
             if cache_path.exists():
                 with cache_path.open() as source:
