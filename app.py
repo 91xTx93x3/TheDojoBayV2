@@ -517,6 +517,19 @@ def dojo_edit(dojo_id):
         new_image = _save_dojo_image(request.files.get('image'), dojo.get('image_file'))
         was_approved = dojo.get('status') == 'approved'
         old_name     = dojo.get('name', '')
+        old_network  = dojo.get('network', 'mainnet')
+        old_qr_filename = dojo.get('qr_filename')
+        if was_approved and old_qr_filename:
+            try:
+                (QR_IMAGE_DIR / old_qr_filename).unlink(missing_ok=True)
+            except OSError as exc:
+                return render_template(
+                    'dojo_form.html',
+                    mode='edit',
+                    dojo=dojo,
+                    error=f'Could not remove the previous QR code: {exc}',
+                    form_data=request.form,
+                )
         dojo['name']           = name
         dojo['network']        = request.form.get('network', 'mainnet').strip()
         dojo['jurisdiction']   = request.form.get('jurisdiction', '').strip()
@@ -534,11 +547,13 @@ def dojo_edit(dojo_id):
         # If previously approved, revoke from live directory and require re-approval
         if was_approved:
             dojo['status'] = 'pending'
-            network  = dojo.get('network', 'mainnet')
+            dojo.pop('qr_filename', None)
             with open(DOJOS_DATA_FILE) as f:
                 dojos_data = json.load(f)
-            dojos_data[network] = [
-                d for d in dojos_data.get(network, []) if d.get('name') != old_name
+            dojos_data[old_network] = [
+                d for d in dojos_data.get(old_network, [])
+                if d.get('submission_id') != dojo_id
+                and d.get('name') != old_name
             ]
             with open(DOJOS_DATA_FILE, 'w') as f:
                 json.dump(dojos_data, f, indent=2, ensure_ascii=False)

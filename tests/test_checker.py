@@ -1,30 +1,8 @@
 import unittest
-import sys
-from types import ModuleType
 from unittest.mock import Mock, patch
 
-requests = ModuleType("requests")
-
-
-class RequestException(Exception):
-    pass
-
-
-class ConnectionError(RequestException):
-    pass
-
-
-class ConnectTimeout(RequestException):
-    pass
-
-
-requests.RequestException = RequestException
-requests.ConnectionError = ConnectionError
-requests.ConnectTimeout = ConnectTimeout
-requests.get = Mock()
-sys.modules.setdefault("requests", requests)
-
 from checker import DojoChecker
+import checker
 
 
 class DojoCheckerTests(unittest.TestCase):
@@ -37,7 +15,7 @@ class DojoCheckerTests(unittest.TestCase):
     @patch("checker.requests.get")
     def test_retries_a_transient_tor_failure(self, get):
         response = Mock(status_code=301, headers={"X-Dojo-Version": "1.29.2"})
-        get.side_effect = [requests.ConnectionError(), response]
+        get.side_effect = [checker.requests.ConnectionError(), response]
 
         result = self.checker.check_dojo({
             "name": "Transient",
@@ -51,7 +29,7 @@ class DojoCheckerTests(unittest.TestCase):
 
     @patch("checker.requests.get")
     def test_marks_node_inactive_after_two_failures(self, get):
-        get.side_effect = requests.ConnectTimeout()
+        get.side_effect = checker.requests.ConnectTimeout()
 
         result = self.checker.check_dojo({
             "name": "Offline",
