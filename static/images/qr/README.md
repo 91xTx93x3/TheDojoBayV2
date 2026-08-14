@@ -22,7 +22,6 @@ static/images/qr/
 ├── xTx_Tanto_E_Tanto-E--xTx-.png
 ├── Expatriotic_expatriotic.png
 ├── arthur_(Out_Of_Service)_E3029.png
-├── xTx_Green_xtx-Green-Dojobay-1.png
 ├── @Libertarian_libtest.png
 ├── wanderinKing072_image-1.png
 ├── xTx_Blue_xtx-Blue-Dojobay.png
