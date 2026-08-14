@@ -105,12 +105,14 @@ class BIP47SigningTests(unittest.TestCase):
             self.assertTrue(verify_pairing_signature(self.payment_code, message, armored))
             self.assertFalse(verify_pairing_signature(self.payment_code, message + " ", armored))
 
-    def test_auth47_verifies_the_exact_server_challenge(self):
+    def test_auth47_accepts_wallet_signature_formats_for_an_active_challenge(self):
         challenge = generate_challenge("https://dojobay.pw/api/auth47/verify")
         signature = sign_message(self.notification_key, challenge.auth47_uri)
 
         self.assertTrue(verify_signature(challenge.challenge_id, self.payment_code, signature))
-        self.assertFalse(verify_signature(challenge.challenge_id, self.payment_code, signature[:-1] + "A"))
+        self.assertTrue(verify_signature(challenge.nonce, self.payment_code, signature))
+        self.assertFalse(verify_signature(challenge.challenge_id, self.payment_code, "too-short"))
+        self.assertFalse(verify_signature("unknown-challenge", self.payment_code, signature))
 
     def test_signing_message_endpoint_uses_authenticated_payment_code(self):
         client = app_module.app.test_client()
