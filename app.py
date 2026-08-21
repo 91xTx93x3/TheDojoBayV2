@@ -256,6 +256,96 @@ def _save_dojos_data(dojos_data):
         json.dump(dojos_data, f, indent=2, ensure_ascii=False)
 
 
+def _generate_pairing_qr(pairing_obj, dojo_name, dojo_id):
+    """Generate and persist the QR for a canonical pairing payload."""
+    import qrcode as _qrcode
+
+    safe_name = ''.join(
+        c if c.isalnum() or c in '-_' else '_'
+        for c in dojo_name or 'dojo'
+    )
+    qr_filename = f"{safe_name}_{dojo_id[:8]}.png"
+    qr_path = QR_IMAGE_DIR / qr_filename
+    qr_path.parent.mkdir(parents=True, exist_ok=True)
+    qr = _qrcode.QRCode(
+        error_correction=_qrcode.constants.ERROR_CORRECT_M,
+        box_size=8,
+        border=4,
+    )
+    qr.add_data(json.dumps(pairing_obj, separators=(',', ':')))
+    qr.make(fit=True)
+    image = qr.make_image(fill_color='#000000', back_color='#ffffff')
+    image.save(qr_path)
+    return qr_filename
+
+
+def _repair_missing_qr_codes():
+    """Backfill QRs missing from approved owner submissions and live entries."""
+    submissions = _load_submissions()
+    dojos_data = _load_dojos_data()
+    changed_submissions = False
+    changed_directory = False
+    repaired = 0
+
+    for dojo in submissions:
+        if dojo.get('status') != 'approved':
+            continue
+        network = dojo.get('network', 'mainnet')
+        live_entry = next(
+            (
+                entry for entry in dojos_data.get(network, [])
+                if entry.get('submission_id') == dojo.get('id')
+            ),
+            None,
+        )
+        if live_entry is None:
+            same_name = [
+                entry for entry in dojos_data.get(network, [])
+                if entry.get('name') == dojo.get('name')
+            ]
+            live_entry = same_name[0] if len(same_name) == 1 else None
+        if live_entry is None:
+            continue
+
+        current_image = live_entry.get('image', '')
+        current_path = (
+            QR_IMAGE_DIR / Path(current_image).name
+            if current_image.startswith('/static/images/qr/')
+            else None
+        )
+        if current_path is not None and current_path.is_file():
+            continue
+
+        try:
+            pairing_obj = json.loads(dojo.get('pairing_details', '{}'))
+        except (json.JSONDecodeError, TypeError):
+            print(f"[QR REPAIR ERROR] Invalid pairing details for {dojo.get('name')}")
+            continue
+        if not pairing_obj:
+            print(f"[QR REPAIR ERROR] Empty pairing details for {dojo.get('name')}")
+            continue
+
+        qr_filename = _generate_pairing_qr(
+            pairing_obj,
+            dojo.get('name', ''),
+            dojo.get('id', ''),
+        )
+        live_entry['image'] = f'/static/images/qr/{qr_filename}'
+        if dojo.get('qr_filename') != qr_filename:
+            dojo['qr_filename'] = qr_filename
+            changed_submissions = True
+        changed_directory = True
+        repaired += 1
+
+    if changed_directory:
+        _save_dojos_data(dojos_data)
+    if changed_submissions:
+        _save_submissions(submissions)
+    if repaired:
+        print(f"[QR REPAIR] Regenerated {repaired} missing QR code(s)")
+    return repaired
+
+
 def _require_login():
     """Return paynym from session or None if not logged in."""
     return session.get('paynym')
@@ -282,7 +372,8 @@ def _delete_dojo_permanently(submissions, dojo):
         if dojo.get('status') != 'approved' or has_other_approved_owner:
             return False
         if dojo.get('qr_filename'):
-            return Path(entry.get('image', '')).name == dojo['qr_filename']
+            if Path(entry.get('image', '')).name == dojo['qr_filename']:
+                return True
         return entry.get('name') == name
 
     removed_live = [
@@ -750,27 +841,11 @@ def admin_approve(dojo_id):
     # ── 3. Generate QR image from pairing JSON ────────────────────────────────
     qr_filename = None
     if pairing_obj:
-        try:
-            import qrcode as _qrcode
-            safe_name = ''.join(c if c.isalnum() or c in '-_' else '_'
-                                for c in dojo.get('name', 'dojo'))
-            qr_filename = f"{safe_name}_{dojo_id[:8]}.png"
-            qr_path = QR_IMAGE_DIR / qr_filename
-            qr_path.parent.mkdir(parents=True, exist_ok=True)
-            qr_data = json.dumps(pairing_obj, separators=(',', ':'))
-            qr = _qrcode.QRCode(
-                error_correction=_qrcode.constants.ERROR_CORRECT_M,
-                box_size=6, border=2,
-            )
-            qr.add_data(qr_data)
-            qr.make(fit=True)
-            from PIL import Image as _PILImage
-            img = qr.make_image(fill_color='#000000', back_color='#ffffff')
-            pil_img = img.get_image().convert('RGB')
-            pil_img = pil_img.resize((400, 400), _PILImage.NEAREST)
-            pil_img.save(str(qr_path))
-        except Exception:
-            qr_filename = None
+        qr_filename = _generate_pairing_qr(
+            pairing_obj,
+            dojo.get('name', ''),
+            dojo_id,
+        )
 
     # ── 4. Build dojos_data.json entry ────────────────────────────────────────
     network  = dojo.get('network', 'mainnet')

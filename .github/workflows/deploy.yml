@@ -45,6 +45,32 @@ jobs:
             cd "$APP_DIR"
             source venv/bin/activate
             pip install -r requirements.txt --quiet
+            python - <<'PY'
+            from app import (
+                _load_dojos_data,
+                _repair_missing_qr_codes,
+                _save_dojos_data,
+                cache,
+            )
+
+            data = _load_dojos_data()
+            removed = 0
+            for network in ("mainnet", "testnet"):
+                entries = data[network]
+                data[network] = [
+                    entry for entry in entries
+                    if entry.get("name") != "RoninDojoES"
+                ]
+                removed += len(entries) - len(data[network])
+            if removed:
+                _save_dojos_data(data)
+                cache.invalidate()
+            repaired = _repair_missing_qr_codes()
+            print(
+                f"Removed {removed} orphaned RoninDojoES entry; "
+                f"repaired {repaired} missing QR code(s)"
+            )
+            PY
             sudo systemctl restart dojobay.service
             sudo systemctl restart dojobay-api.service
 

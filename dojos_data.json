@@ -207,27 +207,6 @@
       "pairing_details": "{\r\n    \"pairing\": {\r\n        \"type\": \"dojo.api\",\r\n        \"version\": \"1.29.2\",\r\n        \"apikey\": \"ff7fd7bc4c6db6279f013017a05b3a22\",\r\n        \"url\": \"http://e7le2zji4z5fxlxzyv2cbuuwl65o2gaie5s3vob6hfvkngupqcmixkad.onion/v2\"\r\n    },\r\n    \"explorer\": {\r\n        \"type\": \"explorer.null\",\r\n        \"url\": \"http://mempoolhqx4isw62xs7abwphsq7ldayuidyx2v2oethdhhj6mlo2r6ad.onion\"\r\n    }\r\n}"
     },
     {
-      "name": "RoninDojoES",
-      "paynym": "+91xTx93x3",
-      "paynym_url": "https://paynym.rs/+91xTx93x3",
-      "jurisdiction": "EU",
-      "hardware": "Tanto",
-      "image": "/static/images/qr/RoninDojoES_04f17977.png",
-      "pairing": {
-        "type": "dojo.api",
-        "version": "1.28.2",
-        "apikey": "hQ1LmAQIfOzgwqHm0qR89RDuqSHIcYRMtfXkbvC5aUdZjzd9viC7nBp2N4dhYySQ5qo4K",
-        "url": "http://xkjpwzcmk7nmn6vttii5uz4khsc45wh5pwypaxq25ofx3rkomuicazyd.onion/v2"
-      },
-      "explorer": {
-        "type": "explorer.btc_rpc_explorer",
-        "url": "http://jzym2wd4arlincp3bztdjz3mqh6uhh63sqeexgv6jy6xwtug4lmm3yqd.onion"
-      },
-      "electrum_server": "3xmxfolrxdyaqbfwohdxsntem4agugpbozb2u5re2vrwhpgkl6c5ufqd.onion",
-      "pairing_details": "{\n  \"pairing\": {\n    \"type\": \"dojo.api\",\n    \"version\": \"1.28.2\",\n    \"apikey\": \"hQ1LmAQIfOzgwqHm0qR89RDuqSHIcYRMtfXkbvC5aUdZjzd9viC7nBp2N4dhYySQ5qo4K\",\n    \"url\": \"http://xkjpwzcmk7nmn6vttii5uz4khsc45wh5pwypaxq25ofx3rkomuicazyd.onion/v2\"\n  },\n  \"explorer\": {\n    \"type\": \"explorer.btc_rpc_explorer\",\n    \"url\": \"http://jzym2wd4arlincp3bztdjz3mqh6uhh63sqeexgv6jy6xwtug4lmm3yqd.onion\"\n  }\n}",
-      "signature": "H44eTowDn76YT2yGN7SF8bXhvbCSMGwxP79dZfZz7sFJCZy8ak1e57Kzn672RaKDI+cryFTeE5e+J3guVUZL1c8="
-    },
-    {
       "name": "91xTx93x3 Yellow",
       "paynym": "+91xTx93x3",
       "paynym_url": "https://paynym.rs/+91xTx93x3",

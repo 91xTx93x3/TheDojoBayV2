@@ -136,6 +136,51 @@ class PermanentDeleteTests(unittest.TestCase):
                 [live_entry],
             )
 
+    def test_owner_delete_removes_legacy_live_entry_when_its_image_is_missing(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            submissions_path = root / "dojo_submissions.json"
+            dojos_path = root / "dojos_data.json"
+            image_dir = root / "dojos"
+            qr_dir = root / "qr"
+            image_dir.mkdir()
+            qr_dir.mkdir()
+
+            submissions_path.write_text(json.dumps([{
+                "id": "legacy-node-id",
+                "paynym": "owner",
+                "name": "Legacy Node",
+                "network": "mainnet",
+                "status": "approved",
+                "qr_filename": "legacy.png",
+            }]))
+            dojos_path.write_text(json.dumps({
+                "mainnet": [{
+                    "name": "Legacy Node",
+                    "pairing": {"url": "http://legacy.onion/v2"},
+                }],
+                "testnet": [],
+            }))
+
+            with (
+                patch.object(app_module, "DOJOS_DATA_FILE", dojos_path),
+                patch.object(app_module, "SUBMISSIONS_FILE", submissions_path),
+                patch.object(app_module, "DOJO_IMAGE_DIR", image_dir),
+                patch.object(app_module, "QR_IMAGE_DIR", qr_dir),
+                patch.object(app_module.data_loader, "data_file", dojos_path),
+                patch.object(app_module, "mainnet_dojos", []),
+                patch.object(app_module, "testnet_dojos", []),
+                patch.object(app_module, "cache", FakeCache(None)),
+            ):
+                client = app_module.app.test_client()
+                with client.session_transaction() as session:
+                    session["paynym"] = "owner"
+                response = client.post("/add-dojo/delete/legacy-node-id")
+
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(json.loads(submissions_path.read_text()), [])
+            self.assertEqual(json.loads(dojos_path.read_text())["mainnet"], [])
+
 
 if __name__ == "__main__":
     unittest.main()
